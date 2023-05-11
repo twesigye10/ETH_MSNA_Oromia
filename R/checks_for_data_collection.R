@@ -16,3 +16,9 @@ loc_tool <- "inputs/ETH2301_MSNA_Oromia_tool.xlsx"
 
 df_survey <- readxl::read_excel(loc_tool, sheet = "survey")
 df_choices <- readxl::read_excel(loc_tool, sheet = "choices")
+
+# checks ------------------------------------------------------------------
+
+checks_output <- list()
+
+
