@@ -56,3 +56,9 @@ df_c_survey_time <-  supporteR::check_survey_time(input_tool_data = df_tool_data
                                                   input_max_time = max_time_of_survey)
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_c_survey_time")
+
+# check duplicate uuids ---------------------------------------------------
+
+df_c_duplicate_uuid <-  supporteR::checks_duplicate_uuids(input_tool_data = df_tool_data)
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_c_duplicate_uuid")
