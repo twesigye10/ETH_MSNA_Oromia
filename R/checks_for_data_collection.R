@@ -80,3 +80,17 @@ df_others_data <- supporteR::extract_other_specify_data(input_tool_data = df_too
                                                         input_choices = df_choices)
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_others_data")
+
+
+# logical checks ----------------------------------------------------------
+
+
+
+
+# combined  checks --------------------------------------------------------
+
+df_combined_checks <- bind_rows(checks_output)
+
+# output the log
+write_csv(x = df_combined_checks, file = paste0("outputs/", butteR::date_file_prefix(), "_combined_checks_eth_msna_oromia.csv"), na = "")
+
