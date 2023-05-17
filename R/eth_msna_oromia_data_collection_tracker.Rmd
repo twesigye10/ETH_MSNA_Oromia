@@ -153,3 +153,19 @@ df_enum_performance |>
   summarise(number_of_interviews_done = n(), `average_survey_time(minutes)` = round(mean(int.survey_time_interval, na.rm = TRUE), 0)) |> 
   dt_options_fewcols()
 ```
+
+
+## Looking into the cleaning log
+
+### Number of issues by issue_id
+
+```{r, echo = FALSE}
+df_cl_log |> 
+  group_by(issue_id) |> 
+  summarise(number_of_issues_by_issue_id = n()) |>
+  # mutate(int.issue_id = str_extract(string = issue_id, pattern = "[0-9]{1,3}")) |> 
+  # left_join(df_logical_check_description, by = c("int.issue_id" = "check_number")) |> 
+  # mutate(issue = ifelse(str_detect(string = issue_id, pattern = "[0-9]{1,3}"), check_description, issue_id)) |> 
+  # select(-c(int.issue_id, check_description))  |> 
+  dt_options_fewcols()
+```
