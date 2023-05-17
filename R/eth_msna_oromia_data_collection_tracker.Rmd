@@ -220,7 +220,7 @@ labels_pts <- ~sprintf(
     lapply(htmltools::HTML)
 
 df_cl_log |> 
-    filter(type == "remove_survey", reviewed == 1, adjust_log != "delete_log") |> 
+    filter(type == "remove_survey", reviewed == 1, !adjust_log %in% c("delete_log")) |> 
     group_by(uuid, hh_kebele, latitude, longitude) |> 
     summarise(start_date = paste(start_date, collapse = " : "),
               enum_code = paste(enum_code, collapse = " : "),
