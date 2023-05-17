@@ -13,5 +13,26 @@ knit: (function(inputFile, encoding) { rmarkdown::render(inputFile, encoding = e
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+
+# read packages
+library(tidyverse)
+library(lubridate)
+library(glue)
+library(htmlwidgets)
+library(supporteR)
+
+# read data
+df_tool_data <- readxl::read_excel("../inputs/ETH2301_MSNA_Oromia_data.xlsx")  |>  
+  mutate(uuid = `_uuid`,
+         start_date = as_date(start),
+         start = as_datetime(start),
+         end = as_datetime(end))
+
+# days that contain data
+df_days_for_data_collection <- df_tool_data |> 
+  select(start_date) |> 
+  unique() |> 
+  arrange(start_date) |> 
+  pull()
 ```
 
