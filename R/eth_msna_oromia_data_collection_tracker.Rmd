@@ -40,7 +40,7 @@ df_data_support_cl_log <- df_tool_data |>
   select(uuid, hh_woreda, hh_kebele)
 
 df_cl_log <- read_csv(file = "../inputs/combined_checks_eth_msna_oromia.csv") |> 
-  left_join(df_data_support_cl_log, by = "uuid")
+  left_join(df_data_support_cl_log |> select(-hh_kebele), by = "uuid")
 
 # change_response logs that affect stats in the data collection progress
 cl_log_change_response <- df_cl_log |> 
@@ -78,14 +78,15 @@ df_enum_performance <- df_updated_tool_data |>
 # surveys for deletion
 df_cl_deletion <- df_cl_log |> 
   filter(type %in% "remove_survey", reviewed == 1, !adjust_log %in% "delete_log") |>
-  distinct(loc_kebele, uuid)
+  distinct(hh_kebele, uuid)
 
 df_cl_surveys_for_deletion <- df_cl_deletion |>
-  group_by(loc_kebele) |>
+  group_by(hh_kebele) |>
   summarise(surveys_for_deletion = n())
 
 # sample data
-df_samples_required <- readxl::read_excel("../support_files/samples oromia.xlsx")
+df_samples_required <- readxl::read_excel("../support_files/samples oromia.xlsx") |> 
+    select(kebele, required_samples = kebele_sample_size)
 
 
 # tool
@@ -93,7 +94,7 @@ loc_tool <- "../inputs/ETH2301_MSNA_Oromia_tool.xlsx"
 
 df_survey <- readxl::read_excel(loc_tool, sheet = "survey")
 df_choices <- readxl::read_excel(loc_tool, sheet = "choices") |> 
-  mutate(code = name, label = `label::english`)
+  mutate(code = name, label = `label::English`)
 
 # functions for changing some options in the table
 
@@ -112,3 +113,30 @@ dt_options_fewcols <- function(x){
 
 ```
 
+## Summary on the surveys done
+
+>Total surveys: **`r nrow(df_updated_tool_data)`**,\
+Surveys for deletion: **`r nrow(df_cl_deletion)`**,\
+Last date of data collection: **`r df_days_for_data_collection[length(df_days_for_data_collection)]`**.
+
+### Summary on the surveys per location
+
+```{r, echo = FALSE}
+
+df_samp_per_location <- df_samples_required
+
+df_updated_tool_data |> 
+  group_by(hh_kebele) |> 
+  summarise(number_of_surveys = n()) |> 
+  arrange(hh_kebele) |> 
+  full_join(df_samp_per_location, by = c("hh_kebele" = "kebele")) |>
+  mutate(required_samples = ifelse(is.na(required_samples), 0, required_samples)) |> 
+  left_join(df_cl_surveys_for_deletion, by = "hh_kebele") |> 
+  mutate(number_of_surveys = ifelse(is.na(number_of_surveys), 0, number_of_surveys),
+         surveys_for_deletion = ifelse(is.na(surveys_for_deletion), 0, surveys_for_deletion),
+         int.surveys_and_deletion = number_of_surveys - surveys_for_deletion,
+         remaining_surveys = required_samples - int.surveys_and_deletion ) |> 
+  select(-c(int.surveys_and_deletion)) |> 
+  dt_options_fewcols()
+
+```
