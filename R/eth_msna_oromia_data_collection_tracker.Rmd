@@ -40,7 +40,7 @@ df_days_for_data_collection <- df_tool_data |>
 
 # cleaning log handling
 df_data_support_cl_log <- df_tool_data |> 
-  select(uuid, hh_woreda, hh_kebele, latitude =, longitude = )
+  select(uuid, hh_woreda, hh_kebele, latitude, longitude)
 
 df_cl_log <- read_csv(file = "../inputs/combined_checks_eth_msna_oromia.csv") |> 
   left_join(df_data_support_cl_log |> select(-hh_kebele), by = "uuid")
