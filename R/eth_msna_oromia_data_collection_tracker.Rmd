@@ -140,3 +140,16 @@ df_updated_tool_data |>
   dt_options_fewcols()
 
 ```
+
+
+### Daily enumerator performance
+
+The average survey time for all the data is: **`r get_average_survey_time(df_updated_tool_data)`** Minutes
+
+```{r, echo = FALSE}
+
+df_enum_performance |> 
+  group_by(hh_woreda, hh_kebele, start_date, enum_code) |> 
+  summarise(number_of_interviews_done = n(), `average_survey_time(minutes)` = round(mean(int.survey_time_interval, na.rm = TRUE), 0)) |> 
+  dt_options_fewcols()
+```
