@@ -34,5 +34,81 @@ df_days_for_data_collection <- df_tool_data |>
   unique() |> 
   arrange(start_date) |> 
   pull()
+
+# cleaning log handling
+df_data_support_cl_log <- df_tool_data |> 
+  select(uuid, hh_woreda, hh_kebele)
+
+df_cl_log <- read_csv(file = "../inputs/combined_checks_eth_msna_oromia.csv") |> 
+  left_join(df_data_support_cl_log, by = "uuid")
+
+# change_response logs that affect stats in the data collection progress
+cl_log_change_response <- df_cl_log |> 
+  filter(type == "change_response", 
+         !is.na(value),
+         reviewed == 1, 
+         adjust_log != "delete_log", 
+  ) |> 
+  select(uuid, name, value)
+
+# updated tool data
+df_updated_tool_data <- df_tool_data
+
+# get uuids from cleaning log
+uuids_chg_response <- cl_log_change_response |> pull(uuid) |> unique()
+
+for (current_uuid in uuids_chg_response) {
+  current_uuid_data <- cl_log_change_response |> 
+    filter(uuid == current_uuid) |> 
+    mutate(value = ifelse(name == "enum_code", as.numeric(value), value)) |> 
+    pivot_wider(names_from = "name", values_from = "value", uuid)
+  print(current_uuid_data)
+  # process current updates
+  df_current_updated <- df_updated_tool_data |> 
+    rows_update(y = current_uuid_data, by = "uuid")
+  # update the parent dataset with current updates
+  df_updated_tool_data <- df_current_updated
+}
+
+# enumerator performance data
+df_enum_performance <- df_updated_tool_data |> 
+  mutate(int.survey_time_interval = lubridate::time_length(end - start, unit = "min"),
+         int.survey_time_interval = ceiling(int.survey_time_interval))
+
+# surveys for deletion
+df_cl_deletion <- df_cl_log |> 
+  filter(type %in% "remove_survey", reviewed == 1, !adjust_log %in% "delete_log") |>
+  distinct(loc_kebele, uuid)
+
+df_cl_surveys_for_deletion <- df_cl_deletion |>
+  group_by(loc_kebele) |>
+  summarise(surveys_for_deletion = n())
+
+# sample data
+df_samples_required <- readxl::read_excel("../support_files/samples oromia.xlsx")
+
+
+# tool
+loc_tool <- "../inputs/ETH2301_MSNA_Oromia_tool.xlsx"
+
+df_survey <- readxl::read_excel(loc_tool, sheet = "survey")
+df_choices <- readxl::read_excel(loc_tool, sheet = "choices") |> 
+  mutate(code = name, label = `label::english`)
+
+# functions for changing some options in the table
+
+dt_options_fewcols <- function(x){
+  DT::datatable(x,
+                rownames = FALSE,
+                options = list(
+                  pageLength = 20,
+                  initComplete = JS(
+                    "function(settings, json) {",
+                    "$(this.api().table().header()).css({'background-color': '#333', 'color': '#fff'});",
+                    "}")
+                )
+  )
+}
+
 ```
 
