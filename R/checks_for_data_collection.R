@@ -8,8 +8,8 @@ library(supporteR)
 df_tool_data <- readxl::read_excel("inputs/ETH2301_MSNA_Oromia_data.xlsx") |>  
     mutate(start = as_datetime(start),
            end = as_datetime(end)) |> 
-    checks_add_extra_cols(input_enumerator_id_col = "enumerator_id",
-                          input_location_col = "loc_zone")
+    checks_add_extra_cols(input_enumerator_id_col = "enum_code",
+                          input_location_col = "hh_kebele")
 
 # tool
 loc_tool <- "inputs/ETH2301_MSNA_Oromia_tool.xlsx"
