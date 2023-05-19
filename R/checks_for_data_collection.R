@@ -24,7 +24,7 @@ checks_output <- list()
 # testing data ------------------------------------------------------------
 
 df_testing_data <- df_tool_data |> 
-    filter(i.check.start_date < as_date("2023-05-17")) |> 
+    filter(i.check.start_date < as_date("2023-05-19")) |> 
     mutate(i.check.type = "remove_survey",
            i.check.name = "",
            i.check.current_value = "",
