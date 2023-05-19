@@ -8,7 +8,7 @@ library(supporteR)
 df_tool_data <- readxl::read_excel("inputs/ETH2301_MSNA_Oromia_data.xlsx") |>  
     mutate(start = as_datetime(start),
            end = as_datetime(end)) |> 
-    checks_add_extra_cols(input_enumerator_id_col = "enum_code",
+    checks_add_extra_cols(input_enumerator_id_col = "enumerator_id",
                           input_location_col = "hh_kebele")
 
 # tool
@@ -50,7 +50,7 @@ min_time_of_survey <- 15
 max_time_of_survey <- 120
 
 df_c_survey_time <-  supporteR::check_survey_time(input_tool_data = df_tool_data, 
-                                                  input_enumerator_id_col = "enum_code",
+                                                  input_enumerator_id_col = "enumerator_id",
                                                   input_location_col = "hh_kebele",
                                                   input_min_time = min_time_of_survey, 
                                                   input_max_time = max_time_of_survey)
@@ -66,7 +66,7 @@ add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_c
 # outliers ----------------------------------------------------------------
 
 df_c_outliers <- supporteR::check_outliers_cleaninginspector(input_tool_data = df_tool_data,
-                                                             input_enumerator_id_col = "enum_code",
+                                                             input_enumerator_id_col = "enumerator_id",
                                                              input_location_col = "hh_kebele")
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_c_outliers")
@@ -74,7 +74,7 @@ add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_c
 # other_specify -----------------------------------------------------------
 
 df_others_data <- supporteR::extract_other_specify_data(input_tool_data = df_tool_data, 
-                                                        input_enumerator_id_col = "enum_code",
+                                                        input_enumerator_id_col = "enumerator_id",
                                                         input_location_col = "hh_kebele",
                                                         input_survey = df_survey,  
                                                         input_choices = df_choices)

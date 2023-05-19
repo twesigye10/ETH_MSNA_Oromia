@@ -63,7 +63,7 @@ uuids_chg_response <- cl_log_change_response |> pull(uuid) |> unique()
 for (current_uuid in uuids_chg_response) {
   current_uuid_data <- cl_log_change_response |> 
     filter(uuid == current_uuid) |> 
-    mutate(value = ifelse(name == "enum_code", as.numeric(value), value)) |> 
+    mutate(value = ifelse(name == "enumerator_id", as.numeric(value), value)) |> 
     pivot_wider(names_from = "name", values_from = "value", uuid)
   print(current_uuid_data)
   # process current updates
@@ -152,7 +152,7 @@ The average survey time for all the data is: **`r get_average_survey_time(df_upd
 ```{r, echo = FALSE}
 
 df_enum_performance |> 
-  group_by(hh_woreda, hh_kebele, start_date, enum_code) |> 
+  group_by(hh_woreda, hh_kebele, start_date, enumerator_id) |> 
   summarise(number_of_interviews_done = n(), `average_survey_time(minutes)` = round(mean(int.survey_time_interval, na.rm = TRUE), 0)) |> 
   dt_options_fewcols()
 ```
@@ -178,7 +178,7 @@ df_cl_log |>
 
 ```{r, echo = FALSE}
 df_cl_log |> 
-  group_by(enum_code) |> 
+  group_by(enumerator_id) |> 
   summarise(number_of_issues_by_enumerator_id = n()) |>
   dt_options_fewcols()
 ```
@@ -187,7 +187,7 @@ df_cl_log |>
 
 ```{r, echo = FALSE}
 df_cl_log |> 
-  group_by(enum_code, issue_id) |> 
+  group_by(enumerator_id, issue_id) |> 
   summarise(number_of_issues_by_enumerator_and_issue_id = n()) |>
   # mutate(int.issue_id = str_extract(string = issue_id, pattern = "[0-9]{1,3}")) |> 
   # left_join(df_logical_check_description, by = c("int.issue_id" = "check_number")) |> 
@@ -201,7 +201,7 @@ df_cl_log |>
 ```{r, echo = FALSE}
 df_cl_log |> 
   filter(type %in% c("remove_survey"), reviewed == 1, !adjust_log %in% c("delete_log")) |> 
-  group_by(enum_code) |> 
+  group_by(enumerator_id) |> 
   summarise(number_of_surveys_for_deletion_by_enumerator = n()) |>
   dt_options_fewcols()
 ```
@@ -215,7 +215,7 @@ labels_pts <- ~sprintf(
     "<strong>Issue ID :  <strong>%s</strong><br/>
       Issue :  <strong>%s</strong><br/>
       Enumerator ID :  <strong>%s</strong>",
-    issue_id, issue, enum_code
+    issue_id, issue, enumerator_id
 ) |> 
     lapply(htmltools::HTML)
 
@@ -223,7 +223,7 @@ df_cl_log |>
     filter(type == "remove_survey", reviewed == 1, !adjust_log %in% c("delete_log")) |> 
     group_by(uuid, hh_kebele, latitude, longitude) |> 
     summarise(start_date = paste(start_date, collapse = " : "),
-              enum_code = paste(enum_code, collapse = " : "),
+              enumerator_id = paste(enumerator_id, collapse = " : "),
               type = paste(type, collapse = " : "),
               name = paste(name, collapse = " : "),
               current_value = paste(current_value, collapse = " : "),
