@@ -46,7 +46,7 @@ add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_t
 # Time checks -------------------------------------------------------------
 
 # Time interval for the survey
-min_time_of_survey <- 15
+min_time_of_survey <- 30
 max_time_of_survey <- 120
 
 df_c_survey_time <-  supporteR::check_survey_time(input_tool_data = df_tool_data, 
