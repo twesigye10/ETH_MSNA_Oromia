@@ -60,8 +60,7 @@ df_testing_data <- df_tool_data |>
            i.check.reviewed = "1",
            i.check.adjust_log = "",
            i.check.so_sm_choices = "") |> 
-    dplyr::select(starts_with("i.check.")) |> 
-    rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_testing_data")
 
@@ -161,8 +160,7 @@ df_count_hh_number_less_1 <- df_raw_data_loop_educ |>
            i.check.sheet = ifelse(rank == 2, NA_character_, i.check.sheet),
            i.check.index = ifelse(rank == 2, NA_character_, i.check.index)
     ) |>
-    dplyr::select(starts_with("i.check.")) |>
-    rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_count_hh_number_less_1")
 
@@ -189,8 +187,7 @@ df_count_hh_number_less_2 <- df_raw_data_loop_health |>
            i.check.so_sm_choices = "",
            i.check.sheet = "",
            i.check.index = "") |>
-    dplyr::select(starts_with("i.check.")) |>
-    rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_count_hh_number_less_2")
 
@@ -233,8 +230,7 @@ df_fd_consumption_score_same <- df_tool_data |>
                                              rank == 8 ~ as.character(fs_fcs_sugar), 
                                              TRUE ~ as.character(fs_fcs_fat))
     ) |> 
-    dplyr::select(starts_with("i.check.")) |> 
-    rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_fd_consumption_score_same")
 
