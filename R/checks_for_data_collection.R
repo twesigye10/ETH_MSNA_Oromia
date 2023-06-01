@@ -5,11 +5,29 @@ library(supporteR)
 
 # read data and tool ----------------------------------------------------------
 # data
-df_tool_data <- readxl::read_excel("inputs/ETH2301_MSNA_Oromia_data.xlsx") |>  
+data_path <- "inputs/ETH2301_MSNA_Oromia_data.xlsx"
+    
+df_tool_data <- readxl::read_excel(data_path) |>  
     mutate(start = as_datetime(start),
            end = as_datetime(end)) |> 
     checks_add_extra_cols(input_enumerator_id_col = "enumerator_id",
                           input_location_col = "hh_kebele")
+
+# loops
+# loop_educ
+loop_educ <- readxl::read_excel(path = data_path, sheet = "grp_education_loop")
+
+df_raw_data_loop_educ <- df_tool_data |> 
+    select(-`_index`) |> 
+    inner_join(loop_educ, by = c("_uuid" = "_submission__uuid") )
+
+# health_loop
+loop_health <- readxl::read_excel(path = data_path, sheet = "grp_health_loop")
+
+df_raw_data_loop_health <- df_tool_data |> 
+    select(-`_index`) |> 
+    inner_join(loop_health, by = c("_uuid" = "_submission__uuid") )
+
 
 # tool
 loc_tool <- "inputs/ETH2301_MSNA_Oromia_tool.xlsx"
