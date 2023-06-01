@@ -108,7 +108,26 @@ df_999_data <- purrr::map_dfr(.x = cols_with_integer_values,
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_999_data")
 
-##
+# logic_c_sell_livestock_but_not_owning_any_livestock
+df_logic_c_sell_livestock_but_not_owning_any_livestock <- df_tool_data |> 
+    filter(livh_stress_lcsi_4 %in%  c("yes"),
+           !str_detect(string = hh_own_livestock, pattern = "no")) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "livh_stress_lcsi_4",
+           i.check.current_value = livh_stress_lcsi_4,
+           i.check.value = "",
+           i.check.issue_id = "logic_c_sell_livestock_but_not_owning_any_livestock",
+           i.check.issue = glue("livh_stress_lcsi_4: {livh_stress_lcsi_4} but hh_own_livestock: {hh_own_livestock}"),
+           i.check.other_text = "",
+           i.check.checked_by = "",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "")  |> 
+    batch_select_rename()
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "logic_c_sell_livestock_but_not_owning_any_livestock")
 
 # combined  checks --------------------------------------------------------
 
