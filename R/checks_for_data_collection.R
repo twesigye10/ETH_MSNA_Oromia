@@ -111,7 +111,7 @@ add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_9
 # logic_c_sell_livestock_but_not_owning_any_livestock
 df_logic_c_sell_livestock_but_not_owning_any_livestock <- df_tool_data |> 
     filter(livh_stress_lcsi_4 %in%  c("yes"),
-           !str_detect(string = hh_own_livestock, pattern = "no")) |> 
+           hh_own_livestock %in% c( "no")) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "livh_stress_lcsi_4",
            i.check.current_value = livh_stress_lcsi_4,
@@ -128,6 +128,49 @@ df_logic_c_sell_livestock_but_not_owning_any_livestock <- df_tool_data |>
     batch_select_rename()
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "logic_c_sell_livestock_but_not_owning_any_livestock")
+
+# logic_c_sell_female_animal_but_not_owning_any_livestock
+logic_c_sell_female_animal_but_not_owning_any_livestock <- df_tool_data |> 
+    filter(livh_emerg_lcsi_2 %in%  c("yes"),
+           hh_own_livestock %in% c( "no")) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "livh_emerg_lcsi_2",
+           i.check.current_value = livh_emerg_lcsi_2,
+           i.check.value = "",
+           i.check.issue_id = "logic_c_sell_female_animal_but_not_owning_any_livestock",
+           i.check.issue = glue("livh_emerg_lcsi_2: {livh_emerg_lcsi_2} but hh_own_livestock: {hh_own_livestock}"),
+           i.check.other_text = "",
+           i.check.checked_by = "",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "")  |> 
+    batch_select_rename()
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "logic_c_sell_female_animal_but_not_owning_any_livestock")
+
+# logic_c_children_withdrawn_from_school_but_not_report_dropout
+logic_c_children_withdrawn_from_school_but_not_report_dropout <- df_tool_data |> 
+    filter(livh_crisis_lcsi_3 %in%  c("yes"),
+           edu_dropout_due_drought %in% c( "no")) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "livh_crisis_lcsi_3",
+           i.check.current_value = livh_crisis_lcsi_3,
+           i.check.value = "",
+           i.check.issue_id = "logic_c_children_withdrawn_from_school_but_not_report_dropout",
+           i.check.issue = glue("livh_crisis_lcsi_3: {livh_crisis_lcsi_3} but edu_dropout_due_drought: {edu_dropout_due_drought}"),
+           i.check.other_text = "",
+           i.check.checked_by = "",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "")  |> 
+    batch_select_rename()
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "logic_c_children_withdrawn_from_school_but_not_report_dropout")
+
 
 # combined  checks --------------------------------------------------------
 
