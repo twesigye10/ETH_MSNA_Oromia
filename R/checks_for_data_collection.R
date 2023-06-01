@@ -127,10 +127,10 @@ df_logic_c_sell_livestock_but_not_owning_any_livestock <- df_tool_data |>
            i.check.so_sm_choices = "")  |> 
     batch_select_rename()
 
-add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "logic_c_sell_livestock_but_not_owning_any_livestock")
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_sell_livestock_but_not_owning_any_livestock")
 
 # logic_c_sell_female_animal_but_not_owning_any_livestock
-logic_c_sell_female_animal_but_not_owning_any_livestock <- df_tool_data |> 
+df_logic_c_sell_female_animal_but_not_owning_any_livestock <- df_tool_data |> 
     filter(livh_emerg_lcsi_2 %in%  c("yes"),
            hh_own_livestock %in% c( "no")) |> 
     mutate(i.check.type = "change_response",
@@ -148,10 +148,10 @@ logic_c_sell_female_animal_but_not_owning_any_livestock <- df_tool_data |>
            i.check.so_sm_choices = "")  |> 
     batch_select_rename()
 
-add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "logic_c_sell_female_animal_but_not_owning_any_livestock")
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_sell_female_animal_but_not_owning_any_livestock")
 
 # logic_c_children_withdrawn_from_school_but_not_report_dropout
-logic_c_children_withdrawn_from_school_but_not_report_dropout <- df_tool_data |> 
+df_logic_c_children_withdrawn_from_school_but_not_report_dropout <- df_tool_data |> 
     filter(livh_crisis_lcsi_3 %in%  c("yes"),
            edu_dropout_due_drought %in% c( "no")) |> 
     mutate(i.check.type = "change_response",
@@ -169,12 +169,139 @@ logic_c_children_withdrawn_from_school_but_not_report_dropout <- df_tool_data |>
            i.check.so_sm_choices = "")  |> 
     batch_select_rename()
 
-add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "logic_c_children_withdrawn_from_school_but_not_report_dropout")
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_children_withdrawn_from_school_but_not_report_dropout")
 
+# logic_c_hh_report_debt_repayment_but_doesnot_have_debt
+df_logic_c_hh_report_debt_repayment_but_doesnot_have_debt <- df_tool_data |> 
+    filter(hh_debt %in% c("no"), repaying_debts > 0) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "hh_debt",
+           i.check.current_value = hh_debt,
+           i.check.value = "no",
+           i.check.issue_id = "logic_c_hh_report_debt_repayment_but_doesnot_have_debt",
+           i.check.issue = glue("hh_debt: {hh_debt}, but repaying_debts: {repaying_debts}"),
+           i.check.other_text = "",
+           i.check.checked_by = "",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "")  |> 
+    batch_select_rename()
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_hh_report_debt_repayment_but_doesnot_have_debt")
+
+# logic_c_hh_report_debt_repayment_but_doesnot_have_debt_2
+df_logic_c_hh_report_debt_repayment_but_doesnot_have_debt_2 <- df_tool_data |> 
+    filter(hh_debt %in% c("no"), debt_repayement > 0) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "hh_debt",
+           i.check.current_value = hh_debt,
+           i.check.value = "no",
+           i.check.issue_id = "logic_c_hh_report_debt_repayment_but_doesnot_have_debt_2",
+           i.check.issue = glue("hh_debt: {hh_debt}, but debt_repayement: {debt_repayement}"),
+           i.check.other_text = "",
+           i.check.checked_by = "",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "")  |> 
+    batch_select_rename()
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_hh_report_debt_repayment_but_doesnot_have_debt_2")
+
+# logic_c_experienced_security_restrictions_but_boys_safety_concerns_none
+df_logic_c_experienced_security_restrictions_but_boys_safety_concerns_none <- df_tool_data |> 
+    filter(prot_saftey %in%  c("yes"),
+           !str_detect(string = boys_security_concerns, pattern = "none")) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "prot_saftey",
+           i.check.current_value = prot_saftey,
+           i.check.value = "",
+           i.check.issue_id = "logic_c_experienced_security_restrictions_but_boys_safety_concerns_none",
+           i.check.issue = glue("prot_saftey: {prot_saftey} but boys_security_concerns: {boys_security_concerns}"),
+           i.check.other_text = "",
+           i.check.checked_by = "",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "")  |> 
+    batch_select_rename()
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_experienced_security_restrictions_but_boys_safety_concerns_none")
+
+# logic_c_experienced_security_restrictions_but_girls_safety_concerns_none
+df_logic_c_experienced_security_restrictions_but_girls_safety_concerns_none <- df_tool_data |> 
+    filter(prot_saftey %in%  c("yes"),
+           !str_detect(string = girls_security_concerns, pattern = "none")) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "prot_saftey",
+           i.check.current_value = prot_saftey,
+           i.check.value = "",
+           i.check.issue_id = "logic_c_experienced_security_restrictions_but_girls_security_concerns_none",
+           i.check.issue = glue("prot_saftey: {prot_saftey} but girls_security_concerns: {girls_security_concerns}"),
+           i.check.other_text = "",
+           i.check.checked_by = "",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "")  |> 
+    batch_select_rename()
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_experienced_security_restrictions_but_girls_safety_concerns_none")
+
+# logic_c_experienced_security_restrictions_but_women_security_concerns_none
+df_logic_c_experienced_security_restrictions_but_women_security_concerns_none <- df_tool_data |> 
+    filter(prot_saftey %in%  c("yes"),
+           !str_detect(string = women_security_concerns, pattern = "none")) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "prot_saftey",
+           i.check.current_value = prot_saftey,
+           i.check.value = "",
+           i.check.issue_id = "logic_c_experienced_security_restrictions_but_women_security_concerns_none",
+           i.check.issue = glue("prot_saftey: {prot_saftey} but women_security_concerns: {women_security_concerns}"),
+           i.check.other_text = "",
+           i.check.checked_by = "",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "")  |> 
+    batch_select_rename()
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_experienced_security_restrictions_but_women_security_concerns_none")
+
+# logic_c_experienced_security_restrictions_but_men_security_concerns_none
+df_logic_c_experienced_security_restrictions_but_men_security_concerns_none <- df_tool_data |> 
+    filter(prot_saftey %in%  c("yes"),
+           !str_detect(string = men_security_concerns, pattern = "none")) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "prot_saftey",
+           i.check.current_value = prot_saftey,
+           i.check.value = "",
+           i.check.issue_id = "logic_c_experienced_security_restrictions_but_men_security_concerns_none",
+           i.check.issue = glue("prot_saftey: {prot_saftey} but men_security_concerns: {men_security_concerns}"),
+           i.check.other_text = "",
+           i.check.checked_by = "",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "")  |> 
+    batch_select_rename()
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_experienced_security_restrictions_but_men_security_concerns_none")
 
 # combined  checks --------------------------------------------------------
 
-df_combined_checks <- bind_rows(checks_output)
+df_combined_checks <- bind_rows(checks_output) |> 
+    mutate(int.issue_id = str_extract(string = issue_id, pattern = "[0-9]{1,3}")) |> 
+    left_join(df_logical_check_description, by = c("int.issue_id" = "check_number")) |> 
+    mutate(issue = ifelse(str_detect(string = issue_id, pattern = "[0-9]{1,3}"), paste("[", issue, "].", check_description), issue)) |> 
+    select(-c(int.issue_id, check_description))
 
 # output the log
 write_csv(x = df_combined_checks, file = paste0("outputs/", butteR::date_file_prefix(), "_combined_checks_eth_msna_oromia.csv"), na = "")
