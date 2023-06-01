@@ -193,6 +193,49 @@ df_count_hh_number_less_2 <- df_raw_data_loop_health |>
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_count_hh_number_less_2")
 
+df_fd_consumption_score_same <- df_tool_data |>  
+    filter(if_all(c(fs_fcs_cerealgrainroottuber, fs_fcs_beansnuts, fs_fcs_vegetableleave, fs_fcs_fruit, fs_fcs_condiment, 
+                    fs_fcs_meatfishegg, fs_fcs_dairy, fs_fcs_sugar, fs_fcs_fat), ~ fs_fcs_cerealgrainroottuber == .x))  |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "fs_fcs_cerealgrainroottuber",
+           i.check.current_value = as.character(fs_fcs_cerealgrainroottuber),
+           i.check.value = "NA",
+           i.check.issue_id = "logic_c_fd_consumption_score_same",
+           i.check.issue = glue("fs_fcs_cerealgrainroottuber :{fs_fcs_cerealgrainroottuber}, fs_fcs_beansnuts :{fs_fcs_beansnuts}, fs_fcs_vegetableleave :{fs_fcs_vegetableleave}, fs_fcs_fruit :{fs_fcs_fruit}, fs_fcs_condiment :{fs_fcs_condiment}, fs_fcs_meatfishegg :{fs_fcs_meatfishegg}, fs_fcs_dairy :{fs_fcs_dairy}, fs_fcs_sugar :{fs_fcs_sugar}, fs_fcs_fat :{fs_fcs_fat}"),
+           i.check.other_text = "",
+           i.check.checked_by = "",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    slice(rep(1:n(), each = 9)) |>  
+    group_by(i.check.uuid, i.check.start_date, i.check.enumerator_id, i.check.type,  i.check.name,  i.check.current_value) |>  
+    mutate(rank = row_number(),
+           i.check.name = case_when(rank == 1 ~ "fs_fcs_cerealgrainroottuber", 
+                                    rank == 2 ~ "fs_fcs_beansnuts",
+                                    rank == 3 ~ "fs_fcs_vegetableleave", 
+                                    rank == 4 ~ "fs_fcs_fruit", 
+                                    rank == 5 ~ "fs_fcs_condiment", 
+                                    rank == 6 ~ "fs_fcs_meatfishegg", 
+                                    rank == 7 ~ "fs_fcs_dairy", 
+                                    rank == 8 ~ "fs_fcs_sugar", 
+                                    TRUE ~ "fs_fcs_fat"),
+           i.check.current_value = case_when(rank == 1 ~ as.character(fs_fcs_cerealgrainroottuber),
+                                             rank == 2 ~ as.character(fs_fcs_beansnuts),
+                                             rank == 3 ~ as.character(fs_fcs_vegetableleave), 
+                                             rank == 4 ~ as.character(fs_fcs_fruit), 
+                                             rank == 5 ~ as.character(fs_fcs_condiment), 
+                                             rank == 6 ~ as.character(fs_fcs_meatfishegg), 
+                                             rank == 7 ~ as.character(fs_fcs_dairy), 
+                                             rank == 8 ~ as.character(fs_fcs_sugar), 
+                                             TRUE ~ as.character(fs_fcs_fat))
+    ) |> 
+    dplyr::select(starts_with("i.check.")) |> 
+    rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_fd_consumption_score_same")
+
 
 
 # combined  checks --------------------------------------------------------
