@@ -35,7 +35,20 @@ df_raw_data <- readxl::read_excel(path = loc_data, col_types = c_types) |>
   mutate(across(.cols = -c(any_of(cols_to_escape)), 
                 .fns = ~ifelse(str_detect(string = ., 
                                           pattern = fixed(pattern = "N/A", ignore_case = TRUE)), "NA", .)))
+# loops
+loop_educ <- readxl::read_excel(path = loc_data, sheet = "grp_education_loop") 
+    
+df_raw_data_loop_educ <- df_raw_data |> 
+    select(-`_index`) |> 
+    inner_join(loop_educ, by = c("_uuid" = "_submission__uuid") )
 
+loop_health <- readxl::read_excel(path = loc_data, sheet = "grp_education_loop") 
+    
+df_raw_data_loop_health <- df_raw_data |> 
+    select(-`_index`) |> 
+    inner_join(loop_health, by = c("_uuid" = "_submission__uuid") )
+
+    
 # tool
 loc_tool <- "inputs/ETH2301_MSNA_Oromia_tool.xlsx"
 
