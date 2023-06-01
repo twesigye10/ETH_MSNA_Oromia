@@ -17,8 +17,8 @@ df_cleaning_log <- read_csv("inputs/combined_checks_eth_msna_oromia.csv", col_ty
   ) |> 
   filter(!is.na(value), !is.na(uuid)) |>
   mutate(value = ifelse(value %in% c("blank"), NA, value),
-         sheet = NA,
-         index = NA,
+         # sheet = NA,
+         # index = NA,
          relevant = NA) |>
   select(uuid, type, name, value, issue_id, sheet, index, relevant, issue)
 
