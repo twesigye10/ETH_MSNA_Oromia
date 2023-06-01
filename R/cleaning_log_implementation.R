@@ -71,10 +71,24 @@ df_cleaned_data <- df_cleaning_step |>
   mutate(across(.cols = -c(any_of(cols_to_escape), matches("_age$|^age_|uuid")),
                 .fns = ~ifelse(str_detect(string = ., pattern = "^[9]{3,9}$"), "NA", .)))
 
-# Add composite indicators at this stage ----------------------------------
 
-df_main_with_composites <- create_composite_indicators(input_df = df_cleaned_data) |> 
-  select(-starts_with("int."))
+# clean repeats -----------------------------------------------------------
+
+# educ
+df_cleaning_log_educ <- df_cleaning_log |> 
+    filter(uuid %in% df_raw_data_loop_educ$`_uuid`, name %in% colnames(df_raw_data_loop_educ))
+
+df_cleaned_data_log_educ <- implement_cleaning_support(input_df_raw_data = df_raw_data_loop_educ,
+                                                        input_df_survey = df_survey,
+                                                        input_df_choices = df_choices,
+                                                        input_df_cleaning_log = df_cleaning_log_educ) |> 
+    select(any_of(colnames(loop_educ)), `_index` = index, `_submission__uuid` = uuid) |> 
+    filter(`_submission__uuid` %in% df_cleaned_data$uuid)
+
+# health
+df_cleaned_data_log_health <- df_raw_data_loop_health |> 
+    select(any_of(colnames(loop_health)), `_index`, `_submission__uuid`) |> 
+    filter(`_submission__uuid` %in% df_cleaned_data$uuid)
 
 # # deletion log ------------------------------------------------------------
 # 
@@ -86,13 +100,17 @@ df_main_with_composites <- create_composite_indicators(input_df = df_cleaned_dat
 
 # write final datasets out -----------------------------------------------
 
-list_of_raw_datasets <- list("Raw_main" = df_raw_data |> select(-starts_with("int.")))
+list_of_raw_datasets <- list("raw_main" = df_raw_data |> select(-starts_with("int.")),
+                             "raw_education_loop" = df_raw_data_loop_educ,
+                             "raw_health_loop" = df_raw_data_loop_health)
 
 openxlsx::write.xlsx(x = list_of_raw_datasets,
                      file = paste0("outputs/", butteR::date_file_prefix(), 
                                    "_raw_data_eth_msna_oromia.xlsx"))
 
-list_of_clean_datasets <- list("cleaned_data" = df_main_with_composites
+list_of_clean_datasets <- list("cleaned_main_data" = df_main_with_composites,
+                               "cleaned_education_loop" = df_cleaned_data_log_educ,
+                               "cleaned_health_loop" = df_cleaned_data_log_health
 )
 
 openxlsx::write.xlsx(x = list_of_clean_datasets,
