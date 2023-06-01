@@ -11,7 +11,12 @@ df_tool_data <- readxl::read_excel(data_path) |>
     mutate(start = as_datetime(start),
            end = as_datetime(end)) |> 
     checks_add_extra_cols(input_enumerator_id_col = "enumerator_id",
-                          input_location_col = "hh_kebele")
+                          input_location_col = "hh_kebele") |> 
+    rowwise() |> 
+    mutate( 
+        int.hh_number = sum(c_across(num_males_0to6:num_females_66plusyrs))
+    ) |>
+    ungroup()
 
 # loops
 # loop_educ
@@ -27,7 +32,6 @@ loop_health <- readxl::read_excel(path = data_path, sheet = "grp_health_loop")
 df_raw_data_loop_health <- df_tool_data |> 
     select(-`_index`) |> 
     inner_join(loop_health, by = c("_uuid" = "_submission__uuid") )
-
 
 # tool
 loc_tool <- "inputs/ETH2301_MSNA_Oromia_tool.xlsx"
@@ -125,6 +129,34 @@ df_999_data <- purrr::map_dfr(.x = cols_with_integer_values,
     rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_999_data")
+
+# more loop data than main dataset
+df_count_hh_number_less_1 <- df_raw_data_loop_educ |>
+    group_by(`_uuid`) |>
+    mutate(int.loop_count = n()) |>
+    filter(row_number() == 1) |>
+    filter(int.loop_count > int.hh_number) |>
+    ungroup() |>
+    mutate(i.check.type = "change_response",
+           i.check.name = "int.hh_number",
+           int.loop_count_difference = int.loop_count - int.hh_number,
+           i.check.current_value = as.character(int.hh_number),
+           i.check.value = as.character(int.hh_number + int.loop_count_difference),
+           i.check.issue_id = "logic_c_count_hh_number_less_1",
+           i.check.issue = glue("int.loop_count : {int.loop_count}, hh_count not equal to roster composition"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "",
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "",
+           i.check.sheet = "",
+           i.check.index = "") |>
+    dplyr::select(starts_with("i.check.")) |>
+    rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_count_hh_number_less_1")
 
 
 
