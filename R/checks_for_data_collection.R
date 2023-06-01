@@ -166,6 +166,7 @@ df_count_hh_number_less_1 <- df_raw_data_loop_educ |>
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_count_hh_number_less_1")
 
+# health loop count greater than given hh_number 
 df_count_hh_number_less_2 <- df_raw_data_loop_health |>
     group_by(`_uuid`) |>
     mutate(int.loop_count = n()) |>
@@ -193,6 +194,7 @@ df_count_hh_number_less_2 <- df_raw_data_loop_health |>
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_count_hh_number_less_2")
 
+# same value of fcs components
 df_fd_consumption_score_same <- df_tool_data |>  
     filter(if_all(c(fs_fcs_cerealgrainroottuber, fs_fcs_beansnuts, fs_fcs_vegetableleave, fs_fcs_fruit, fs_fcs_condiment, 
                     fs_fcs_meatfishegg, fs_fcs_dairy, fs_fcs_sugar, fs_fcs_fat), ~ fs_fcs_cerealgrainroottuber == .x))  |> 
