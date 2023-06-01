@@ -89,7 +89,7 @@ cols_with_integer_values <- df_survey |> filter(type %in% c("integer")) |> pull(
 
 df_999_data <- purrr::map_dfr(.x = cols_with_integer_values, 
                               .f = ~ {df_tool_data |> 
-                                      dplyr::filter(str_detect(string = !!sym(.x), pattern = "^-[9]{2,4}$")) |> 
+                                      dplyr::filter(str_detect(string = !!sym(.x), pattern = "^-[9]{2,4}$|^[9]{2,4}$")) |> 
                                       dplyr::mutate(i.check.type = "change_response",
                                                     i.check.name = .x,
                                                     i.check.current_value = as.character(!!sym(.x)),
