@@ -177,7 +177,7 @@ df_logic_c_hh_report_debt_repayment_but_doesnot_have_debt <- df_tool_data |>
     mutate(i.check.type = "change_response",
            i.check.name = "hh_debt",
            i.check.current_value = hh_debt,
-           i.check.value = "no",
+           i.check.value = "",
            i.check.issue_id = "logic_c_hh_report_debt_repayment_but_doesnot_have_debt",
            i.check.issue = glue("hh_debt: {hh_debt}, but repaying_debts: {repaying_debts}"),
            i.check.other_text = "",
@@ -197,7 +197,7 @@ df_logic_c_hh_report_debt_repayment_but_doesnot_have_debt_2 <- df_tool_data |>
     mutate(i.check.type = "change_response",
            i.check.name = "hh_debt",
            i.check.current_value = hh_debt,
-           i.check.value = "no",
+           i.check.value = "",
            i.check.issue_id = "logic_c_hh_report_debt_repayment_but_doesnot_have_debt_2",
            i.check.issue = glue("hh_debt: {hh_debt}, but debt_repayement: {debt_repayement}"),
            i.check.other_text = "",
@@ -214,7 +214,7 @@ add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_l
 # logic_c_experienced_security_restrictions_but_boys_safety_concerns_none
 df_logic_c_experienced_security_restrictions_but_boys_safety_concerns_none <- df_tool_data |> 
     filter(prot_saftey %in%  c("yes"),
-           !str_detect(string = boys_security_concerns, pattern = "none")) |> 
+           str_detect(string = boys_security_concerns, pattern = "none")) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "prot_saftey",
            i.check.current_value = prot_saftey,
@@ -235,7 +235,7 @@ add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_l
 # logic_c_experienced_security_restrictions_but_girls_safety_concerns_none
 df_logic_c_experienced_security_restrictions_but_girls_safety_concerns_none <- df_tool_data |> 
     filter(prot_saftey %in%  c("yes"),
-           !str_detect(string = girls_security_concerns, pattern = "none")) |> 
+           str_detect(string = girls_security_concerns, pattern = "none")) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "prot_saftey",
            i.check.current_value = prot_saftey,
@@ -256,7 +256,7 @@ add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_l
 # logic_c_experienced_security_restrictions_but_women_security_concerns_none
 df_logic_c_experienced_security_restrictions_but_women_security_concerns_none <- df_tool_data |> 
     filter(prot_saftey %in%  c("yes"),
-           !str_detect(string = women_security_concerns, pattern = "none")) |> 
+           str_detect(string = women_security_concerns, pattern = "none")) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "prot_saftey",
            i.check.current_value = prot_saftey,
@@ -277,7 +277,7 @@ add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_l
 # logic_c_experienced_security_restrictions_but_men_security_concerns_none
 df_logic_c_experienced_security_restrictions_but_men_security_concerns_none <- df_tool_data |> 
     filter(prot_saftey %in%  c("yes"),
-           !str_detect(string = men_security_concerns, pattern = "none")) |> 
+           str_detect(string = men_security_concerns, pattern = "none")) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "prot_saftey",
            i.check.current_value = prot_saftey,
@@ -297,12 +297,8 @@ add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_l
 
 # combined  checks --------------------------------------------------------
 
-df_combined_checks <- bind_rows(checks_output) |> 
-    mutate(int.issue_id = str_extract(string = issue_id, pattern = "[0-9]{1,3}")) |> 
-    left_join(df_logical_check_description, by = c("int.issue_id" = "check_number")) |> 
-    mutate(issue = ifelse(str_detect(string = issue_id, pattern = "[0-9]{1,3}"), paste("[", issue, "].", check_description), issue)) |> 
-    select(-c(int.issue_id, check_description))
-
+df_combined_checks <- bind_rows(checks_output) 
+    
 # output the log
 write_csv(x = df_combined_checks, file = paste0("outputs/", butteR::date_file_prefix(), "_combined_checks_eth_msna_oromia.csv"), na = "")
 
