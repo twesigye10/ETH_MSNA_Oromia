@@ -24,15 +24,15 @@ df2 <- format_nut_health_indicators(df = df,
 
                                     cluster = "cluster_id", enum = "enum",
 
-                                    fcs_cereal = "F01A", fcs_legumes = "F02A", fcs_dairy = "F03A", fcs_meat = "F04A", fcs_veg = "F05A", fcs_fruit = "F06A", fcs_oil = "F07A", fcs_sugar = "F08A",
+                                    fcs_cereal = "fs_fcs_cerealgrainroottuber", fcs_legumes = "fs_fcs_beansnuts", fcs_dairy = "fs_fcs_dairy", fcs_meat = "fs_fcs_meatfishegg", fcs_veg = "fs_fcs_vegetableleave", fcs_fruit = "fs_fcs_fruit", fcs_oil = "fs_fcs_fat", fcs_sugar = "fs_fcs_sugar",
 
                                     hdds_cereals = "F011B", hdds_tubers = "F012B", hdds_dairy = "F03B", hdds_veg = "F05B", hdds_fish = "F043B", hdds_meat = "hdds_meats_any", hdds_eggs = "F044B", hdds_fruit = "F06B", hdds_legumes = "F02B", hdds_condiments = "F09B", hdds_sugars = "F08B", hdds_oils = "F07B",
 
-                                    hhs_nofoodhh_1 = "hhs_1", hhs_nofoodhh_1a = "hhs_2", hhs_sleephungry_2 = "hhs_3", hhs_sleephungry_2a = "hhs_4", hhs_alldaynight_3 = "hhs_5", hhs_alldaynight_3a = "hhs_6",
+                                    hhs_nofoodhh_1 = "fs_hhs_no_food", hhs_nofoodhh_1a = "fs_hhs_no_food_freq", hhs_sleephungry_2 = "fs_hhs_sleephungry", hhs_sleephungry_2a = "fs_hhs_sleephungry_freq", hhs_alldaynight_3 = "fs_hhs_daynoteating", hhs_alldaynight_3a = "fs_hhs_daynoteating_freq",
 
-                                    rcsi_lesspreferred_1 = "rcsi1", rcsi_borrowfood_2 = "rcsi2", rcsi_limitportion_3 = "rcsi3", rcsi_restrict_4 = "rcsi4", rcsi_reducemeals5 = "rcsi5",
+                                    rcsi_lesspreferred_1 = "rCSILessQlty", rcsi_borrowfood_2 = "rCSIBorrow", rcsi_limitportion_3 = "rCSIMealSize", rcsi_restrict_4 = "rCSIMealAdult", rcsi_reducemeals5 = "rCSIMealNb",
 
-                                    lcs_variables = c("lcs1", "lcs2", "lcs3", "lcs4", "lcs5", "lcs6", "lcs7", "lcs8", "lcs9", "lcs10")
+                                    lcs_variables = c("livh_stress_lcsi_1", "livh_stress_lcsi_2", "livh_stress_lcsi_3", "livh_stress_lcsi_4", "livh_crisis_lcsi_1", "livh_crisis_lcsi_2", "livh_crisis_lcsi_3", "livh_emerg_lcsi_1", "livh_emerg_lcsi_2", "livh_emerg_lcsi_3")
 )
 
 # Step 3: Review a Quality Summary Report ####
