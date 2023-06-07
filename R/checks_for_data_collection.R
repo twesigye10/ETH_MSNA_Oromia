@@ -312,10 +312,10 @@ df_fd_rcsi_same <- df_tool_data |>
            i.check.issue_id = "logic_c_fd_rcsi_same",
            i.check.issue = glue("rCSILessQlty :{rCSILessQlty}, rCSIMealSize :{rCSIMealSize}, rCSIMealAdult :{rCSIMealAdult}, rCSIMealNb :{rCSIMealNb}, rCSIBorrow :{rCSIBorrow}"),
            i.check.other_text = "",
-           i.check.checked_by = "",
+           i.check.checked_by = "AT",
            i.check.checked_date = as_date(today()),
            i.check.comment = "", 
-           i.check.reviewed = "",
+           i.check.reviewed = "1",
            i.check.adjust_log = "",
            i.check.so_sm_choices = "") |> 
     slice(rep(1:n(), each = 5)) |>  
