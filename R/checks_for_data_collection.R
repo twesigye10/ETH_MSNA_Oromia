@@ -301,6 +301,41 @@ df_fd_consumption_score_same <- df_tool_data |>
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_fd_consumption_score_same")
 
+# same value of rcsi components and more than 4 times of rcsi
+df_fd_rcsi_same <- df_tool_data |>  
+    filter(if_all(c(rCSILessQlty, rCSIMealSize, rCSIMealAdult, rCSIMealNb,
+                    rCSIBorrow), ~ rCSILessQlty == .x & rCSILessQlty > 4))  |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "rCSILessQlty",
+           i.check.current_value = as.character(rCSILessQlty),
+           i.check.value = "NA",
+           i.check.issue_id = "logic_c_fd_rcsi_same",
+           i.check.issue = glue("rCSILessQlty :{rCSILessQlty}, rCSIMealSize :{rCSIMealSize}, rCSIMealAdult :{rCSIMealAdult}, rCSIMealNb :{rCSIMealNb}, rCSIBorrow :{rCSIBorrow}"),
+           i.check.other_text = "",
+           i.check.checked_by = "",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    slice(rep(1:n(), each = 9)) |>  
+    group_by(i.check.uuid, i.check.start_date, i.check.enumerator_id, i.check.type,  i.check.name,  i.check.current_value) |>  
+    mutate(rank = row_number(),
+           i.check.name = case_when(rank == 1 ~ "rCSILessQlty", 
+                                    rank == 2 ~ "rCSIMealSize",
+                                    rank == 3 ~ "rCSIMealAdult", 
+                                    rank == 4 ~ "rCSIMealNb", 
+                                    TRUE ~ "rCSIBorrow"),
+           i.check.current_value = case_when(rank == 1 ~ as.character(rCSILessQlty),
+                                             rank == 2 ~ as.character(rCSIMealSize),
+                                             rank == 3 ~ as.character(rCSIMealAdult), 
+                                             rank == 4 ~ as.character(rCSIMealNb), 
+                                             TRUE ~ as.character(rCSIBorrow))
+    ) |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_fd_rcsi_same")
+
 # logic_c_hh_report_debt_repayment_but_doesnot_have_debt
 df_logic_c_hh_report_debt_repayment_but_doesnot_have_debt <- df_tool_data |> 
     filter(hh_debt %in% c("no"), repaying_debts > 0) |> 
