@@ -4,7 +4,7 @@ library(lubridate)
 library(glue)
 library(supporteR)
 
-# source("R/composite_indicators.R")
+source("R/composite_indicators.R")
 
 # Read data and checking log 
 
