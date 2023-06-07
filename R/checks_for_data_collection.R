@@ -3,6 +3,9 @@ library(lubridate)
 library(glue)
 library(supporteR)
 
+
+source("R/composite_indicators.R")
+
 # read data and tool ----------------------------------------------------------
 # data
 data_path <- "inputs/ETH2301_MSNA_Oromia_data.xlsx"
