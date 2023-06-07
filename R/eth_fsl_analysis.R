@@ -22,11 +22,11 @@ df <- readxl::read_excel(path = "inputs/clean_data_eth_msna_oromia.xlsx")
 
 df2 <- format_nut_health_indicators(df = df,
 
-                                    cluster = "cluster_id", enum = "enum",
+                                    cluster = "hh_kebele", enum = "enumerator_id",
 
                                     fcs_cereal = "fs_fcs_cerealgrainroottuber", fcs_legumes = "fs_fcs_beansnuts", fcs_dairy = "fs_fcs_dairy", fcs_meat = "fs_fcs_meatfishegg", fcs_veg = "fs_fcs_vegetableleave", fcs_fruit = "fs_fcs_fruit", fcs_oil = "fs_fcs_fat", fcs_sugar = "fs_fcs_sugar",
 
-                                    hdds_cereals = "F011B", hdds_tubers = "F012B", hdds_dairy = "F03B", hdds_veg = "F05B", hdds_fish = "F043B", hdds_meat = "hdds_meats_any", hdds_eggs = "F044B", hdds_fruit = "F06B", hdds_legumes = "F02B", hdds_condiments = "F09B", hdds_sugars = "F08B", hdds_oils = "F07B",
+                                    # hdds_cereals = "F011B", hdds_tubers = "F012B", hdds_dairy = "F03B", hdds_veg = "F05B", hdds_fish = "F043B", hdds_meat = "hdds_meats_any", hdds_eggs = "F044B", hdds_fruit = "F06B", hdds_legumes = "F02B", hdds_condiments = "F09B", hdds_sugars = "F08B", hdds_oils = "F07B",
 
                                     hhs_nofoodhh_1 = "fs_hhs_no_food", hhs_nofoodhh_1a = "fs_hhs_no_food_freq", hhs_sleephungry_2 = "fs_hhs_sleephungry", hhs_sleephungry_2a = "fs_hhs_sleephungry_freq", hhs_alldaynight_3 = "fs_hhs_daynoteating", hhs_alldaynight_3a = "fs_hhs_daynoteating_freq",
 
@@ -65,7 +65,7 @@ df2 <- format_nut_health_indicators(df = df,
 
 (flag_summary <- flag_summary_table(df = df2, grouping = "enum"))
 
-cl <- create_cleaning_log_flags(df = df2, uuid_col = "KEY")
+cl <- create_cleaning_log_flags(df = df2, uuid_col = "uuid")
 View(cl)
 
 # Step 6: Analyse Survey Results ####
