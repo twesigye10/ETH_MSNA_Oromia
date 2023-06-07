@@ -17,10 +17,11 @@ df_tool_data <- readxl::read_excel(data_path) |>
                           input_location_col = "hh_kebele") |> 
     rowwise() |> 
     mutate( 
-        int.hh_number = sum(c_across(num_males_0to6:num_females_66plusyrs))
+        i.hh_number = sum(c_across(num_males_0to6:num_females_66plusyrs), na.rm = T)
     ) |>
     ungroup() |> 
-    create_composite_indicators()
+    create_composite_indicators() |> 
+    rename(int.hh_number = i.hh_number)
 
 # loops
 # loop_educ
