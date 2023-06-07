@@ -19,7 +19,8 @@ df_tool_data <- readxl::read_excel(data_path) |>
     mutate( 
         int.hh_number = sum(c_across(num_males_0to6:num_females_66plusyrs))
     ) |>
-    ungroup()
+    ungroup() |> 
+    create_composite_indicators()
 
 # loops
 # loop_educ
