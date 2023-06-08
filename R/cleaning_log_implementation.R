@@ -71,6 +71,8 @@ df_cleaned_data <- df_cleaning_step |>
   mutate(across(.cols = -c(any_of(cols_to_escape), matches("_age$|^age_|uuid")),
                 .fns = ~ifelse(str_detect(string = ., pattern = "^[9]{3,9}$"), "NA", .)))
 
+df_main_with_composites <- df_cleaned_data |> 
+    create_composite_indicators()
 
 # clean repeats -----------------------------------------------------------
 
