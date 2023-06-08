@@ -67,9 +67,7 @@ df_cleaning_step <- supporteR::cleaning_support(input_df_raw_data = df_raw_data,
                                               input_df_choices = df_choices,
                                               input_df_cleaning_log = df_cleaning_log_main)
 
-df_cleaned_data <- df_cleaning_step |> 
-  mutate(across(.cols = -c(any_of(cols_to_escape), matches("_age$|^age_|uuid")),
-                .fns = ~ifelse(str_detect(string = ., pattern = "^[9]{3,9}$"), "NA", .)))
+df_cleaned_data <- df_cleaning_step
 
 df_main_with_composites <- df_cleaned_data |> 
     create_composite_indicators()
