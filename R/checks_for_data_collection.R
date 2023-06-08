@@ -200,7 +200,7 @@ add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_l
 # more loop data than main dataset
 df_count_hh_number_less_1 <- df_raw_data_loop_educ |>
     group_by(`_uuid`) |>
-    mutate(int.loop_count = n()) |>
+    mutate(int.loop_count = n(), int.index = max(`_index`)) |>
     filter(row_number() == 1) |>
     filter(int.loop_count > int.hh_number) |>
     ungroup() |>
@@ -219,7 +219,7 @@ df_count_hh_number_less_1 <- df_raw_data_loop_educ |>
            i.check.adjust_log = "",
            i.check.so_sm_choices = "",
            i.check.sheet = "grp_education_loop",
-           i.check.index = int.hh_number) |>
+           i.check.index = int.index) |>
     slice(rep(1:n(), each = 2)) |> 
     group_by(i.check.uuid, i.check.start_date, i.check.enumerator_id, i.check.type,  i.check.name,  i.check.current_value) |> 
     mutate(rank = row_number(),
