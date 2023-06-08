@@ -69,6 +69,28 @@ df_testing_data <- df_tool_data |>
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_testing_data")
 
+
+# fix enumerator_id data --------------------------------------------------
+
+df_logic_c_enumerator_id_harmonization <- df_tool_data |> 
+    filter(is.na(enumerator_id), i.check.start_date > as_date("2023-05-18")) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "enumerator_id",
+           i.check.current_value = "NA",
+           i.check.value = enum_code,
+           i.check.issue_id = "logic_c_enumerator_id_harmonization",
+           i.check.issue = "enumerator_id_harmonization",
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_enumerator_id_harmonization")
+
 # Time checks -------------------------------------------------------------
 
 # Time interval for the survey
