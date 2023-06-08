@@ -56,6 +56,10 @@ df_survey <- readxl::read_excel(loc_tool, sheet = "survey")
 df_choices <- readxl::read_excel(loc_tool, sheet = "choices") |> 
   mutate(label = `label::English`)
 
+vars_to_remove_from_data = c("deviceid", "audit", "audit_URL", "instance_name",
+                                   "complainant_name", "complainant_id", "respondent_telephone", "name_pers_recording",
+                                   "enum_gender", "enum_phonenum", "enum_name",
+                                   "gps", "_gps_latitude", "_gps_longitude", "_gps_altitude", "_gps_precision")
 
 # main dataset ------------------------------------------------------------
 
@@ -65,9 +69,11 @@ df_cleaning_log_main <-  df_cleaning_log |>
 df_cleaning_step <- supporteR::cleaning_support(input_df_raw_data = df_raw_data,
                                               input_df_survey = df_survey,
                                               input_df_choices = df_choices,
-                                              input_df_cleaning_log = df_cleaning_log_main)
+                                              input_df_cleaning_log = df_cleaning_log_main, 
+                                              input_vars_to_remove_from_data = vars_to_remove_from_data)
 
-df_cleaned_data <- df_cleaning_step
+df_cleaned_data <- df_cleaning_step|> 
+    select(-`...1198`)
 
 df_main_with_composites <- df_cleaned_data |> 
     create_composite_indicators()
@@ -100,7 +106,10 @@ df_cleaned_data_log_health <- df_raw_data_loop_health |>
 
 # write final datasets out -----------------------------------------------
 
-list_of_raw_datasets <- list("raw_main" = df_raw_data |> select(-starts_with("int.")),
+df_raw_data_final <- df_raw_data |> select(-starts_with("int."), -`...1198`) |> 
+    mutate(across(.cols = any_of(vars_to_remove_from_data), .fns = ~na_if(., .)))  
+    
+list_of_raw_datasets <- list("raw_main" = df_raw_data_final,
                              "raw_education_loop" = df_raw_data_loop_educ,
                              "raw_health_loop" = df_raw_data_loop_health)
 
