@@ -134,6 +134,30 @@ df_999_data <- purrr::map_dfr(.x = cols_with_integer_values,
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_999_data")
 
+# log 999
+cols_with_text_values <- df_survey |> filter(type %in% c("text"), name %in% colnames(df_tool_data)) |> pull(name)
+
+df_999_data_other <- purrr::map_dfr(.x = cols_with_text_values, 
+                              .f = ~ {df_tool_data |> 
+                                      dplyr::filter(str_detect(string = !!sym(.x), pattern = "^-[9]{2,4}$|^[9]{2,4}$")) |> 
+                                      dplyr::mutate(i.check.type = "change_response",
+                                                    i.check.name = .x,
+                                                    i.check.current_value = as.character(!!sym(.x)),
+                                                    i.check.value = "NA",
+                                                    i.check.issue_id = "logic_c_handle_999_other",
+                                                    i.check.issue = "remove 999 added during data collection",
+                                                    i.check.other_text = "",
+                                                    i.check.checked_by = "GG",
+                                                    i.check.checked_date = as_date(today()),
+                                                    i.check.comment = "",
+                                                    i.check.reviewed = "1",
+                                                    i.check.adjust_log = "",
+                                                    i.check.so_sm_choices = "") |>
+                                      dplyr::select(starts_with("i.check."))}) |> 
+    rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_999_data_other")
+
 # logic_c_sell_livestock_but_not_owning_any_livestock
 df_logic_c_sell_livestock_but_not_owning_any_livestock <- df_tool_data |> 
     filter(livh_stress_lcsi_4 %in%  c("yes"),
