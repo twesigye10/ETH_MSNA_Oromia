@@ -223,6 +223,7 @@ df_count_hh_number_less_1 <- df_raw_data_loop_educ |>
     slice(rep(1:n(), each = 2)) |> 
     group_by(i.check.uuid, i.check.start_date, i.check.enumerator_id, i.check.type,  i.check.name,  i.check.current_value) |> 
     mutate(rank = row_number(),
+           i.check.type = ifelse(rank == 2, "change_response", i.check.type),
            i.check.name = ifelse(rank == 2, "children_size", i.check.name),
            i.check.value = ifelse(rank == 2, as.character(int.hh_number), i.check.value),
            i.check.sheet = ifelse(rank == 2, NA_character_, i.check.sheet),
