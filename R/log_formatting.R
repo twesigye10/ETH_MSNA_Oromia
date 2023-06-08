@@ -7,11 +7,11 @@ library(supporteR)
 
 # Read data and checking log 
 
-df_cleaning_log <- read_csv("inputs/combined_checks_eth_msna_oromia.csv", col_types = cols(sheet = "c", index = "i")) |> 
+df_cleaning_log <- read_csv("inputs/combined_checks_eth_msha_oromia.csv", col_types = cols(sheet = "c", index = "i")) |> 
   filter(reviewed %in% c("1"))
 
 # raw data
-loc_data <- "inputs/ETH2301_MSNA_Oromia_data.xlsx"
+loc_data <- "inputs/ETH2301_MSHA_Oromia_data.xlsx"
 
 cols_to_escape <- c("index", "start", "end", "today", "starttime",	"endtime", "_submission_time", "_submission__submission_time")
 
@@ -24,7 +24,7 @@ df_raw_data <- readxl::read_excel(path = loc_data, col_types = c_types) |>
                                           pattern = fixed(pattern = "N/A", ignore_case = TRUE)), "NA", .)))
 
 # tool
-loc_tool <- "inputs/ETH2301_MSNA_Oromia_tool.xlsx"
+loc_tool <- "inputs/ETH2301_MSHA_Oromia_tool.xlsx"
 
 df_survey <- readxl::read_excel(loc_tool, sheet = "survey")
 df_choices <- readxl::read_excel(loc_tool, sheet = "choices") |> 

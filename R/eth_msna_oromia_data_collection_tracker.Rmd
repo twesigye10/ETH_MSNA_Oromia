@@ -1,5 +1,5 @@
 ---
-title: "ETH MSNA Oromia: Data Collection Tracker"
+title: "ETH MSHA Oromia: Data Collection Tracker"
 author: "REACH"
 date: "May 2023"
 output:
@@ -8,7 +8,7 @@ html_document:
     toc_float:
       collapsed: false
       smooth_scroll: false
-knit: (function(inputFile, encoding) { rmarkdown::render(inputFile, encoding = encoding, output_file = paste0(dirname(inputFile), '/eth_msna_oromia_data_collection_tracker_', format(Sys.Date(), '%Y_%m_%d'),'.html')) })
+knit: (function(inputFile, encoding) { rmarkdown::render(inputFile, encoding = encoding, output_file = paste0(dirname(inputFile), '/eth_msha_oromia_data_collection_tracker_', format(Sys.Date(), '%Y_%m_%d'),'.html')) })
 ---
 
 ```{r setup, include=FALSE}
@@ -23,7 +23,7 @@ library(supporteR)
 library(leaflet)
 
 # read data
-df_tool_data <- readxl::read_excel("../inputs/ETH2301_MSNA_Oromia_data.xlsx")  |>  
+df_tool_data <- readxl::read_excel("../inputs/ETH2301_MSHA_Oromia_data.xlsx")  |>  
   mutate(uuid = `_uuid`,
          start_date = as_date(start),
          start = as_datetime(start),
@@ -42,7 +42,7 @@ df_days_for_data_collection <- df_tool_data |>
 df_data_support_cl_log <- df_tool_data |> 
   select(uuid, hh_woreda, hh_kebele, latitude, longitude)
 
-df_cl_log <- read_csv(file = "../inputs/combined_checks_eth_msna_oromia.csv") |> 
+df_cl_log <- read_csv(file = "../inputs/combined_checks_eth_msha_oromia.csv") |> 
   left_join(df_data_support_cl_log |> select(-hh_kebele), by = "uuid")
 
 # change_response logs that affect stats in the data collection progress
@@ -93,7 +93,7 @@ df_samples_required <- readxl::read_excel("../support_files/samples oromia.xlsx"
 
 
 # tool
-loc_tool <- "../inputs/ETH2301_MSNA_Oromia_tool.xlsx"
+loc_tool <- "../inputs/ETH2301_MSHA_Oromia_tool.xlsx"
 
 df_survey <- readxl::read_excel(loc_tool, sheet = "survey")
 df_choices <- readxl::read_excel(loc_tool, sheet = "choices") |> 

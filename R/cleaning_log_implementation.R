@@ -8,7 +8,7 @@ source("R/composite_indicators.R")
 
 # Read data and checking log 
 
-df_cleaning_log <- read_csv("inputs/combined_checks_eth_msna_oromia.csv", col_types = cols(sheet = "c", index = "i")) |> 
+df_cleaning_log <- read_csv("inputs/combined_checks_eth_msha_oromia.csv", col_types = cols(sheet = "c", index = "i")) |> 
   filter(!adjust_log %in% c("delete_log"), reviewed %in% c("1")) |>
   mutate(adjust_log = ifelse(is.na(adjust_log), "apply_suggested_change", adjust_log),
          value = ifelse(is.na(value) & str_detect(string = issue_id, pattern = "logic_c_"), "blank", value),
@@ -23,7 +23,7 @@ df_cleaning_log <- read_csv("inputs/combined_checks_eth_msna_oromia.csv", col_ty
   select(uuid, type, name, value, issue_id, sheet, index, relevant, issue)
 
 # raw data
-loc_data <- "inputs/ETH2301_MSNA_Oromia_data.xlsx"
+loc_data <- "inputs/ETH2301_MSHA_Oromia_data.xlsx"
 
 cols_to_escape <- c("index", "start", "end", "today", "starttime",	"endtime", "_submission_time", "_submission__submission_time")
 
@@ -50,7 +50,7 @@ df_raw_data_loop_health <- df_raw_data |>
 
     
 # tool
-loc_tool <- "inputs/ETH2301_MSNA_Oromia_tool.xlsx"
+loc_tool <- "inputs/ETH2301_MSHA_Oromia_tool.xlsx"
 
 df_survey <- readxl::read_excel(loc_tool, sheet = "survey")
 df_choices <- readxl::read_excel(loc_tool, sheet = "choices") |> 
@@ -115,7 +115,7 @@ list_of_raw_datasets <- list("raw_main" = df_raw_data_final,
 
 openxlsx::write.xlsx(x = list_of_raw_datasets,
                      file = paste0("outputs/", butteR::date_file_prefix(), 
-                                   "_raw_data_eth_msna_oromia.xlsx"))
+                                   "_raw_data_eth_msha_oromia.xlsx"))
 
 list_of_clean_datasets <- list("cleaned_main_data" = df_main_with_composites,
                                "cleaned_education_loop" = df_cleaned_data_log_educ,
@@ -124,9 +124,9 @@ list_of_clean_datasets <- list("cleaned_main_data" = df_main_with_composites,
 
 openxlsx::write.xlsx(x = list_of_clean_datasets,
                      file = paste0("outputs/", butteR::date_file_prefix(), 
-                                   "_clean_data_eth_msna_oromia.xlsx"), 
+                                   "_clean_data_eth_msha_oromia.xlsx"), 
                      overwrite = TRUE, keepNA = TRUE, na.string = "NA")
 
 # openxlsx::write.xlsx(x = list_of_clean_datasets,
-#                      file = paste0("inputs/clean_data_eth_msna_oromia.xlsx"), 
+#                      file = paste0("inputs/clean_data_eth_msha_oromia.xlsx"), 
 #                      overwrite = TRUE, keepNA = TRUE, na.string = "NA")

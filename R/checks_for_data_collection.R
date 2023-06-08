@@ -8,7 +8,7 @@ source("R/composite_indicators.R")
 
 # read data and tool ----------------------------------------------------------
 # data
-data_path <- "inputs/ETH2301_MSNA_Oromia_data.xlsx"
+data_path <- "inputs/ETH2301_MSHA_Oromia_data.xlsx"
     
 df_tool_data <- readxl::read_excel(data_path) |>  
     mutate(start = as_datetime(start),
@@ -39,7 +39,7 @@ df_raw_data_loop_health <- df_tool_data |>
     inner_join(loop_health, by = c("_uuid" = "_submission__uuid") )
 
 # tool
-loc_tool <- "inputs/ETH2301_MSNA_Oromia_tool.xlsx"
+loc_tool <- "inputs/ETH2301_MSHA_Oromia_tool.xlsx"
 
 df_survey <- readxl::read_excel(loc_tool, sheet = "survey")
 df_choices <- readxl::read_excel(loc_tool, sheet = "choices")
@@ -513,5 +513,5 @@ add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_l
 df_combined_checks <- bind_rows(checks_output) 
     
 # output the log
-write_csv(x = df_combined_checks, file = paste0("outputs/", butteR::date_file_prefix(), "_combined_checks_eth_msna_oromia.csv"), na = "")
+write_csv(x = df_combined_checks, file = paste0("outputs/", butteR::date_file_prefix(), "_combined_checks_eth_msha_oromia.csv"), na = "")
 

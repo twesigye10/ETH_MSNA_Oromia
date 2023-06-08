@@ -16,7 +16,7 @@ library(healthyr)
 
 # Step 1: Load your Dataset ####
 
-df <- readxl::read_excel(path = "inputs/clean_data_eth_msna_oromia.xlsx")
+df <- readxl::read_excel(path = "inputs/clean_data_eth_msha_oromia.xlsx")
 
 # Step 2: Format Your Dataset ####
 
