@@ -76,8 +76,8 @@ df_main_with_composites <- df_cleaned_data |>
 
 # educ
 df_cleaning_log_educ <- df_cleaning_log |> 
-    filter(uuid %in% df_raw_data_loop_educ$`_uuid`, name %in% colnames(df_raw_data_loop_educ))
-
+    filter(uuid %in% df_raw_data_loop_educ$`_uuid`)
+remove_index <- df_cleaning_log_educ |> filter(!is.na(index))
 df_cleaned_data_log_educ <- supporteR::cleaning_support(input_df_raw_data = df_raw_data_loop_educ,
                                                         input_df_survey = df_survey,
                                                         input_df_choices = df_choices,
@@ -87,7 +87,7 @@ df_cleaned_data_log_educ <- supporteR::cleaning_support(input_df_raw_data = df_r
 
 # health
 df_cleaned_data_log_health <- df_raw_data_loop_health |> 
-    select(any_of(colnames(loop_health)), `_index`, `_submission__uuid`) |> 
+    select(any_of(colnames(loop_health)), `_index`, `_submission__uuid` = "_uuid") |> 
     filter(`_submission__uuid` %in% df_cleaned_data$uuid)
 
 # # deletion log ------------------------------------------------------------
