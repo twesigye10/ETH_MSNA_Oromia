@@ -1,7 +1,7 @@
 # creating composite indicators -------------------------------------------
 
 create_composite_indicators <- function(input_df) {
-  input_df %>% 
+  input_df |> 
     mutate(i.fcs = (fs_fcs_cerealgrainroottuber*2 + fs_fcs_beansnuts*3 + fs_fcs_vegetableleave +  
                         fs_fcs_fruit + fs_fcs_meatfishegg*4 + fs_fcs_dairy*4 + 
                         fs_fcs_sugar*0.5 + fs_fcs_fat*0.5),
