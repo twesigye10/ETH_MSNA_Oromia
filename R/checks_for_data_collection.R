@@ -18,11 +18,15 @@ df_tool_data <- readxl::read_excel(data_path) |>
                           input_location_col = "hh_kebele") |> 
     rowwise() |> 
     mutate( 
-        i.hh_number = sum(c_across(num_males_0to6:num_females_66plusyrs), na.rm = T)
+        i.hh_number = sum(c_across(num_males_0to6:num_females_66plusyrs), na.rm = T),
+        i.tot_income_percent = sum(c_across(income_salaried_work:income_other_income), na.rm = T),
+        i.tot_expenditure = sum(c_across(food_items:expenditure_other_frequent), na.rm = T),
     ) |>
     ungroup() |> 
     create_composite_indicators() |> 
-    rename(int.hh_number = i.hh_number)
+    rename(int.hh_number = i.hh_number,
+           int.tot_income_percent = i.tot_income_percent,
+           int.tot_expenditure = i.tot_expenditure)
 
 # loops
 # loop_educ
