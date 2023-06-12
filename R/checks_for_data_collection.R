@@ -532,6 +532,7 @@ omit_cols_sil <- c("start", "end", "today", "consent","hoh", "hoh_equivalent",
                    "hh_woreda", "hoh_marital_status", "hoh_no", "hoh_no_marital_status", "hoh_gender", "hoh_age")
 
 data_similartiy_sil <- df_tool_data |> 
+    filter(!is.na(enumerator_id)) |> 
     select(- any_of(omit_cols_sil), 
            - c("...1198"), 
            -starts_with("i."), 
