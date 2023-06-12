@@ -31,6 +31,16 @@ calculateDifferences <- function(data, input_df_survey){
 
 # silhouette analysis based on gower distance between surveys -------------
 
+# silhouette analysis based on gower distance between surveys
+# METHOD: check for anomalies using the silhouette function. We assume the dataset is clustered using the 
+# enumerator IDs as the cluster IDs and we calculate the silhouette for this clustering scenario. A 
+# silhouette value close to 1 indicates that the entries of the cluster are very similar to each other and 
+# very dissimilar from entries of other clusters. Thus, we need to raise a flag if the silhouette value gets 
+# close to 1 for any of the clusters/enumerators.
+# https://en.wikipedia.org/wiki/Silhouette_(clustering)
+# https://dpmartin42.github.io/posts/r/cluster-mixed-types
+# https://medium.com/@rumman1988/clustering-categorical-and-numerical-datatype-using-gower-distance-ab89b3aa90d9
+
 calculateEnumeratorSimilarity <- function(data, input_df_survey, col_enum, col_admin){
     
     # helper function
