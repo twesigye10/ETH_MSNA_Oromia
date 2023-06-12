@@ -24,12 +24,12 @@ create_composite_indicators <- function(input_df) {
            i.hhs = (int.freq_no_food_lack_resources + int.freq_sleep_hungry + int.freq_day_and_night_no_food),
            i.hhs_cat = case_when(i.hhs <= 1 ~ "Little to no hunger",
                                  i.hhs <= 3 ~ "Moderate hunger",
-                                 i.hhs <= 6 ~ "Severe hunger"),
-           i.respondent_age = case_when(respondent_age < 18 ~ "age_12_17",
-                                        respondent_age <= 24 ~ "age_18_24",
-                                        respondent_age <= 39 ~ "age_25_39",
-                                        respondent_age <= 59 ~ "age_40_59",
-                                        respondent_age > 59 ~ "age_60+")
+                                 i.hhs <= 6 ~ "Severe hunger") #,
+           # i.respondent_age = case_when(respondent_age < 18 ~ "age_12_17",
+           #                              respondent_age <= 24 ~ "age_18_24",
+           #                              respondent_age <= 39 ~ "age_25_39",
+           #                              respondent_age <= 59 ~ "age_40_59",
+           #                              respondent_age > 59 ~ "age_60+")
     ) |> 
     select(-c(starts_with("int.")))
 }
