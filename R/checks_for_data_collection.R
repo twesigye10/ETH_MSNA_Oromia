@@ -2,10 +2,11 @@ library(tidyverse)
 library(lubridate)
 library(glue)
 library(supporteR)
+library(cluster)
 
 
 source("R/composite_indicators.R")
-
+source("R/enumerator_behavior.R")
 # read data and tool ----------------------------------------------------------
 # data
 data_path <- "inputs/ETH2301_MSHA_Oromia_data.xlsx"
@@ -515,3 +516,74 @@ df_combined_checks <- bind_rows(checks_output)
 # output the log
 write_csv(x = df_combined_checks, file = paste0("outputs/", butteR::date_file_prefix(), "_combined_checks_eth_msha_oromia.csv"), na = "")
 
+
+
+# similarity and silhouette analysis --------------------------------------
+
+# silhouette analysis
+
+# NOTE: the column for "col_admin" is kept in the data
+omit_cols_sil <- c("start", "end", "today", "consent","hoh", "hoh_equivalent",
+                   "deviceid", "audit", "audit_URL", "instance_name", "end_survey", 
+                   "gps", "_gps_latitude", "_gps_longitude", "_gps_altitude", "_gps_precision", "_id" ,"_submission_time","_validation_status","_notes","_status","_submitted_by","_tags","_index",
+                   "i.check.enumerator_id",
+                   "__version__", 
+                   "enum_gender", "enum_phonenum", "note_consent_statement", "respondent_gender", "respondent_age", 
+                   "hh_woreda", "hoh_marital_status", "hoh_no", "hoh_no_marital_status", "hoh_gender", "hoh_age")
+
+data_similartiy_sil <- df_tool_data |> 
+    select(- any_of(omit_cols_sil), 
+           - c("...1198"), 
+           -starts_with("i."), 
+           -starts_with("note_"), 
+           -starts_with("int."))
+
+df_sil_data <- calculateEnumeratorSimilarity(data = data_similartiy_sil,
+                                             input_df_survey = df_survey, 
+                                             col_enum = "enumerator_id",
+                                             col_admin = "hh_kebele") |> 
+    mutate(si2= abs(si))
+
+df_sil_data[order(df_sil_data$`si2`, decreasing = TRUE),!colnames(df_sil_data)%in%"si2"] |>  
+    openxlsx::write.xlsx(paste0("outputs/", butteR::date_file_prefix(), "_silhouette_analysis_msha.xlsx"))
+
+
+# similarity analysis
+
+data_similartiy <- df_tool_data |> 
+    select(- any_of(c(omit_cols_sil, "hh_kebele")), 
+           - c("...1198"), 
+           -starts_with("i."), 
+           -starts_with("note_"), 
+           -starts_with("int."))
+
+df_sim_data <- calculateDifferences(data = data_similartiy, 
+                                    input_df_survey = df_survey)
+
+openxlsx::write.xlsx(df_sim_data, paste0("outputs/", butteR::date_file_prefix(), 
+                                "_most_similar_analysis_msha.xlsx"))
+
+# check surveys with less than 70
+
+df_surveys_per_enum <- df_tool_data |> 
+    group_by(enumerator_id) |> 
+    summarise(num_surveys = n())
+
+df_suspected_data <- df_sim_data |> 
+    filter(number.different.columns < 60) |> 
+    group_by(enumerator_id) |> 
+    summarise(similar_count = n()) |> 
+    arrange(desc(similar_count)) |> 
+    left_join(df_surveys_per_enum)
+
+df_suspected_data_similarity <- df_sim_data |> 
+    filter(number.different.columns < 70) |> 
+    group_by(enumerator_id) |> 
+    summarise(similar_count = n()) |> 
+    arrange(desc(similar_count)) |> 
+    left_join(df_surveys_per_enum)
+
+openxlsx::write.xlsx(list("similar_60" = df_suspected_data,
+                          "similar_70" = df_suspected_data_similarity), 
+                     paste0("outputs/", butteR::date_file_prefix(), 
+                                         "_most_similar_data_extract.xlsx"))
