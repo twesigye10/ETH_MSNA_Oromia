@@ -110,8 +110,8 @@ df_raw_data_final <- df_raw_data |> select(-starts_with("int."), -`...1198`) |>
     mutate(across(.cols = any_of(vars_to_remove_from_data), .fns = ~na_if(., .)))  
     
 list_of_raw_datasets <- list("raw_main" = df_raw_data_final,
-                             "raw_education_loop" = df_raw_data_loop_educ,
-                             "raw_health_loop" = df_raw_data_loop_health)
+                             "raw_education_loop" = loop_educ,
+                             "raw_health_loop" = loop_health)
 
 openxlsx::write.xlsx(x = list_of_raw_datasets,
                      file = paste0("outputs/", butteR::date_file_prefix(), 
