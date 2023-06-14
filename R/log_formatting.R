@@ -113,4 +113,4 @@ openxlsx::write.xlsx(x = list(Summary = df_variable_summary,
                     file = paste0("outputs/", butteR::date_file_prefix(), "_eth_msha_data_cleaning_logbook.xlsx"))
 
 # exporting log alone
-write_csv(df_formatted_log, file = "outputs/Log_book.csv", na = "")
+write_csv(df_formatted_log, file = paste0("outputs/", butteR::date_file_prefix(), "_log_book.csv", na = ""))
