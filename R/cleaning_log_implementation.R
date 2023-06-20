@@ -42,7 +42,7 @@ df_raw_data_loop_educ <- df_raw_data |>
     select(-`_index`) |> 
     inner_join(loop_educ, by = c("_uuid" = "_submission__uuid") )
 
-loop_health <- readxl::read_excel(path = loc_data, sheet = "grp_education_loop") 
+loop_health <- readxl::read_excel(path = loc_data, sheet = "grp_health_loop") 
     
 df_raw_data_loop_health <- df_raw_data |> 
     select(-`_index`) |> 
