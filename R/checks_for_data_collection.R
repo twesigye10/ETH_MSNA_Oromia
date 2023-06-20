@@ -513,6 +513,69 @@ df_logic_c_experienced_security_restrictions_but_men_security_concerns_none <- d
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_experienced_security_restrictions_but_men_security_concerns_none")
 
+
+# handling hhs questions harmonisation ------------------------------------
+
+# fs_hhs_no_food
+df_logic_c_hhs_harmonisation_no_food <- df_main_extra_data |> 
+    filter(fs_hhs_no_food %in% c("yes", "no")) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "fs_hhs_no_food",
+           i.check.current_value = as.character(fs_hhs_no_food),
+           i.check.value = ifelse(fs_hhs_no_food %in% c("yes"), as.character(1), as.character(0)),
+           i.check.issue_id = "logic_c_hhs_harmonisation_no_food",
+           i.check.issue = glue("hhs_harmonisation_no_food"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_hhs_harmonisation_no_food")
+
+# fs_hhs_sleephungry
+df_logic_c_hhs_harmonisation_sleephungry <- df_main_extra_data |> 
+    filter(fs_hhs_sleephungry %in% c("yes", "no")) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "fs_hhs_sleephungry",
+           i.check.current_value = as.character(fs_hhs_sleephungry),
+           i.check.value = ifelse(fs_hhs_sleephungry %in% c("yes"), as.character(1), as.character(0)),
+           i.check.issue_id = "logic_c_hhs_harmonisation_sleephungry",
+           i.check.issue = glue("hhs_harmonisation_sleephungry"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_hhs_harmonisation_sleephungry")
+
+# fs_hhs_daynoteating
+df_logic_c_hhs_harmonisation_daynoteating <- df_main_extra_data |> 
+    filter(fs_hhs_daynoteating %in% c("yes", "no")) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "fs_hhs_daynoteating",
+           i.check.current_value = as.character(fs_hhs_daynoteating),
+           i.check.value = ifelse(fs_hhs_daynoteating %in% c("yes"), as.character(1), as.character(0)),
+           i.check.issue_id = "logic_c_hhs_harmonisation_daynoteating",
+           i.check.issue = glue("hhs_harmonisation_daynoteating"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_hhs_harmonisation_daynoteating")
+
 # combined  checks --------------------------------------------------------
 
 df_combined_checks <- bind_rows(checks_output) 
