@@ -13,7 +13,8 @@ data_path <- "inputs/ETH2301_MSHA_Oromia_data.xlsx"
     
 df_tool_data <- readxl::read_excel(data_path) |>  
     mutate(start = as_datetime(start),
-           end = as_datetime(end)) |> 
+           end = as_datetime(end),
+           enumerator_id = ifelse(is.na(enumerator_id), enum_code, enumerator_id)) |> 
     checks_add_extra_cols(input_enumerator_id_col = "enumerator_id",
                           input_location_col = "hh_kebele") |> 
     rowwise() |> 
@@ -517,7 +518,7 @@ add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_l
 # handling hhs questions harmonisation ------------------------------------
 
 # fs_hhs_no_food
-df_logic_c_hhs_harmonisation_no_food <- df_main_extra_data |> 
+df_logic_c_hhs_harmonisation_no_food <- df_tool_data |> 
     filter(fs_hhs_no_food %in% c("yes", "no")) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "fs_hhs_no_food",
@@ -532,12 +533,21 @@ df_logic_c_hhs_harmonisation_no_food <- df_main_extra_data |>
            i.check.reviewed = "1",
            i.check.adjust_log = "",
            i.check.so_sm_choices = "") |> 
+    slice(rep(1:n(), each = 2)) |>  
+    group_by(i.check.uuid, i.check.start_date, i.check.enumerator_id, i.check.type,  i.check.name,  i.check.current_value) |>  
+    mutate(rank = row_number(),
+           i.check.name = ifelse(rank == 1, "fs_hhs_no_food", "fs_hhs_no_food_freq"),
+           i.check.current_value = ifelse(rank == 1, as.character(fs_hhs_no_food), as.character(fs_hhs_no_food_freq)),
+           i.check.value = ifelse(rank == 1, i.check.value, case_when(i.check.current_value %in% c("rarely_1_2") ~ "1",
+                                                                      i.check.current_value %in% c("sometimes_3_10") ~ "2",
+                                                                      i.check.current_value %in% c("often_10_times") ~ "3"))
+    ) |> 
     supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_hhs_harmonisation_no_food")
 
 # fs_hhs_sleephungry
-df_logic_c_hhs_harmonisation_sleephungry <- df_main_extra_data |> 
+df_logic_c_hhs_harmonisation_sleephungry <- df_tool_data |> 
     filter(fs_hhs_sleephungry %in% c("yes", "no")) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "fs_hhs_sleephungry",
@@ -552,12 +562,21 @@ df_logic_c_hhs_harmonisation_sleephungry <- df_main_extra_data |>
            i.check.reviewed = "1",
            i.check.adjust_log = "",
            i.check.so_sm_choices = "") |> 
+    slice(rep(1:n(), each = 2)) |>  
+    group_by(i.check.uuid, i.check.start_date, i.check.enumerator_id, i.check.type,  i.check.name,  i.check.current_value) |>  
+    mutate(rank = row_number(),
+           i.check.name = ifelse(rank == 1, "fs_hhs_sleephungry", "fs_hhs_sleephungry_freq"),
+           i.check.current_value = ifelse(rank == 1, as.character(fs_hhs_sleephungry), as.character(fs_hhs_sleephungry_freq)),
+           i.check.value = ifelse(rank == 1, i.check.value, case_when(i.check.current_value %in% c("rarely_1_2") ~ "1",
+                                                                      i.check.current_value %in% c("sometimes_3_10") ~ "2",
+                                                                      i.check.current_value %in% c("often_10_times") ~ "3"))
+    ) |> 
     supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_hhs_harmonisation_sleephungry")
 
 # fs_hhs_daynoteating
-df_logic_c_hhs_harmonisation_daynoteating <- df_main_extra_data |> 
+df_logic_c_hhs_harmonisation_daynoteating <- df_tool_data |> 
     filter(fs_hhs_daynoteating %in% c("yes", "no")) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "fs_hhs_daynoteating",
@@ -572,6 +591,15 @@ df_logic_c_hhs_harmonisation_daynoteating <- df_main_extra_data |>
            i.check.reviewed = "1",
            i.check.adjust_log = "",
            i.check.so_sm_choices = "") |> 
+    slice(rep(1:n(), each = 2)) |>  
+    group_by(i.check.uuid, i.check.start_date, i.check.enumerator_id, i.check.type,  i.check.name,  i.check.current_value) |>  
+    mutate(rank = row_number(),
+           i.check.name = ifelse(rank == 1, "fs_hhs_daynoteating", "fs_hhs_daynoteating_freq"),
+           i.check.current_value = ifelse(rank == 1, as.character(fs_hhs_daynoteating), as.character(fs_hhs_daynoteating_freq)),
+           i.check.value = ifelse(rank == 1, i.check.value, case_when(i.check.current_value %in% c("rarely_1_2") ~ "1",
+                                                                      i.check.current_value %in% c("sometimes_3_10") ~ "2",
+                                                                      i.check.current_value %in% c("often_10_times") ~ "3"))
+    ) |> 
     supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_hhs_harmonisation_daynoteating")
