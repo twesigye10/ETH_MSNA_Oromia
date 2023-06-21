@@ -16,7 +16,7 @@ library(healthyr)
 
 # Step 1: Load your Dataset ####
 
-df <- readxl::read_excel(path = "inputs/clean_data_eth_msha_oromia.xlsx")
+df <- readxl::read_excel(path = "inputs/clean_data_eth_msha_oromia.xlsx", na = "NA")
 
 # Step 2: Format Your Dataset ####
 
@@ -66,7 +66,11 @@ df2 <- format_nut_health_indicators(df = df,
 (flag_summary <- flag_summary_table(df = df2, grouping = "enum"))
 
 cl <- create_cleaning_log_flags(df = df2, uuid_col = "uuid")
-View(cl)
+
+cl_food_related <- cl|> filter(!description %in% c("Other values, check if should be recoded."))
+
+write_csv(cl_food_related, 
+          file = "outputs/eth_msha_oromia_healthyr_cl_output.csv")
 
 # Step 6: Analyse Survey Results ####
 
