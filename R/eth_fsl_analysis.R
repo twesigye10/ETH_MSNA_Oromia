@@ -89,7 +89,15 @@ write_csv(cl_food_related,
 
 
 
+# enumerator reports ------------------------------------------------------
 
+healthyr::create_fsl_quality_report(df = df2 |> filter(!enum %in% c("6", "ETH07", "ETH30")), 
+                                    grouping = "enum", short_report = FALSE, 
+                                    file_path = "outputs/full_report_enu.xlsx")
+
+healthyr::create_fsl_quality_report(df = df2 |> filter(!enum %in% c("6", "ETH07", "ETH30")), 
+                                    grouping = "enum", short_report = TRUE, 
+                                    file_path = "outputs/full_short_report_enu.xlsx")
 
 
 
