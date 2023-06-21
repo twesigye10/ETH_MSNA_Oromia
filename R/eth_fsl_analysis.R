@@ -70,7 +70,7 @@ cl <- create_cleaning_log_flags(df = df2, uuid_col = "uuid")
 cl_food_related <- cl|> filter(!description %in% c("Other values, check if should be recoded."))
 
 write_csv(cl_food_related, 
-          file = "outputs/eth_msha_oromia_healthyr_cl_output.csv")
+          file = paste0("outputs/", butteR::date_file_prefix(), "_eth_msha_oromia_healthyr_cl_output.csv"))
 
 # Step 6: Analyse Survey Results ####
 
