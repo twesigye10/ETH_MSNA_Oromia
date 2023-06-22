@@ -16,7 +16,23 @@ library(healthyr)
 
 # Step 1: Load your Dataset ####
 
-df <- readxl::read_excel(path = "inputs/clean_data_eth_msha_oromia.xlsx", na = "NA")
+df <- readxl::read_excel(path = "inputs/clean_data_eth_msha_oromia.xlsx", na = "NA") |> 
+    mutate(across(.cols = livh_stress_lcsi_1:livh_emerg_lcsi_3, 
+                  .fns = ~case_when(.x %in% c("yes") ~ "1",
+                                    .x %in% c("no_had_no_need") ~ "2",
+                                    .x %in% c("no_exhausted") ~ "3",
+                                    .x %in% c("not_applicable") ~ "4"
+                                    ))) |> 
+    mutate(fs_hhs_no_food = case_when(fs_hhs_no_food %in% c("yes", "1") ~ "1",
+                                      fs_hhs_no_food %in% c("no", "0") ~ "2"),
+           # fs_hhs_no_food_freq =,
+           fs_hhs_sleephungry = case_when(fs_hhs_sleephungry %in% c("yes", "1") ~ "1",
+                                          fs_hhs_sleephungry %in% c("no", "0") ~ "2"),
+           # fs_hhs_sleephungry_freq =,
+           fs_hhs_daynoteating = case_when(fs_hhs_daynoteating %in% c("yes", "1") ~ "1",
+                                           fs_hhs_daynoteating %in% c("no", "0") ~ "2"),
+           # fs_hhs_daynoteating_freq =,
+           )
 
 # Step 2: Format Your Dataset ####
 
@@ -37,13 +53,34 @@ df2 <- format_nut_health_indicators(df = df,
 
 # Step 3: Review a Quality Summary Report ####
 
-(create_fsl_quality_report(df = df2, short_report = TRUE))
+# (create_fsl_quality_report(df = df2, short_report = TRUE))
+# 
+# (create_fsl_quality_report(df = df2, short_report = FALSE))
+# 
+# (create_fsl_quality_report(df = df2, grouping = "enum", short_report = TRUE))
+# 
+# (create_fsl_quality_report(df = df2, grouping = "enum", short_report = FALSE))
 
-(create_fsl_quality_report(df = df2, short_report = FALSE))
+# export reports
+healthyr::create_fsl_quality_report(df = df2, 
+                                    short_report = FALSE, 
+                                    file_path = paste0("outputs/", butteR::date_file_prefix(), 
+                                                       "_eth_msha_oromia_healthyr_full_report.xlsx"))
 
-(create_fsl_quality_report(df = df2, grouping = "enum", short_report = TRUE))
+healthyr::create_fsl_quality_report(df = df2 |> filter(!enum %in% c("6", "ETH07", "ETH30")), 
+                                    short_report = TRUE, 
+                                    file_path = paste0("outputs/", butteR::date_file_prefix(), 
+                                                       "_eth_msha_oromia_healthyr_short_report.xlsx"))
 
-(create_fsl_quality_report(df = df2, grouping = "enum", short_report = FALSE))
+healthyr::create_fsl_quality_report(df = df2 |> filter(!enum %in% c("6", "ETH07", "ETH30")), 
+                                    grouping = "enum", short_report = FALSE, 
+                                    file_path = paste0("outputs/", butteR::date_file_prefix(), 
+                                                       "_eth_msha_oromia_healthyr_full_report_enu.xlsx"))
+
+healthyr::create_fsl_quality_report(df = df2 |> filter(!enum %in% c("6", "ETH07", "ETH30")), 
+                                    grouping = "enum", short_report = TRUE, 
+                                    file_path = paste0("outputs/", butteR::date_file_prefix(), 
+                                                       "_eth_msha_oromia_healthyr_short_report_enu.xlsx"))
 
 # Step 4: Evaluate Data with Visualizations ####
 
@@ -87,17 +124,6 @@ write_csv(cl_food_related,
                                   means = c("fcs_score", "hhs_score", "rcsi_score")))
 
 
-
-
-# enumerator reports ------------------------------------------------------
-
-healthyr::create_fsl_quality_report(df = df2 |> filter(!enum %in% c("6", "ETH07", "ETH30")), 
-                                    grouping = "enum", short_report = FALSE, 
-                                    file_path = "outputs/full_report_enu.xlsx")
-
-healthyr::create_fsl_quality_report(df = df2 |> filter(!enum %in% c("6", "ETH07", "ETH30")), 
-                                    grouping = "enum", short_report = TRUE, 
-                                    file_path = "outputs/full_short_report_enu.xlsx")
 
 
 
