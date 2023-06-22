@@ -27,9 +27,8 @@ create_composite_indicators <- function(input_df) {
         ) |> 
         rowwise() |> 
         mutate(i.fcs = sum(c_across(int.fcs_cereals_tubers:int.fcs_oils), na.rm = T),
-               i.rcsi = sum(c_across(int.rCSILessQlty:int.rCSIMealNb), na.rm = T),
+               i.rcsi = sum(c_across(int.rCSILessQlty:int.rCSIMealNb)),
                i.hhs = sum(c_across(int.freq_no_food_lack_resources:int.freq_day_and_night_no_food), na.rm = T)
-               
         ) |>
         ungroup() |>
         mutate(i.fcs_cat = case_when(i.fcs <= 21 ~ "Poor",
