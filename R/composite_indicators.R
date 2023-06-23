@@ -26,7 +26,7 @@ create_composite_indicators <- function(input_df) {
                                                           fs_hhs_daynoteating_freq %in% c("3") ~ 2) 
         ) |> 
         rowwise() |> 
-        mutate(i.fcs = sum(c_across(int.fcs_cereals_tubers:int.fcs_oils), na.rm = T),
+        mutate(i.fcs = sum(c_across(int.fcs_cereals_tubers:int.fcs_oils)),
                i.rcsi = sum(c_across(int.rCSILessQlty:int.rCSIMealNb)),
                i.hhs = sum(c_across(int.freq_no_food_lack_resources:int.freq_day_and_night_no_food), na.rm = T)
         ) |>
