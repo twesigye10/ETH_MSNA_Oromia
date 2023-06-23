@@ -21,7 +21,8 @@ c_types <- ifelse(str_detect(string = data_nms, pattern = "_other$"), "text", "g
 df_raw_data <- readxl::read_excel(path = loc_data, col_types = c_types) |> 
   mutate(across(.cols = -c(contains(cols_to_escape)), 
                 .fns = ~ifelse(str_detect(string = ., 
-                                          pattern = fixed(pattern = "N/A", ignore_case = TRUE)), "NA", .)))
+                                          pattern = fixed(pattern = "N/A", ignore_case = TRUE)), "NA", .))) |> 
+    mutate(enumerator_id = ifelse(is.na(enumerator_id) & !is.na(enum_code), enum_code, enumerator_id))
 
 # tool
 loc_tool <- "inputs/ETH2301_MSHA_Oromia_tool.xlsx"
@@ -110,7 +111,7 @@ openxlsx::write.xlsx(x = list(Summary = df_variable_summary,
                              changes_by_issue = df_changes_by_enum_issue,
                              del_by_enum = df_deletion_by_enum,
                              del_by_enum_time = df_deletion_by_enum_time), 
-                    file = paste0("outputs/", butteR::date_file_prefix(), "_eth_msha_data_cleaning_logbook.xlsx"))
+                    file = paste0("outputs/", butteR::date_file_prefix(), "_eth_msha_data_cleaning_logbook_for_formatting.xlsx"))
 
 # exporting log alone
 write_csv(df_formatted_log, file = paste0("outputs/", butteR::date_file_prefix(), "_log_book.csv", na = ""))
