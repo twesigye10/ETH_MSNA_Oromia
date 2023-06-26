@@ -65,5 +65,5 @@ full_analysis_long <- combined_analysis |>
          subset_1_val)
 
 # output analysis
-write_csv(full_analysis_long, paste0("outputs/", butteR::date_file_prefix(), "_full_analysis_lf_msna_eth.csv"), na="")
-write_csv(full_analysis_long, paste0("outputs/full_analysis_lf_msna_eth.csv"), na="")
+write_csv(full_analysis_long, paste0("outputs/", butteR::date_file_prefix(), "_full_analysis_lf_eth_msna_oromia.csv"), na="")
+write_csv(full_analysis_long, paste0("outputs/full_analysis_lf_eth_msna_oromia.csv"), na="")
