@@ -31,7 +31,13 @@ ref_svy <- as_survey(.data = df_main_clean_data)
 # analysis
 
 df_main_analysis <- analysis_after_survey_creation(input_svy_obj = ref_svy,
-                                                   input_dap = dap)
+                                                   input_dap = dap |> 
+                                                       filter(!variable %in% c("hh_living_district", 
+                                                                               "when_settlement_est", 
+                                                                               "idp_name",
+                                                                               "wash_watertime1",
+                                                                               "hh_shocks_affect11"))
+                                                   )
 # merge analysis
 
 combined_analysis <- df_main_analysis
@@ -59,5 +65,5 @@ full_analysis_long <- combined_analysis |>
          subset_1_val)
 
 # output analysis
-write_csv(full_analysis_long, paste0("outputs/", butteR::date_file_prefix(), "_full_analysis_lf_msha_eth.csv"), na="")
-write_csv(full_analysis_long, paste0("outputs/full_analysis_lf_msha_eth.csv"), na="")
+write_csv(full_analysis_long, paste0("outputs/", butteR::date_file_prefix(), "_full_analysis_lf_msna_eth.csv"), na="")
+write_csv(full_analysis_long, paste0("outputs/full_analysis_lf_msna_eth.csv"), na="")
