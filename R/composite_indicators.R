@@ -37,14 +37,11 @@ create_composite_indicators <- function(input_df) {
                i.rcsi_cat = case_when(i.rcsi < 4 ~ "rcsi_0_3",
                                       i.rcsi < 19 ~ "rcsi_4_18",
                                       i.rcsi >= 19 ~ "rcsi_19+"),
-               i.hhs_cat = case_when(i.hhs <= 1 ~ "Little to no hunger",
-                                     i.hhs <= 3 ~ "Moderate hunger",
-                                     i.hhs <= 6 ~ "Severe hunger"),
-               i.fewsnet_phase = case_when(i.hhs == 0 ~ "Phase 1",
-                                           i.hhs == 1 ~ "Phase 2",
-                                           i.hhs <= 3 ~ "Phase 3",
-                                           i.hhs == 4 ~ "Phase 4",
-                                           i.hhs <= 6 ~ "Phase 5"),
+               i.hhs_cat = case_when(i.hhs == 0 ~ "None",
+                                     i.hhs == 1 ~ "Slight",
+                                     i.hhs <= 3 ~ "Moderate",
+                                     i.hhs == 4 ~ "Severe",
+                                     i.hhs <= 6 ~ "Very severe")
         ) |> 
         relocate(i.fcs_cat, .after = i.fcs) |> 
         relocate(i.rcsi_cat, .after = i.rcsi) |> 
