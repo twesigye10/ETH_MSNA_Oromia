@@ -27,7 +27,7 @@ loc_data <- "inputs/ETH2301_MSHA_Oromia_data.xlsx"
 
 cols_to_escape <- c("index", "start", "end", "today", "starttime",	"endtime", "_submission_time", "_submission__submission_time")
 
-data_nms <- names(readxl::read_excel(path = loc_data, n_max = 2000))
+data_nms <- names(readxl::read_excel(path = loc_data, n_max = 1000))
 c_types <- case_when(str_detect(string = data_nms, pattern = "_other$") ~ "text",
                         TRUE ~ "guess")
 
