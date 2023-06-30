@@ -604,6 +604,446 @@ df_logic_c_hhs_harmonisation_daynoteating <- df_tool_data |>
 
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_hhs_harmonisation_daynoteating")
 
+
+# extra checks income -----------------------------------------------------
+
+
+df_logic_c_expenditure_greater_than_income <- df_main_extra_data |> 
+    filter(int.tot_expenditure > 2*hh_tot_income_amount) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "int.tot_expenditure",
+           i.check.current_value = as.character(int.tot_expenditure),
+           i.check.value = "NA",
+           i.check.issue_id = "logic_c_expenditure_greater_than_income",
+           i.check.issue = glue("expenditure_greater_than_income, int.tot_expenditure: {int.tot_expenditure} but hh_tot_income_amount: {hh_tot_income_amount}"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_expenditure_greater_than_income")
+
+# income composition greater than 100 percent
+
+df_logic_c_income_greater_than_100 <- df_main_extra_data |> 
+    filter(int.tot_income_percent > 100) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "income_salaried_work",
+           i.check.current_value = as.character(income_salaried_work),
+           i.check.value = "",
+           i.check.issue_id = "logic_c_income_greater_than_100",
+           i.check.issue = glue("income_greater_than_100_percent, int.tot_income_percent: {int.tot_income_percent}"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    slice(rep(1:n(), each = 12)) |>  
+    group_by(i.check.uuid, i.check.start_date, i.check.enumerator_id, i.check.type,  i.check.name,  i.check.current_value) |>  
+    mutate(rank = row_number(),
+           i.check.name = case_when(rank == 1 ~ "income_salaried_work", 
+                                    rank == 2 ~ "income_casual_labour",
+                                    rank == 3 ~ "income_business", 
+                                    rank == 4 ~ "income_own_production", 
+                                    rank == 5 ~ "income_govt_benefits", 
+                                    rank == 6 ~ "income_rent", 
+                                    rank == 7 ~ "income_remittances", 
+                                    rank == 8 ~ "income_loans_family_friends", 
+                                    rank == 9 ~ "income_loans_community_members", 
+                                    rank == 10 ~ "income_hum_assistance", 
+                                    rank == 11 ~ "income_other_income", 
+                                    TRUE ~ "income_other_income_other"),
+           i.check.current_value = case_when(rank == 1 ~ as.character(income_salaried_work),
+                                             rank == 2 ~ as.character(income_casual_labour),
+                                             rank == 3 ~ as.character(income_business), 
+                                             rank == 4 ~ as.character(income_own_production), 
+                                             rank == 5 ~ as.character(income_govt_benefits), 
+                                             rank == 6 ~ as.character(income_rent), 
+                                             rank == 7 ~ as.character(income_remittances), 
+                                             rank == 8 ~ as.character(income_loans_family_friends), 
+                                             rank == 9 ~ as.character(income_loans_community_members), 
+                                             rank == 10 ~ as.character(income_hum_assistance), 
+                                             rank == 11 ~ as.character(income_other_income), 
+                                             TRUE ~ as.character(income_other_income_other))
+    ) |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_income_greater_than_100")
+
+
+# number of surveys -------------------------------------------------------
+
+# column differences less than 60
+df_sim_data <- readxl::read_excel("outputs/20230612_most_similar_analysis_msha.xlsx") 
+
+df_suspected_data_60 <- df_sim_data |> 
+    filter(number.different.columns < 60)
+
+df_logic_c_similar_data_across_interviews <- df_main_extra_data |> 
+    filter(uuid %in% df_suspected_data_60$`_uuid`) |> 
+    mutate(i.check.type = "remove_survey",
+           i.check.name = "",
+           i.check.current_value = "",
+           i.check.value = "",
+           i.check.issue_id = "logic_c_similar_data_across_interviews",
+           i.check.issue = glue("similar_data_across_interviews"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_similar_data_across_interviews")
+
+# excluding un trusted enumerators
+
+df_logic_c_excluded_enums <- df_main_extra_data |> 
+    filter(!uuid %in% df_logic_c_similar_data_across_interviews$uuid, enumerator_id %in% c("ETH06", "ETH04", "ETH48", "6")) |> 
+    mutate(i.check.type = "remove_survey",
+           i.check.name = "",
+           i.check.current_value = "",
+           i.check.value = "",
+           i.check.issue_id = "logic_c_excluded_enums",
+           i.check.issue = glue("enumerators with un satisfactory quality"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_excluded_enums")
+
+# handling other_job
+df_logic_c_reclassifying_other_job <- df_main_extra_data |> 
+    filter(other_job %in% c("yes")) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "other_job",
+           i.check.current_value = as.character(other_job),
+           i.check.value = "",
+           i.check.issue_id = "logic_c_reclassifying_other_job",
+           i.check.issue = glue("Reclassifying other_job"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = paste(c("permanent_job_female", "permanent_job_male", "temporary_job_female", "temporary_job_male", "casual_lobour_female", "casual_lobour_male", "own_bisuness_female", "own_bisuness_male"), collapse = " : ")) |> 
+    slice(rep(1:n(), each = 2)) |>  
+    group_by(i.check.uuid, i.check.start_date, i.check.enumerator_id, i.check.type,  i.check.name,  i.check.current_value) |>  
+    mutate(rank = row_number(),
+           i.check.name = case_when(rank == 1 ~ "other_job_female", 
+                                    TRUE ~ "other_job_male"),
+           i.check.current_value = case_when(rank == 1 ~ as.character(other_job_female),
+                                             TRUE ~ as.character(other_job_male))
+    ) |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_other_job")
+
+# handling other_job_children
+df_logic_c_reclassifying_other_job_children <- df_main_extra_data |> 
+    filter(other_job_children %in% c("yes")) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "other_job_children",
+           i.check.current_value = as.character(other_job_children),
+           i.check.value = "",
+           i.check.issue_id = "logic_c_reclassifying_other_job_children",
+           i.check.issue = glue("Reclassifying other_job_children"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = paste(c("permanent_children_job_female", "permanent_children_job_male", "temporary_children_job_female", "temporary_children_job_male", "casual_lobour_children_female", "casual_lobour_children_male", "own_bisuness_children_female", "own_bisuness_children_male"), collapse = " : ")) |> 
+    slice(rep(1:n(), each = 2)) |>  
+    group_by(i.check.uuid, i.check.start_date, i.check.enumerator_id, i.check.type,  i.check.name,  i.check.current_value) |>  
+    mutate(rank = row_number(),
+           i.check.name = case_when(rank == 1 ~ "other_job_children_female", 
+                                    TRUE ~ "other_job_children_male"),
+           i.check.current_value = case_when(rank == 1 ~ as.character(other_job_children_female),
+                                             TRUE ~ as.character(other_job_children_male))
+    ) |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_other_job_children")
+
+# handling expenditure_other_infrequent
+df_logic_c_harmonise_expenditure_other_infrequent <- df_main_extra_data |> 
+    filter(expenditure_other_infrequent > 0,  expenditure_other_infrequent_other %in% c("0", "9", "NA", "No", "o")) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "expenditure_other_infrequent",
+           i.check.current_value = as.character(expenditure_other_infrequent),
+           i.check.value = "NA",
+           i.check.issue_id = "logic_c_harmonise_expenditure_other_infrequent",
+           i.check.issue = glue("harmonise expenditure_other_infrequent"),
+           i.check.other_text = expenditure_other_infrequent_other,
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = paste(c("shelter", "nfi_purchase", "healthcare_expenditures", "education_expenditures", "debt_repayement"), collapse = " : ")) |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_harmonise_expenditure_other_infrequent")
+
+# handling expenditure_other_infrequent_other
+df_logic_c_reclassifying_expenditure_other_infrequent_other <- df_main_extra_data |> 
+    filter(!is.na(expenditure_other_infrequent_other), !expenditure_other_infrequent_other %in% c("0", "9", "NA", "No", "o")) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "expenditure_other_infrequent_other",
+           i.check.current_value = as.character(expenditure_other_infrequent_other),
+           i.check.value = "",
+           i.check.issue_id = "logic_c_reclassifying_expenditure_other_infrequent_other",
+           i.check.issue = glue("Reclassifying expenditure_other_infrequent_other"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = paste(c("shelter", "nfi_purchase", "healthcare_expenditures", "education_expenditures", "debt_repayement"), collapse = " : ")) |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_expenditure_other_infrequent_other")
+
+
+# extra other checks ------------------------------------------------------
+# handling other_vegetables
+df_logic_c_reclassifying_other_vegetables <- df_main_extra_data |> 
+    filter(!is.na(other_vegetables)) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "other_vegetables",
+           i.check.current_value = as.character(other_vegetables),
+           i.check.value = ifelse(other_vegetables %in% c("0", "9", "NA", "o")|str_detect(string = other_vegetables, 
+                                                                                          pattern = regex("Lakki|Hin |No|none|Nothing", ignore_case = TRUE)), "NA", ""),
+           i.check.issue_id = "logic_c_reclassifying_other_vegetables",
+           i.check.issue = glue("Reclassifying other_vegetables"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_other_vegetables")
+
+# handling other_fruits
+df_logic_c_reclassifying_other_fruits <- df_main_extra_data |> 
+    filter(!is.na(other_fruits)) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "other_fruits",
+           i.check.current_value = as.character(other_fruits),
+           i.check.value = ifelse(other_fruits %in% c("0", "9", "NA", "o")|str_detect(string = other_fruits, 
+                                                                                      pattern = regex("Lakki|Hin |No|none|Nothing", ignore_case = TRUE)), "NA", ""),
+           i.check.issue_id = "logic_c_reclassifying_other_fruits",
+           i.check.issue = glue("Reclassifying other_fruits"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_other_fruits")
+
+# handling other_meats
+df_logic_c_reclassifying_other_meats <- df_main_extra_data |> 
+    filter(!is.na(other_meats)) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "other_meats",
+           i.check.current_value = as.character(other_meats),
+           i.check.value = ifelse(other_meats %in% c("0", "9", "NA", "o")|str_detect(string = other_meats, 
+                                                                                     pattern = regex("Lakki|Hin |No|none|Nothing", ignore_case = TRUE)), "NA", ""),
+           i.check.issue_id = "logic_c_reclassifying_other_meats",
+           i.check.issue = glue("Reclassifying other_meats"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_other_meats")
+
+# handling income_other_income_other
+df_logic_c_reclassifying_income_other_income_other <- df_main_extra_data |> 
+    filter(!is.na(income_other_income_other)) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "income_other_income_other",
+           i.check.current_value = as.character(income_other_income_other),
+           i.check.value = ifelse(income_other_income_other %in% c("0", "9", "NA", "o")|str_detect(string = income_other_income_other, 
+                                                                                                   pattern = regex("Lakki|Hin |No|none|Nothing", ignore_case = TRUE)), "NA", ""),
+           i.check.issue_id = "logic_c_reclassifying_income_other_income_other",
+           i.check.issue = glue("Reclassifying income_other_income_other"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_income_other_income_other")
+
+# handling expenditure_other_infrequent_other
+df_logic_c_reclassifying_expenditure_other_infrequent_other <- df_main_extra_data |> 
+    filter(!is.na(expenditure_other_infrequent_other)) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "expenditure_other_infrequent_other",
+           i.check.current_value = as.character(expenditure_other_infrequent_other),
+           i.check.value = ifelse(expenditure_other_infrequent_other %in% c("0", "9", "NA", "o")|str_detect(string = expenditure_other_infrequent_other, 
+                                                                                                            pattern = regex("Lakki|Hin |No|none|Nothing", ignore_case = TRUE)), "NA", ""),
+           i.check.issue_id = "logic_c_reclassifying_expenditure_other_infrequent_other",
+           i.check.issue = glue("Reclassifying expenditure_other_infrequent_other"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_expenditure_other_infrequent_other")
+
+# handling hh_other_livestock_other
+df_logic_c_reclassifying_hh_other_livestock_other <- df_main_extra_data |> 
+    filter(!is.na(hh_other_livestock_other)) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "hh_other_livestock_other",
+           i.check.current_value = as.character(hh_other_livestock_other),
+           i.check.value = ifelse(hh_other_livestock_other %in% c("0", "9", "NA", "o")|str_detect(string = hh_other_livestock_other, 
+                                                                                                  pattern = regex("Lakki|Hin |No|none|Nothing", ignore_case = TRUE)), "NA", ""),
+           i.check.issue_id = "logic_c_reclassifying_hh_other_livestock_other",
+           i.check.issue = glue("Reclassifying hh_other_livestock_other"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_hh_other_livestock_other")
+
+# handling hh_previous_location
+df_logic_c_reclassifying_hh_previous_location <- df_main_extra_data |> 
+    filter(!is.na(hh_previous_location)) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "hh_previous_location",
+           i.check.current_value = as.character(hh_previous_location),
+           i.check.value = ifelse(hh_previous_location %in% c("0", "9", "NA", "o")|str_detect(string = hh_previous_location, 
+                                                                                              pattern = regex("Lakki|Hin |No|none|Nothing", ignore_case = TRUE)), "NA", ""),
+           i.check.issue_id = "logic_c_reclassifying_hh_previous_location",
+           i.check.issue = glue("Reclassifying hh_previous_location"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_hh_previous_location")
+
+# handling water_based_liquids_other
+df_logic_c_reclassifying_water_based_liquids_other <- df_main_extra_data |> 
+    filter(!is.na(water_based_liquids_other)) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "water_based_liquids_other",
+           i.check.current_value = as.character(water_based_liquids_other),
+           i.check.value = ifelse(water_based_liquids_other %in% c("0", "9", "NA", "o")|str_detect(string = water_based_liquids_other, 
+                                                                                                   pattern = regex("Lakki|Hin |No|none|Nothing", ignore_case = TRUE)), "NA", ""),
+           i.check.issue_id = "logic_c_reclassifying_water_based_liquids_other",
+           i.check.issue = glue("Reclassifying water_based_liquids_other"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_water_based_liquids_other")
+
+# handling water_based_liquids_sweetened
+df_logic_c_reclassifying_water_based_liquids_sweetened <- df_main_extra_data |> 
+    filter(!is.na(water_based_liquids_sweetened)) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "water_based_liquids_sweetened",
+           i.check.current_value = as.character(water_based_liquids_sweetened),
+           i.check.value = ifelse(water_based_liquids_sweetened %in% c("0", "9", "NA", "o")|str_detect(string = water_based_liquids_sweetened, 
+                                                                                                       pattern = regex("Lakki|Hin |No|none|Nothing", ignore_case = TRUE)), "NA", ""),
+           i.check.issue_id = "logic_c_reclassifying_water_based_liquids_sweetened",
+           i.check.issue = glue("Reclassifying water_based_liquids_sweetened"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_water_based_liquids_sweetened")
+
+# handling snfi_core_nfis_other
+df_logic_c_reclassifying_snfi_core_nfis_other <- df_main_extra_data |> 
+    filter(!is.na(snfi_core_nfis_other)) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "snfi_core_nfis_other",
+           i.check.current_value = as.character(snfi_core_nfis_other),
+           i.check.value = ifelse(snfi_core_nfis_other %in% c("0", "9", "NA", "o")|str_detect(string = snfi_core_nfis_other, 
+                                                                                              pattern = regex("Lakki|Hin |No|none|Nothing", ignore_case = TRUE)), "NA", ""),
+           i.check.issue_id = "logic_c_reclassifying_snfi_core_nfis_other",
+           i.check.issue = glue("Reclassifying snfi_core_nfis_other"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_snfi_core_nfis_other")
+
+# handling hh_face_barriers_other
+df_logic_c_reclassifying_hh_face_barriers_other <- df_main_extra_data |> 
+    filter(!is.na(hh_face_barriers_other)) |> 
+    mutate(i.check.type = "change_response",
+           i.check.name = "hh_face_barriers_other",
+           i.check.current_value = as.character(hh_face_barriers_other),
+           i.check.value = ifelse(hh_face_barriers_other %in% c("0", "9", "NA", "o")|str_detect(string = hh_face_barriers_other, 
+                                                                                                pattern = regex("Lakki|Hin |No|none|Nothing", ignore_case = TRUE)), "NA", ""),
+           i.check.issue_id = "logic_c_reclassifying_hh_face_barriers_other",
+           i.check.issue = glue("Reclassifying hh_face_barriers_other"),
+           i.check.other_text = "",
+           i.check.checked_by = "AT",
+           i.check.checked_date = as_date(today()),
+           i.check.comment = "", 
+           i.check.reviewed = "1",
+           i.check.adjust_log = "",
+           i.check.so_sm_choices = "") |> 
+    supporteR::batch_select_rename(input_selection_str = "i.check.", input_replacement_str = "")
+add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_hh_face_barriers_other")
+
+
 # combined  checks --------------------------------------------------------
 
 df_combined_checks <- bind_rows(checks_output) 
