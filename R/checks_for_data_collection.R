@@ -608,7 +608,7 @@ add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_l
 # extra checks income -----------------------------------------------------
 
 
-df_logic_c_expenditure_greater_than_income <- df_main_extra_data |> 
+df_logic_c_expenditure_greater_than_income <- df_tool_data |> 
     filter(int.tot_expenditure > 2*hh_tot_income_amount) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "int.tot_expenditure",
@@ -629,7 +629,7 @@ add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_l
 
 # income composition greater than 100 percent
 
-df_logic_c_income_greater_than_100 <- df_main_extra_data |> 
+df_logic_c_income_greater_than_100 <- df_tool_data |> 
     filter(int.tot_income_percent > 100) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "income_salaried_work",
@@ -685,7 +685,7 @@ df_sim_data <- readxl::read_excel("outputs/20230612_most_similar_analysis_msha.x
 df_suspected_data_60 <- df_sim_data |> 
     filter(number.different.columns < 60)
 
-df_logic_c_similar_data_across_interviews <- df_main_extra_data |> 
+df_logic_c_similar_data_across_interviews <- df_tool_data |> 
     filter(uuid %in% df_suspected_data_60$`_uuid`) |> 
     mutate(i.check.type = "remove_survey",
            i.check.name = "",
@@ -706,7 +706,7 @@ add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_l
 
 # excluding un trusted enumerators
 
-df_logic_c_excluded_enums <- df_main_extra_data |> 
+df_logic_c_excluded_enums <- df_tool_data |> 
     filter(!uuid %in% df_logic_c_similar_data_across_interviews$uuid, enumerator_id %in% c("ETH06", "ETH04", "ETH48", "6")) |> 
     mutate(i.check.type = "remove_survey",
            i.check.name = "",
@@ -726,7 +726,7 @@ df_logic_c_excluded_enums <- df_main_extra_data |>
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_excluded_enums")
 
 # handling other_job
-df_logic_c_reclassifying_other_job <- df_main_extra_data |> 
+df_logic_c_reclassifying_other_job <- df_tool_data |> 
     filter(other_job %in% c("yes")) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "other_job",
@@ -754,7 +754,7 @@ df_logic_c_reclassifying_other_job <- df_main_extra_data |>
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_other_job")
 
 # handling other_job_children
-df_logic_c_reclassifying_other_job_children <- df_main_extra_data |> 
+df_logic_c_reclassifying_other_job_children <- df_tool_data |> 
     filter(other_job_children %in% c("yes")) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "other_job_children",
@@ -782,7 +782,7 @@ df_logic_c_reclassifying_other_job_children <- df_main_extra_data |>
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_other_job_children")
 
 # handling expenditure_other_infrequent
-df_logic_c_harmonise_expenditure_other_infrequent <- df_main_extra_data |> 
+df_logic_c_harmonise_expenditure_other_infrequent <- df_tool_data |> 
     filter(expenditure_other_infrequent > 0,  expenditure_other_infrequent_other %in% c("0", "9", "NA", "No", "o")) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "expenditure_other_infrequent",
@@ -802,7 +802,7 @@ df_logic_c_harmonise_expenditure_other_infrequent <- df_main_extra_data |>
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_harmonise_expenditure_other_infrequent")
 
 # handling expenditure_other_infrequent_other
-df_logic_c_reclassifying_expenditure_other_infrequent_other <- df_main_extra_data |> 
+df_logic_c_reclassifying_expenditure_other_infrequent_other <- df_tool_data |> 
     filter(!is.na(expenditure_other_infrequent_other), !expenditure_other_infrequent_other %in% c("0", "9", "NA", "No", "o")) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "expenditure_other_infrequent_other",
@@ -824,7 +824,7 @@ add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_l
 
 # extra other checks ------------------------------------------------------
 # handling other_vegetables
-df_logic_c_reclassifying_other_vegetables <- df_main_extra_data |> 
+df_logic_c_reclassifying_other_vegetables <- df_tool_data |> 
     filter(!is.na(other_vegetables)) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "other_vegetables",
@@ -844,7 +844,7 @@ df_logic_c_reclassifying_other_vegetables <- df_main_extra_data |>
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_other_vegetables")
 
 # handling other_fruits
-df_logic_c_reclassifying_other_fruits <- df_main_extra_data |> 
+df_logic_c_reclassifying_other_fruits <- df_tool_data |> 
     filter(!is.na(other_fruits)) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "other_fruits",
@@ -864,7 +864,7 @@ df_logic_c_reclassifying_other_fruits <- df_main_extra_data |>
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_other_fruits")
 
 # handling other_meats
-df_logic_c_reclassifying_other_meats <- df_main_extra_data |> 
+df_logic_c_reclassifying_other_meats <- df_tool_data |> 
     filter(!is.na(other_meats)) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "other_meats",
@@ -884,7 +884,7 @@ df_logic_c_reclassifying_other_meats <- df_main_extra_data |>
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_other_meats")
 
 # handling income_other_income_other
-df_logic_c_reclassifying_income_other_income_other <- df_main_extra_data |> 
+df_logic_c_reclassifying_income_other_income_other <- df_tool_data |> 
     filter(!is.na(income_other_income_other)) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "income_other_income_other",
@@ -904,7 +904,7 @@ df_logic_c_reclassifying_income_other_income_other <- df_main_extra_data |>
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_income_other_income_other")
 
 # handling expenditure_other_infrequent_other
-df_logic_c_reclassifying_expenditure_other_infrequent_other <- df_main_extra_data |> 
+df_logic_c_reclassifying_expenditure_other_infrequent_other <- df_tool_data |> 
     filter(!is.na(expenditure_other_infrequent_other)) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "expenditure_other_infrequent_other",
@@ -924,7 +924,7 @@ df_logic_c_reclassifying_expenditure_other_infrequent_other <- df_main_extra_dat
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_expenditure_other_infrequent_other")
 
 # handling hh_other_livestock_other
-df_logic_c_reclassifying_hh_other_livestock_other <- df_main_extra_data |> 
+df_logic_c_reclassifying_hh_other_livestock_other <- df_tool_data |> 
     filter(!is.na(hh_other_livestock_other)) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "hh_other_livestock_other",
@@ -944,7 +944,7 @@ df_logic_c_reclassifying_hh_other_livestock_other <- df_main_extra_data |>
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_hh_other_livestock_other")
 
 # handling hh_previous_location
-df_logic_c_reclassifying_hh_previous_location <- df_main_extra_data |> 
+df_logic_c_reclassifying_hh_previous_location <- df_tool_data |> 
     filter(!is.na(hh_previous_location)) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "hh_previous_location",
@@ -964,7 +964,7 @@ df_logic_c_reclassifying_hh_previous_location <- df_main_extra_data |>
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_hh_previous_location")
 
 # handling water_based_liquids_other
-df_logic_c_reclassifying_water_based_liquids_other <- df_main_extra_data |> 
+df_logic_c_reclassifying_water_based_liquids_other <- df_tool_data |> 
     filter(!is.na(water_based_liquids_other)) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "water_based_liquids_other",
@@ -984,7 +984,7 @@ df_logic_c_reclassifying_water_based_liquids_other <- df_main_extra_data |>
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_water_based_liquids_other")
 
 # handling water_based_liquids_sweetened
-df_logic_c_reclassifying_water_based_liquids_sweetened <- df_main_extra_data |> 
+df_logic_c_reclassifying_water_based_liquids_sweetened <- df_tool_data |> 
     filter(!is.na(water_based_liquids_sweetened)) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "water_based_liquids_sweetened",
@@ -1004,7 +1004,7 @@ df_logic_c_reclassifying_water_based_liquids_sweetened <- df_main_extra_data |>
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_water_based_liquids_sweetened")
 
 # handling snfi_core_nfis_other
-df_logic_c_reclassifying_snfi_core_nfis_other <- df_main_extra_data |> 
+df_logic_c_reclassifying_snfi_core_nfis_other <- df_tool_data |> 
     filter(!is.na(snfi_core_nfis_other)) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "snfi_core_nfis_other",
@@ -1024,7 +1024,7 @@ df_logic_c_reclassifying_snfi_core_nfis_other <- df_main_extra_data |>
 add_checks_data_to_list(input_list_name = "checks_output", input_df_name = "df_logic_c_reclassifying_snfi_core_nfis_other")
 
 # handling hh_face_barriers_other
-df_logic_c_reclassifying_hh_face_barriers_other <- df_main_extra_data |> 
+df_logic_c_reclassifying_hh_face_barriers_other <- df_tool_data |> 
     filter(!is.na(hh_face_barriers_other)) |> 
     mutate(i.check.type = "change_response",
            i.check.name = "hh_face_barriers_other",
