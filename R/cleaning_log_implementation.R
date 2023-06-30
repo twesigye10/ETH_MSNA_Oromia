@@ -73,7 +73,36 @@ df_cleaning_step <- supporteR::cleaning_support(input_df_raw_data = df_raw_data,
                                               input_vars_to_remove_from_data = vars_to_remove_from_data)
 
 df_cleaned_data <- df_cleaning_step|> 
-    select(-`...1198`)
+    select(-`...1198`) |> 
+    mutate(`women_unsafe_location_yes/no_unsafe_location` = ifelse(!is.na(women_unsafe_location_yes)  & str_detect(string = women_unsafe_location_yes, pattern = "no_unsafe_location"), TRUE, `women_unsafe_location_yes/no_unsafe_location`),
+           `women_unsafe_location_yes/no_unsafe_location` = ifelse(!is.na(women_unsafe_location_yes)  & !str_detect(string = women_unsafe_location_yes, pattern = "no_unsafe_location"), FALSE, `women_unsafe_location_yes/no_unsafe_location`),
+           `women_unsafe_location_yes/latrines_bathing_facilities` = ifelse(!is.na(women_unsafe_location_yes)  & str_detect(string = women_unsafe_location_yes, pattern = "latrines_bathing_facilities"), TRUE, `women_unsafe_location_yes/latrines_bathing_facilities`),
+           `women_unsafe_location_yes/latrines_bathing_facilities` = ifelse(!is.na(women_unsafe_location_yes)  & !str_detect(string = women_unsafe_location_yes, pattern = "latrines_bathing_facilities"), FALSE, `women_unsafe_location_yes/latrines_bathing_facilities`),
+           `women_unsafe_location_yes/markets` = ifelse(!is.na(women_unsafe_location_yes)  & str_detect(string = women_unsafe_location_yes, pattern = "markets"), TRUE, `women_unsafe_location_yes/markets`),
+           `women_unsafe_location_yes/markets` = ifelse(!is.na(women_unsafe_location_yes)  & !str_detect(string = women_unsafe_location_yes, pattern = "markets"), FALSE, `women_unsafe_location_yes/markets`),
+           `women_unsafe_location_yes/distribution_areas` = ifelse(!is.na(women_unsafe_location_yes)  & str_detect(string = women_unsafe_location_yes, pattern = "distribution_areas"), TRUE, `women_unsafe_location_yes/distribution_areas`),
+           `women_unsafe_location_yes/distribution_areas` = ifelse(!is.na(women_unsafe_location_yes)  & !str_detect(string = women_unsafe_location_yes, pattern = "distribution_areas"), FALSE, `women_unsafe_location_yes/distribution_areas`),
+           `women_unsafe_location_yes/water_points` = ifelse(!is.na(women_unsafe_location_yes)  & str_detect(string = women_unsafe_location_yes, pattern = "water_points"), TRUE, `women_unsafe_location_yes/water_points`),
+           `women_unsafe_location_yes/water_points` = ifelse(!is.na(women_unsafe_location_yes)  & !str_detect(string = women_unsafe_location_yes, pattern = "water_points"), FALSE, `women_unsafe_location_yes/water_points`),
+           `women_unsafe_location_yes/social_areas` = ifelse(!is.na(women_unsafe_location_yes)  & str_detect(string = women_unsafe_location_yes, pattern = "social_areas"), TRUE, `women_unsafe_location_yes/social_areas`),
+           `women_unsafe_location_yes/social_areas` = ifelse(!is.na(women_unsafe_location_yes)  & !str_detect(string = women_unsafe_location_yes, pattern = "social_areas"), FALSE, `women_unsafe_location_yes/social_areas`),
+           `women_unsafe_location_yes/towards_school` = ifelse(!is.na(women_unsafe_location_yes)  & str_detect(string = women_unsafe_location_yes, pattern = "towards_school"), TRUE, `women_unsafe_location_yes/towards_school`),
+           `women_unsafe_location_yes/towards_school` = ifelse(!is.na(women_unsafe_location_yes)  & !str_detect(string = women_unsafe_location_yes, pattern = "towards_school"), FALSE, `women_unsafe_location_yes/towards_school`),
+           `women_unsafe_location_yes/towards_health_centers` = ifelse(!is.na(women_unsafe_location_yes)  & str_detect(string = women_unsafe_location_yes, pattern = "towards_health_centers"), TRUE, `women_unsafe_location_yes/towards_health_centers`),
+           `women_unsafe_location_yes/towards_health_centers` = ifelse(!is.na(women_unsafe_location_yes)  & !str_detect(string = women_unsafe_location_yes, pattern = "towards_health_centers"), FALSE, `women_unsafe_location_yes/towards_health_centers`),
+           `women_unsafe_location_yes/homes` = ifelse(!is.na(women_unsafe_location_yes)  & str_detect(string = women_unsafe_location_yes, pattern = "homes"), TRUE, `women_unsafe_location_yes/homes`),
+           `women_unsafe_location_yes/homes` = ifelse(!is.na(women_unsafe_location_yes)  & !str_detect(string = women_unsafe_location_yes, pattern = "homes"), FALSE, `women_unsafe_location_yes/homes`),
+           `women_unsafe_location_yes/public_transportation` = ifelse(!is.na(women_unsafe_location_yes)  & str_detect(string = women_unsafe_location_yes, pattern = "public_transportation"), TRUE, `women_unsafe_location_yes/public_transportation`),
+           `women_unsafe_location_yes/public_transportation` = ifelse(!is.na(women_unsafe_location_yes)  & !str_detect(string = women_unsafe_location_yes, pattern = "public_transportation"), FALSE, `women_unsafe_location_yes/public_transportation`),
+           `women_unsafe_location_yes/towards_collect_firewood` = ifelse(!is.na(women_unsafe_location_yes)  & str_detect(string = women_unsafe_location_yes, pattern = "towards_collect_firewood"), TRUE, `women_unsafe_location_yes/towards_collect_firewood`),
+           `women_unsafe_location_yes/towards_collect_firewood` = ifelse(!is.na(women_unsafe_location_yes)  & !str_detect(string = women_unsafe_location_yes, pattern = "towards_collect_firewood"), FALSE, `women_unsafe_location_yes/towards_collect_firewood`),
+           `women_unsafe_location_yes/other` = ifelse(!is.na(women_unsafe_location_yes)  & str_detect(string = women_unsafe_location_yes, pattern = "other"), TRUE, `women_unsafe_location_yes/other`),
+           `women_unsafe_location_yes/other` = ifelse(!is.na(women_unsafe_location_yes)  & !str_detect(string = women_unsafe_location_yes, pattern = "other"), FALSE, `women_unsafe_location_yes/other`),
+           `women_unsafe_location_yes/dk` = ifelse(!is.na(women_unsafe_location_yes)  & str_detect(string = women_unsafe_location_yes, pattern = "dk"), TRUE, `women_unsafe_location_yes/dk`),
+           `women_unsafe_location_yes/dk` = ifelse(!is.na(women_unsafe_location_yes)  & !str_detect(string = women_unsafe_location_yes, pattern = "dk"), FALSE, `women_unsafe_location_yes/dk`),
+           `women_unsafe_location_yes/dwa` = ifelse(!is.na(women_unsafe_location_yes)  & str_detect(string = women_unsafe_location_yes, pattern = "dwa"), TRUE, `women_unsafe_location_yes/dwa`),
+           `women_unsafe_location_yes/dwa` = ifelse(!is.na(women_unsafe_location_yes)  & !str_detect(string = women_unsafe_location_yes, pattern = "dwa"), FALSE, `women_unsafe_location_yes/dwa`)
+    ) 
 
 df_main_with_composites <- df_cleaned_data |> 
     create_composite_indicators()
