@@ -17,17 +17,30 @@ df_tool_data <- readxl::read_excel(data_path) |>
            enumerator_id = ifelse(is.na(enumerator_id), enum_code, enumerator_id)) |> 
     checks_add_extra_cols(input_enumerator_id_col = "enumerator_id",
                           input_location_col = "hh_kebele") |> 
+    create_composite_indicators() |> 
     rowwise() |> 
     mutate( 
         i.hh_number = sum(c_across(num_males_0to6:num_females_66plusyrs), na.rm = T),
         i.tot_income_percent = sum(c_across(income_salaried_work:income_other_income), na.rm = T),
         i.tot_expenditure = sum(c_across(food_items:expenditure_other_frequent), na.rm = T),
+        int.hh_number = sum(c_across(num_males_0to6:num_females_66plusyrs), na.rm = T),
+        int.hh_number_male = sum(c_across(starts_with("num_males_")), na.rm = T),
+        int.hh_number_female = sum(c_across(starts_with("num_females_")), na.rm = T),
+        int.hh_number_children = sum(c_across(num_males_0to6:num_females_14to17), na.rm = T),
+        int.hh_number_children_male = sum(c_across(c("num_males_4to6", "num_males_7to13", "num_males_14to17")), na.rm = T),
+        int.hh_number_children_female = sum(c_across(c("num_females_4to6", "num_females_7to13", "num_females_14to17")), na.rm = T),
+        int.hh_no_4_work = sum(c_across(num_males_14to17:num_females_66plusyrs), na.rm = T),
+        int.hh_no_4_work_male = sum(c_across(all_of(c("num_males_14to17", "num_males_18to49", "num_males_50to65", "num_males_66plusyrs"))), na.rm = T),
+        int.hh_no_4_work_female = sum(c_across(all_of(c("num_females_14to17", "num_females_18to49", "num_females_50to65", "num_females_66plusyrs"))), na.rm = T),
+        int.num_male_7m_6yrs = sum(c_across(all_of(c("num_males_7to3yrs", "num_males_4to6"))), na.rm = T),
+        int.num_female_7m_6yrs = sum(c_across(all_of(c("num_females_7to3yrs", "num_females_4to6"))), na.rm = T),
+        int.tot_income_percent = sum(c_across(income_salaried_work:income_other_income), na.rm = T),
+        int.tot_expenditure = sum(c_across(food_items:expenditure_other_frequent), na.rm = T),
+        int.job_components = sum(c_across(permanent_job_female:own_bisuness_male), na.rm = T),
+        int.job_children_components = sum(c_across(permanent_children_job_female:own_bisuness_children_male), na.rm = T)
     ) |>
-    ungroup() |> 
-    create_composite_indicators() |> 
-    rename(int.hh_number = i.hh_number,
-           int.tot_income_percent = i.tot_income_percent,
-           int.tot_expenditure = i.tot_expenditure)
+    ungroup()
+    
 
 # loops
 # loop_educ
