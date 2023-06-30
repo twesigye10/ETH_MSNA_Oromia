@@ -72,12 +72,12 @@ healthyr::create_fsl_quality_report(df = df2 |> filter(!enum %in% c("6", "ETH07"
                                     file_path = paste0("outputs/", butteR::date_file_prefix(), 
                                                        "_eth_msha_oromia_healthyr_short_report.xlsx"))
 
-healthyr::create_fsl_quality_report(df = df2 |> filter(!enum %in% c("6", "ETH07", "ETH30")), 
+healthyr::create_fsl_quality_report(df = df2 |> filter(!enum %in% c("6", "ETH07", "ETH30", "ETH03")), 
                                     grouping = "enum", short_report = FALSE, 
                                     file_path = paste0("outputs/", butteR::date_file_prefix(), 
                                                        "_eth_msha_oromia_healthyr_full_report_enu.xlsx"))
 
-healthyr::create_fsl_quality_report(df = df2 |> filter(!enum %in% c("6", "ETH07", "ETH30")), 
+healthyr::create_fsl_quality_report(df = df2 |> filter(!enum %in% c("6", "ETH07", "ETH30", "ETH03")), 
                                     grouping = "enum", short_report = TRUE, 
                                     file_path = paste0("outputs/", butteR::date_file_prefix(), 
                                                        "_eth_msha_oromia_healthyr_short_report_enu.xlsx"))
