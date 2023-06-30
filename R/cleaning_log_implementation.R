@@ -31,10 +31,8 @@ data_nms <- names(readxl::read_excel(path = loc_data, n_max = 1000))
 c_types <- case_when(str_detect(string = data_nms, pattern = "_other$") ~ "text",
                         TRUE ~ "guess")
 
-df_raw_data <- readxl::read_excel(path = loc_data, col_types = c_types) |> 
-  mutate(across(.cols = -c(any_of(cols_to_escape)), 
-                .fns = ~ifelse(str_detect(string = ., 
-                                          pattern = fixed(pattern = "N/A", ignore_case = TRUE)), "NA", .)))
+df_raw_data <- readxl::read_excel(path = loc_data, col_types = c_types, na = c("NA", "N/A", "n/a"))
+
 # loops
 loop_educ <- readxl::read_excel(path = loc_data, sheet = "grp_education_loop") 
     
