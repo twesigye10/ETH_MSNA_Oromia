@@ -86,7 +86,7 @@ create_composite_indicators <- function(input_df) {
                                            girls_anxiety > 0 ~ "yes"), 
                i.adults_anxiety = case_when(adults_anxiety == 0 ~ "no",
                                             adults_anxiety > 0 ~ "yes"),
-               i.snfi_no_rooms = i.hh_size/snfi_no_rooms,
+               i.snfi_no_rooms = i.hh_composition_size/snfi_no_rooms,
                i.chronic_illiness_male = case_when(chronic_illiness_male == 0 ~ "no",
                                                    chronic_illiness_male > 0 ~ "yes"), 
                i.chronic_illiness_female = case_when(chronic_illiness_female == 0 ~ "no",
