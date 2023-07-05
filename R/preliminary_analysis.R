@@ -42,19 +42,28 @@ df_main_analysis <- analysis_after_survey_creation(input_svy_obj = ref_svy,
 
 combined_analysis <- df_main_analysis
 
+integer_cols_i <- c("i.fcs", "i.rcsi", "i.hhs", "i.adults_permanent_job", "i.adults_temporary_job", "i.adults_casual_lobour",
+                    "i.adults_own_bisuness", "i.children_permanent_job", "i.children_temporary_job", "i.children_casual_lobour",
+                    "i.children_own_bisuness", "i.boys_early_marriege", "i.girls_early_marriege", "i.boys_work_outside_home",
+                    "i.girls_work_outside_home")
+integer_cols_int <- c("int.fcs", "int.rcsi", "int.hhs", "int.adults_permanent_job", "int.adults_temporary_job", "int.adults_casual_lobour",
+                      "int.adults_own_bisuness", "int.children_permanent_job", "int.children_temporary_job", "int.children_casual_lobour",
+                      "int.children_own_bisuness", "int.boys_early_marriege", "int.girls_early_marriege", "int.boys_work_outside_home",
+                      "int.girls_work_outside_home")
+
 # formatting the analysis, adding question labels
 full_analysis_long <- combined_analysis |> 
   mutate(variable = ifelse(is.na(variable) | variable %in% c(""), variable_val, variable),
          int.variable = ifelse(str_detect(string = variable, pattern = "^i\\."), str_replace(string = variable, pattern = "^i\\.", replacement = ""), variable)) |> 
   left_join(df_tool_data_support, by = c("int.variable" = "name")) |> 
   relocate(label, .after = variable) |> 
-  mutate(variable = ifelse(variable %in% c("i.fcs", "i.rcsi", "i.hhs"), str_replace(string = variable, pattern = "i.", replacement = "int."), variable),
-         select_type = ifelse(variable %in% c("int.fcs", "int.rcsi", "int.hhs"), "integer", select_type),
+  mutate(variable = ifelse(variable %in% integer_cols_i, str_replace(string = variable, pattern = "i.", replacement = "int."), variable),
+         select_type = ifelse(variable %in% integer_cols_int, "integer", select_type),
          label = ifelse(is.na(label), variable, label),
-         `mean/pct` = ifelse(select_type %in% c("integer") & !variable %in% c("i.fcs", "i.hhs") & !str_detect(string = variable, pattern = "^i\\."), `mean/pct`, `mean/pct`*100),
+         `mean/pct` = ifelse(select_type %in% c("integer") & !variable %in% integer_cols_i & !str_detect(string = variable, pattern = "^i\\."), `mean/pct`, `mean/pct`*100),
          `mean/pct` = round(`mean/pct`, digits = 2)) |> 
-  mutate(variable = ifelse(variable %in% c("int.fcs", "int.rcsi", "int.hhs"), str_replace(string = variable, pattern = "int.", replacement = "i."), variable),
-         label = ifelse(label %in% c("int.fcs", "int.rcsi", "int.hhs"), str_replace(string = label, pattern = "int.", replacement = "i."), label)) |> 
+  mutate(variable = ifelse(variable %in% integer_cols_int, str_replace(string = variable, pattern = "int.", replacement = "i."), variable),
+         label = ifelse(label %in% integer_cols_int, str_replace(string = label, pattern = "int.", replacement = "i."), label)) |> 
   select(`Question`= label, 
          variable, 
          `choices/options` = variable_val, 
