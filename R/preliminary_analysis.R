@@ -2,6 +2,7 @@ library(tidyverse)
 library(srvyr)
 library(supporteR)  
 
+source("R/composite_indicators.R")
 # packages to install incase
 # devtools::install_github("zackarno/butteR")
 # devtools::install_github("twesigye10/supporteR")
@@ -12,7 +13,19 @@ data_path <- "inputs/clean_data_eth_msha_oromia.xlsx"
 data_nms <- names(readxl::read_excel(path = data_path, n_max = 2000, sheet = "cleaned_main_data"))
 c_types <- ifelse(str_detect(string = data_nms, pattern = "_other$"), "text", "guess")
 
-df_main_clean_data <- readxl::read_excel(path = data_path, sheet = "cleaned_main_data", col_types = c_types, na = "NA")
+df_main_clean_data <- readxl::read_excel(path = data_path, sheet = "cleaned_main_data", col_types = c_types, na = "NA") |> 
+    create_composite_indicators()
+
+loop_support_data <- df_main_clean_data |> select(uuid, hh_woreda, i.hoh_gender)
+
+education_loop <- readxl::read_excel(path = data_path, sheet = "cleaned_education_loop", na = "NA")
+df_education_data <- loop_support_data |> 
+    inner_join(education_loop, by = c("uuid" = "_submission__uuid") ) 
+
+health_loop <- readxl::read_excel(path = data_path, sheet = "cleaned_health_loop", na = "NA") |> 
+    create_composite_indicators_health()
+df_health_clean_data <- loop_support_data |> 
+    inner_join(health_loop, by = c("uuid" = "_submission__uuid") ) 
 
 # tool
 df_survey <- readxl::read_excel("inputs/ETH2301_MSHA_Oromia_tool.xlsx", sheet = "survey") 
@@ -24,6 +37,9 @@ df_tool_data_support <- df_survey |>
 
 # dap
 dap <- read_csv("inputs/r_dap_msha_eth.csv")
+
+
+# main dataset ------------------------------------------------------------
 
 # set up design object
 ref_svy <- as_survey(.data = df_main_clean_data)
@@ -38,15 +54,39 @@ df_main_analysis <- analysis_after_survey_creation(input_svy_obj = ref_svy,
                                                                                "wash_watertime1",
                                                                                "hh_shocks_affect11"))
                                                    )
-# merge analysis
 
-combined_analysis <- df_main_analysis
+# education loop ----------------------------------------------------------
 
-integer_cols_i <- c("i.fcs", "i.rcsi", "i.hhs", "i.adults_permanent_job", "i.adults_temporary_job", "i.adults_casual_lobour",
+# set up design object
+ref_svy_education_loop <- as_survey(.data = df_education_data)
+# analysis 
+df_analysis_education_loop <- analysis_after_survey_creation(input_svy_obj = ref_svy_education_loop,
+                                                   input_dap = dap |> 
+                                                       filter(variable %in% c("edu_modality", "edu_attendance", "edu_attendance_remote", 
+                                                                              "edu_non_access_reason", "edu_safe_environment", "edu_safe_environment_reasons",         
+                                                                              "edu_learning_conditions", "edu_learning_conditions_reasons", "edu_pre_primary"))
+                                                   )
+
+# health loop -------------------------------------------------------------
+
+# set up design object
+ref_svy_health_loop <- as_survey(.data = df_health_clean_data)
+# analysis
+df_analysis_health_loop <- analysis_after_survey_creation(input_svy_obj = ref_svy_health_loop,
+                                                   input_dap = dap |> 
+                                                       filter(variable %in% c("i.disability"))
+                                                   )
+
+# merge and format analysis ----------------------------------------------------------
+
+combined_analysis <- bind_rows(df_main_analysis, df_analysis_education_loop, df_analysis_health_loop)
+
+
+integer_cols_i <- c("i.fcs", "i.rcsi", "i.hhs", "i.hh_composition_size",  "i.adults_permanent_job", "i.adults_temporary_job", "i.adults_casual_lobour",
                     "i.adults_own_bisuness", "i.children_permanent_job", "i.children_temporary_job", "i.children_casual_lobour",
                     "i.children_own_bisuness", "i.boys_early_marriege", "i.girls_early_marriege", "i.boys_work_outside_home",
                     "i.girls_work_outside_home")
-integer_cols_int <- c("int.fcs", "int.rcsi", "int.hhs", "int.adults_permanent_job", "int.adults_temporary_job", "int.adults_casual_lobour",
+integer_cols_int <- c("int.fcs", "int.rcsi", "int.hhs", "int.hh_composition_size", "int.adults_permanent_job", "int.adults_temporary_job", "int.adults_casual_lobour",
                       "int.adults_own_bisuness", "int.children_permanent_job", "int.children_temporary_job", "int.children_casual_lobour",
                       "int.children_own_bisuness", "int.boys_early_marriege", "int.girls_early_marriege", "int.boys_work_outside_home",
                       "int.girls_work_outside_home")
