@@ -2,7 +2,8 @@
 
 create_composite_indicators <- function(input_df) {
     input_df |> 
-        mutate(int.fcs_cereals_tubers = fs_fcs_cerealgrainroottuber*2,
+        mutate(i.hoh_gender = ifelse(is.na(hoh_gender), respondent_gender, hoh_gender),
+               int.fcs_cereals_tubers = fs_fcs_cerealgrainroottuber*2,
                int.fcs_pulses = fs_fcs_beansnuts*3,
                int.fcs_vegetables = fs_fcs_vegetableleave,
                int.fcs_fruit = fs_fcs_fruit,
