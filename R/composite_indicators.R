@@ -4,6 +4,7 @@ create_composite_indicators <- function(input_df) {
     input_df |> 
         mutate(i.hoh_gender = ifelse(is.na(hoh_gender), respondent_gender, hoh_gender),
                i.hoh_age = ifelse(is.na(hoh_age), respondent_age, hoh_age),
+               i.hh_size = sum(c_across(num_males_0to6:num_females_66plusyrs), na.rm = T),
                int.fcs_cereals_tubers = fs_fcs_cerealgrainroottuber*2,
                int.fcs_pulses = fs_fcs_beansnuts*3,
                int.fcs_vegetables = fs_fcs_vegetableleave,
