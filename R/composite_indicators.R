@@ -47,8 +47,6 @@ create_composite_indicators <- function(input_df) {
                int.hh_number_children_female = sum(c_across(c("num_females_0to6", "num_females_7to3yrs", "num_females_4to6", "num_females_7to13", "num_females_14to17")), na.rm = T),
                int.boys_work_outside_home = sum(c_across(c("boys_between2_7years", "boys_between8_13years", "boys_between14_17years")), na.rm = T),
                int.girls_work_outside_home = sum(c_across(c("girls_between2_7years", "girls_between8_13years", "girls_between14_17years")), na.rm = T),
-               int.disability = paste(difficulty_seeing, difficulty_hearing, difficulty_walking, 
-                                      difficulty_remembering, difficulty_self_care, difficulty_communicating),
                
                
         ) |>
@@ -85,7 +83,6 @@ create_composite_indicators <- function(input_df) {
                i.adults_anxiety = case_when(adults_anxiety == 0 ~ "no",
                                             adults_anxiety > 0 ~ "yes"),
                i.snfi_no_rooms = i.hh_size/snfi_no_rooms,
-               i.disability = ifelse(str_detect(string = int.disability, pattern = "a_lot_of_difficulty|cannot_do_at_all"), "yes", "no"),
                i.chronic_illiness_male = case_when(chronic_illiness_male == 0 ~ "no",
                                                    chronic_illiness_male > 0 ~ "yes"), 
                i.chronic_illiness_female = case_when(chronic_illiness_female == 0 ~ "no",
@@ -98,6 +95,17 @@ create_composite_indicators <- function(input_df) {
         ) |> 
         relocate(i.fcs_cat, .after = i.fcs) |> 
         relocate(i.rcsi_cat, .after = i.rcsi) |> 
+        select(-c(starts_with("int.")))
+}
+
+
+create_composite_indicators_health <- function(input_df) {
+    input_df |> 
+        mutate(int.disability = paste(difficulty_seeing, difficulty_hearing, difficulty_walking, 
+                                   difficulty_remembering, difficulty_self_care, difficulty_communicating),
+               i.disability = ifelse(str_detect(string = int.disability, pattern = "a_lot_of_difficulty|cannot_do_at_all"), "yes", "no"),
+               
+        ) |>  
         select(-c(starts_with("int.")))
 }
 
