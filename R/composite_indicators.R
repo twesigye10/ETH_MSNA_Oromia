@@ -63,7 +63,7 @@ create_composite_indicators <- function(input_df) {
                                      i.hhs <= 3 ~ "Moderate",
                                      i.hhs == 4 ~ "Severe",
                                      i.hhs <= 6 ~ "Very severe"),
-               i.hh_size = int.hh_size,
+               i.hh_composition_size = int.hh_size,
                i.hoh_gender = ifelse(is.na(hoh_gender), respondent_gender, hoh_gender),
                i.hoh_age = ifelse(is.na(hoh_age), respondent_age, hoh_age),
                i.adults_permanent_job = (int.adults_permanent_job/int.hh_no_4_work) * 100,
