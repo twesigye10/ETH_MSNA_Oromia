@@ -2,9 +2,7 @@
 
 create_composite_indicators <- function(input_df) {
     input_df |> 
-        mutate(i.hoh_gender = ifelse(is.na(hoh_gender), respondent_gender, hoh_gender),
-               i.hoh_age = ifelse(is.na(hoh_age), respondent_age, hoh_age),
-               int.fcs_cereals_tubers = fs_fcs_cerealgrainroottuber*2,
+        mutate(int.fcs_cereals_tubers = fs_fcs_cerealgrainroottuber*2,
                int.fcs_pulses = fs_fcs_beansnuts*3,
                int.fcs_vegetables = fs_fcs_vegetableleave,
                int.fcs_fruit = fs_fcs_fruit,
@@ -28,10 +26,10 @@ create_composite_indicators <- function(input_df) {
                                                           fs_hhs_daynoteating_freq %in% c("3") ~ 2) 
         ) |> 
         rowwise() |> 
-        mutate(i.fcs = sum(c_across(int.fcs_cereals_tubers:int.fcs_oils)),
-               i.rcsi = sum(c_across(int.rCSILessQlty:int.rCSIMealNb)),
-               i.hhs = sum(c_across(int.freq_no_food_lack_resources:int.freq_day_and_night_no_food), na.rm = T),
-               i.hh_size = sum(c_across(num_males_0to6:num_females_66plusyrs), na.rm = T),
+        mutate(int.fcs = sum(c_across(int.fcs_cereals_tubers:int.fcs_oils)),
+               int.rcsi = sum(c_across(int.rCSILessQlty:int.rCSIMealNb)),
+               int.hhs = sum(c_across(int.freq_no_food_lack_resources:int.freq_day_and_night_no_food), na.rm = T),
+               int.hh_size = sum(c_across(num_males_0to6:num_females_66plusyrs), na.rm = T),
                int.adults_permanent_job = sum(c_across(permanent_job_female : permanent_job_male), na.rm = T),
                int.adults_temporary_job = sum(c_across(temporary_job_female : temporary_job_male), na.rm = T),
                int.adults_casual_lobour = sum(c_across(casual_lobour_female : casual_lobour_male), na.rm = T),
@@ -51,17 +49,23 @@ create_composite_indicators <- function(input_df) {
                
         ) |>
         ungroup() |>
-        mutate(i.fcs_cat = case_when(i.fcs <= 21 ~ "Poor",
+        mutate(i.fcs = int.fcs,
+               i.fcs_cat = case_when(i.fcs <= 21 ~ "Poor",
                                      i.fcs <= 35 ~ "Borderline",
                                      i.fcs <= 112 ~ "Acceptable"),
+               i.rcsi = int.rcsi,
                i.rcsi_cat = case_when(i.rcsi < 4 ~ "rcsi_0_3",
                                       i.rcsi < 19 ~ "rcsi_4_18",
                                       i.rcsi >= 19 ~ "rcsi_19+"),
+               i.hhs = int.hhs,
                i.hhs_cat = case_when(i.hhs == 0 ~ "None",
                                      i.hhs == 1 ~ "Slight",
                                      i.hhs <= 3 ~ "Moderate",
                                      i.hhs == 4 ~ "Severe",
                                      i.hhs <= 6 ~ "Very severe"),
+               i.hh_size = int.hh_size,
+               i.hoh_gender = ifelse(is.na(hoh_gender), respondent_gender, hoh_gender),
+               i.hoh_age = ifelse(is.na(hoh_age), respondent_age, hoh_age),
                i.adults_permanent_job = (int.adults_permanent_job/int.hh_no_4_work) * 100,
                i.adults_temporary_job = (int.adults_temporary_job/int.hh_no_4_work) * 100,
                i.adults_casual_lobour = (int.adults_casual_lobour/int.hh_no_4_work) * 100,
@@ -93,8 +97,6 @@ create_composite_indicators <- function(input_df) {
                                                  mental_heath_female > 0 ~ "yes"),
                
         ) |> 
-        relocate(i.fcs_cat, .after = i.fcs) |> 
-        relocate(i.rcsi_cat, .after = i.rcsi) |> 
         select(-c(starts_with("int.")))
 }
 
