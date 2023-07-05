@@ -4,7 +4,6 @@ create_composite_indicators <- function(input_df) {
     input_df |> 
         mutate(i.hoh_gender = ifelse(is.na(hoh_gender), respondent_gender, hoh_gender),
                i.hoh_age = ifelse(is.na(hoh_age), respondent_age, hoh_age),
-               i.hh_size = sum(c_across(num_males_0to6:num_females_66plusyrs), na.rm = T),
                int.fcs_cereals_tubers = fs_fcs_cerealgrainroottuber*2,
                int.fcs_pulses = fs_fcs_beansnuts*3,
                int.fcs_vegetables = fs_fcs_vegetableleave,
@@ -31,7 +30,22 @@ create_composite_indicators <- function(input_df) {
         rowwise() |> 
         mutate(i.fcs = sum(c_across(int.fcs_cereals_tubers:int.fcs_oils)),
                i.rcsi = sum(c_across(int.rCSILessQlty:int.rCSIMealNb)),
-               i.hhs = sum(c_across(int.freq_no_food_lack_resources:int.freq_day_and_night_no_food), na.rm = T)
+               i.hhs = sum(c_across(int.freq_no_food_lack_resources:int.freq_day_and_night_no_food), na.rm = T),
+               i.hh_size = sum(c_across(num_males_0to6:num_females_66plusyrs), na.rm = T),
+               int.adults_permanent_job = sum(c_across(permanent_job_female : permanent_job_male), na.rm = T),
+               int.adults_temporary_job = sum(c_across(temporary_job_female : temporary_job_male), na.rm = T),
+               int.adults_casual_lobour = sum(c_across(casual_lobour_female : casual_lobour_male), na.rm = T),
+               int.adults_own_bisuness = sum(c_across(own_bisuness_female : own_bisuness_male), na.rm = T),
+               int.hh_no_4_work = sum(c_across(num_males_18to49:num_females_66plusyrs), na.rm = T),
+               int.children_permanent_job = sum(c_across(permanent_children_job_female : permanent_children_job_male), na.rm = T),
+               int.children_temporary_job = sum(c_across(temporary_children_job_female : temporary_children_job_male), na.rm = T),
+               int.children_casual_lobour = sum(c_across(casual_lobour_children_female : casual_lobour_children_male), na.rm = T),
+               int.children_own_bisuness = sum(c_across(own_bisuness_children_female : own_bisuness_children_male), na.rm = T),
+               int.hh_number_children = sum(c_across(num_males_0to6:num_females_14to17), na.rm = T),
+               int.lost_job = sum(c_across(permanent_lost_job_female : temporary_lost_job_male), na.rm = T),
+               int.hh_number_children_male = sum(c_across(c("num_males_0to6", "num_males_7to3yrs", "num_males_4to6", "num_males_7to13", "num_males_14to17")), na.rm = T),
+               int.hh_number_children_female = sum(c_across(c("num_females_0to6", "num_females_7to3yrs", "num_females_4to6", "num_females_7to13", "num_females_14to17")), na.rm = T),
+               
         ) |>
         ungroup() |>
         mutate(i.fcs_cat = case_when(i.fcs <= 21 ~ "Poor",
@@ -44,7 +58,19 @@ create_composite_indicators <- function(input_df) {
                                      i.hhs == 1 ~ "Slight",
                                      i.hhs <= 3 ~ "Moderate",
                                      i.hhs == 4 ~ "Severe",
-                                     i.hhs <= 6 ~ "Very severe")
+                                     i.hhs <= 6 ~ "Very severe"),
+               i.adults_permanent_job = (int.adults_permanent_job/int.hh_no_4_work) * 100,
+               i.adults_temporary_job = (int.adults_temporary_job/int.hh_no_4_work) * 100,
+               i.adults_casual_lobour = (int.adults_casual_lobour/int.hh_no_4_work) * 100,
+               i.adults_own_bisuness = (int.adults_own_bisuness/int.hh_no_4_work) * 100,
+               i.children_permanent_job = (int.children_permanent_job/int.hh_number_children) * 100,
+               i.children_temporary_job = (int.children_temporary_job/int.hh_number_children) * 100,
+               i.children_casual_lobour = (int.children_casual_lobour/int.hh_number_children) * 100,
+               i.children_own_bisuness = (int.children_own_bisuness/int.hh_number_children) * 100,
+               i.lost_job = case_when(int.lost_job == 0 ~ "no",
+                                        int.lost_job > 0 ~ "yes"),
+               i.boys_early_marriege = (boys_early_marriege/int.hh_number_children_male) * 100,
+               i.girls_early_marriege = (girls_early_marriege/int.hh_number_children_female) * 100
         ) |> 
         relocate(i.fcs_cat, .after = i.fcs) |> 
         relocate(i.rcsi_cat, .after = i.rcsi) |> 
