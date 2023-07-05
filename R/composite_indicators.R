@@ -87,13 +87,13 @@ create_composite_indicators <- function(input_df) {
                i.snfi_no_rooms = i.hh_size/snfi_no_rooms,
                i.disability = ifelse(str_detect(string = int.disability, pattern = "a_lot_of_difficulty|cannot_do_at_all"), "yes", "no"),
                i.chronic_illiness_male = case_when(chronic_illiness_male == 0 ~ "no",
-                                                    > 0 ~ "yes"), 
+                                                   chronic_illiness_male > 0 ~ "yes"), 
                i.chronic_illiness_female = case_when(chronic_illiness_female == 0 ~ "no",
-                                                      > 0 ~ "yes"), 
+                                                     chronic_illiness_female > 0 ~ "yes"), 
                i.mental_heath_male = case_when(mental_heath_male == 0 ~ "no",
-                                                > 0 ~ "yes"), 
+                                               mental_heath_male > 0 ~ "yes"), 
                i.mental_heath_female = case_when(mental_heath_female == 0 ~ "no",
-                                                  > 0 ~ "yes"),
+                                                 mental_heath_female > 0 ~ "yes"),
                
         ) |> 
         relocate(i.fcs_cat, .after = i.fcs) |> 
