@@ -45,6 +45,11 @@ create_composite_indicators <- function(input_df) {
                int.lost_job = sum(c_across(permanent_lost_job_female : temporary_lost_job_male), na.rm = T),
                int.hh_number_children_male = sum(c_across(c("num_males_0to6", "num_males_7to3yrs", "num_males_4to6", "num_males_7to13", "num_males_14to17")), na.rm = T),
                int.hh_number_children_female = sum(c_across(c("num_females_0to6", "num_females_7to3yrs", "num_females_4to6", "num_females_7to13", "num_females_14to17")), na.rm = T),
+               int.boys_work_outside_home = sum(c_across(c("boys_between2_7years", "boys_between8_13years", "boys_between14_17years")), na.rm = T),
+               int.girls_work_outside_home = sum(c_across(c("girls_between2_7years", "girls_between8_13years", "girls_between14_17years")), na.rm = T),
+               int.disability = paste(difficulty_seeing, difficulty_hearing, difficulty_walking, 
+                                      difficulty_remembering, difficulty_self_care, difficulty_communicating),
+               
                
         ) |>
         ungroup() |>
@@ -70,7 +75,26 @@ create_composite_indicators <- function(input_df) {
                i.lost_job = case_when(int.lost_job == 0 ~ "no",
                                         int.lost_job > 0 ~ "yes"),
                i.boys_early_marriege = (boys_early_marriege/int.hh_number_children_male) * 100,
-               i.girls_early_marriege = (girls_early_marriege/int.hh_number_children_female) * 100
+               i.girls_early_marriege = (girls_early_marriege/int.hh_number_children_female) * 100,
+               i.boys_work_outside_home = (int.boys_work_outside_home/int.hh_number_children_male) * 100,
+               i.girls_work_outside_home = (int.girls_work_outside_home/int.hh_number_children_female) * 100,
+               i.boys_anxiety = case_when(boys_anxiety == 0 ~ "no",
+                                          boys_anxiety > 0 ~ "yes"), 
+               i.girls_anxiety = case_when(girls_anxiety == 0 ~ "no",
+                                           girls_anxiety > 0 ~ "yes"), 
+               i.adults_anxiety = case_when(adults_anxiety == 0 ~ "no",
+                                            adults_anxiety > 0 ~ "yes"),
+               i.snfi_no_rooms = i.hh_size/snfi_no_rooms,
+               i.disability = ifelse(str_detect(string = int.disability, pattern = "a_lot_of_difficulty|cannot_do_at_all"), "yes", "no"),
+               i.chronic_illiness_male = case_when(chronic_illiness_male == 0 ~ "no",
+                                                    > 0 ~ "yes"), 
+               i.chronic_illiness_female = case_when(chronic_illiness_female == 0 ~ "no",
+                                                      > 0 ~ "yes"), 
+               i.mental_heath_male = case_when(mental_heath_male == 0 ~ "no",
+                                                > 0 ~ "yes"), 
+               i.mental_heath_female = case_when(mental_heath_female == 0 ~ "no",
+                                                  > 0 ~ "yes"),
+               
         ) |> 
         relocate(i.fcs_cat, .after = i.fcs) |> 
         relocate(i.rcsi_cat, .after = i.rcsi) |> 
