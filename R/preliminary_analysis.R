@@ -111,7 +111,8 @@ full_analysis_long <- combined_analysis |>
          n_unweighted, 
          population, 
          subset_1_name, 
-         subset_1_val)
+         subset_1_val, 
+         select_type)
 
 # output analysis
 write_csv(full_analysis_long, paste0("outputs/", butteR::date_file_prefix(), "_full_analysis_lf_eth_msna_oromia.csv"), na="")
