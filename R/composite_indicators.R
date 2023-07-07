@@ -28,7 +28,7 @@ create_composite_indicators <- function(input_df) {
         rowwise() |> 
         mutate(int.fcs = sum(c_across(int.fcs_cereals_tubers:int.fcs_oils)),
                int.rcsi = sum(c_across(int.rCSILessQlty:int.rCSIMealNb)),
-               int.hhs = sum(c_across(int.freq_no_food_lack_resources:int.freq_day_and_night_no_food), na.rm = T),
+               int.hhs = sum(c_across(int.freq_no_food_lack_resources:int.freq_day_and_night_no_food)),
                int.hh_size = sum(c_across(num_males_0to6:num_females_66plusyrs), na.rm = T),
                int.adults_permanent_job = sum(c_across(permanent_job_female : permanent_job_male), na.rm = T),
                int.adults_temporary_job = sum(c_across(temporary_job_female : temporary_job_male), na.rm = T),
