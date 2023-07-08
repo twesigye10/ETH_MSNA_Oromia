@@ -28,7 +28,9 @@ df_health_clean_data <- loop_support_data |>
     inner_join(health_loop, by = c("uuid" = "_submission__uuid") ) 
 
 # tool
-df_survey <- readxl::read_excel("inputs/ETH2301_MSHA_Oromia_tool.xlsx", sheet = "survey") 
+loc_tool <- "inputs/ETH2301_MSHA_Oromia_tool.xlsx"
+df_survey <- readxl::read_excel(loc_tool, sheet = "survey")
+df_choices <- readxl::read_excel(loc_tool, sheet = "choices")
 
 df_tool_data_support <- df_survey |> 
   select(type, name, label = `label::English`) |> 
@@ -103,7 +105,7 @@ full_analysis_long <- combined_analysis |>
   mutate(variable = ifelse(variable %in% integer_cols_i, str_replace(string = variable, pattern = "i.", replacement = "int."), variable),
          select_type = ifelse(variable %in% integer_cols_int, "integer", select_type),
          label = ifelse(is.na(label), variable, label),
-         `mean/pct` = ifelse(select_type %in% c("integer") & !variable %in% integer_cols_i & !str_detect(string = variable, pattern = "^i\\."), `mean/pct`, `mean/pct`*100),
+         # `mean/pct` = ifelse(select_type %in% c("integer") & !variable %in% integer_cols_i & !str_detect(string = variable, pattern = "^i\\."), `mean/pct`, `mean/pct`*100),
          `mean/pct` = round(`mean/pct`, digits = 2)) |> 
   mutate(variable = ifelse(variable %in% integer_cols_int, str_replace(string = variable, pattern = "int.", replacement = "i."), variable),
          label = ifelse(label %in% integer_cols_int, str_replace(string = label, pattern = "int.", replacement = "i."), label)) |> 
