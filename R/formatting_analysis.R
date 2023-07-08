@@ -42,6 +42,43 @@ df_tool_groups <- df_survey |>
     ) |> 
     select(type, name, `label::English`, i.group, in_number)
 
+df_support_composite_grps <- tibble::tribble(
+                                             ~composite_code,         ~grp_label, ~composite_type,
+                                                     "i.fcs",    "Food security",       "integer",
+                                                 "i.fcs_cat",    "Food security",    "select_one",
+                                                    "i.rcsi",    "Food security",       "integer",
+                                                "i.rcsi_cat",    "Food security",    "select_one",
+                                                     "i.hhs",    "Food security",       "integer",
+                                                 "i.hhs_cat",    "Food security",    "select_one",
+                                     "i.hh_composition_size",   "HH information",       "integer",
+                                              "i.hoh_gender",   "HH information",    "select_one",
+                                                 "i.hoh_age",   "HH information",    "select_one",
+                                    "i.adults_permanent_job", "Cash and Markets",       "integer",
+                                    "i.adults_temporary_job", "Cash and Markets",       "integer",
+                                    "i.adults_casual_lobour", "Cash and Markets",       "integer",
+                                     "i.adults_own_bisuness", "Cash and Markets",       "integer",
+                                  "i.children_permanent_job", "Cash and Markets",       "integer",
+                                  "i.children_temporary_job", "Cash and Markets",       "integer",
+                                  "i.children_casual_lobour", "Cash and Markets",       "integer",
+                                   "i.children_own_bisuness", "Cash and Markets",       "integer",
+                                                "i.lost_job", "Cash and Markets",    "select_one",
+                                     "i.boys_early_marriege",       "Protection",    "select_one",
+                                    "i.girls_early_marriege",       "Protection",    "select_one",
+                                  "i.boys_work_outside_home",       "Protection",    "select_one",
+                                 "i.girls_work_outside_home",       "Protection",    "select_one",
+                                            "i.boys_anxiety",       "Protection",    "select_one",
+                                           "i.girls_anxiety",       "Protection",    "select_one",
+                                          "i.adults_anxiety",       "Protection",    "select_one",
+                                           "i.snfi_no_rooms",      "Shelter_NFI",       "integer",
+                                   "i.chronic_illiness_male",           "Health",    "select_one",
+                                 "i.chronic_illiness_female",           "Health",    "select_one",
+                                       "i.mental_heath_male",           "Health",    "select_one",
+                                     "i.mental_heath_female",           "Health",    "select_one",
+                                              "i.disability",           "Health",    "select_one"
+                                 )
+
+
+
 # identify indicators
 df_dap_questions <- readxl::read_excel("support_files/ETH2301_DAP_Validated.xlsx", sheet = "ETH2301_DAP") |> 
     filter(!is.na(`Indicator / Variable`)) |> 
@@ -68,7 +105,9 @@ df_analysis_dap_info <- df_analysis |>
     mutate(response_lable = recode(analysis_choice_id, !!!setNames(df_choices_support$choice_label, df_choices_support$survey_choice_id)),
            choices = ifelse(is.na(response_lable), `choices/options`, response_lable),
            subset_1_val_label = recode(subset_1_val, !!!setNames(df_choices$choice_label, df_choices$choice_name)),
-           subset_1_val_label =  ifelse(is.na(subset_1_val_label), "Zonal", subset_1_val_label)) |> 
+           subset_1_val_label =  ifelse(is.na(subset_1_val_label), "Zonal", subset_1_val_label),
+           indicator_group_sector = ifelse(is.na(indicator_group_sector) & variable %in% df_support_composite_grps$composite_code, recode(variable, !!!setNames(df_support_composite_grps$grp_label, df_support_composite_grps$composite_code)), indicator_group_sector), 
+           select_type = ifelse(is.na(select_type) & variable %in% df_support_composite_grps$composite_code, recode(variable, !!!setNames(df_support_composite_grps$composite_type, df_support_composite_grps$composite_code)), select_type)) |> 
     select(-c(n_unweighted, subset_1_name, subset_1_val))
 
 # split data based on groups or sectors
