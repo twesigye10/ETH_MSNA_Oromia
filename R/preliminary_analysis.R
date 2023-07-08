@@ -53,7 +53,8 @@ df_main_analysis <- analysis_after_survey_creation(input_svy_obj = ref_svy,
                                                                                "idp_name",
                                                                                "wash_watertime1",
                                                                                "hh_shocks_affect11"))
-                                                   )
+                                                   ) |> 
+    mutate(level = "Household")
 
 # education loop ----------------------------------------------------------
 
@@ -65,7 +66,8 @@ df_analysis_education_loop <- analysis_after_survey_creation(input_svy_obj = ref
                                                        filter(variable %in% c("edu_modality", "edu_attendance", "edu_attendance_remote", 
                                                                               "edu_non_access_reason", "edu_safe_environment", "edu_safe_environment_reasons",         
                                                                               "edu_learning_conditions", "edu_learning_conditions_reasons", "edu_pre_primary"))
-                                                   )
+                                                   ) |> 
+    mutate(level = "Individual")
 
 # health loop -------------------------------------------------------------
 
@@ -75,7 +77,8 @@ ref_svy_health_loop <- as_survey(.data = df_health_clean_data)
 df_analysis_health_loop <- analysis_after_survey_creation(input_svy_obj = ref_svy_health_loop,
                                                    input_dap = dap |> 
                                                        filter(variable %in% c("i.disability"))
-                                                   )
+                                                   ) |> 
+    mutate(level = "Individual")
 
 # merge and format analysis ----------------------------------------------------------
 
@@ -112,7 +115,8 @@ full_analysis_long <- combined_analysis |>
          population, 
          subset_1_name, 
          subset_1_val, 
-         select_type)
+         select_type,
+         level)
 
 # output analysis
 write_csv(full_analysis_long, paste0("outputs/", butteR::date_file_prefix(), "_full_analysis_lf_eth_msna_oromia.csv"), na="")
