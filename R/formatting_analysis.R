@@ -8,13 +8,31 @@ options("openxlsx.withFilter" = FALSE)
 
 # analysis
 df_analysis <- read_csv("outputs/full_analysis_lf_eth_msna_oromia.csv") |> 
-    filter(is.na(subset_1_name))
+    mutate(analysis_choice_id = case_when(select_type %in% c("select_multiple", "select multiple") ~ str_replace(string = `choices/options`, 
+                                                                                                              pattern = "\\/", replacement = "_"),
+                                        select_type %in% c("select_one", "select one") ~ paste0(variable, "_", `choices/options`)
+                                        ))
 
 # tool
-df_survey <- readxl::read_excel("inputs/ETH2301_MSHA_Oromia_tool.xlsx", sheet = "survey") 
+loc_tool <- "inputs/ETH2301_MSHA_Oromia_tool.xlsx"
+df_survey <- readxl::read_excel(loc_tool, sheet = "survey")
+df_choices <- readxl::read_excel(loc_tool, sheet = "choices") |> 
+    select(list_name, choice_name = name,   choice_label =`label::English`)
+
+# extract select types
+df_tool_select_type <- df_survey |> 
+    select(type, qn_name = name) |> 
+    filter(str_detect(string = type, pattern = "integer|date|select_one|select_multiple")) |> 
+    separate(col = type, into = c("select_type", "list_name"), sep =" ", remove = TRUE, extra = "drop" )
+
+# extract choice ids and labels
+df_choices_support <- df_choices |> 
+    left_join(df_tool_select_type) |> 
+    unite("survey_choice_id", qn_name, choice_name, sep = "_", remove = FALSE) |> 
+    select(survey_choice_id, choice_label) 
 
 # extract groups
-df_tool_questions <- df_survey |> 
+df_tool_groups <- df_survey |> 
     mutate(int.group = ifelse(str_detect(string = name, pattern = "^grp_"), name, NA_character_),
            i.group = int.group) |> 
     fill(i.group) |> 
@@ -32,7 +50,7 @@ df_dap_questions <- readxl::read_excel("support_files/ETH2301_DAP_Validated.xlsx
     mutate(indicator_group_sector = str_replace_all(string = indicator_group_sector, pattern = "\\/|\\?", replacement = "_"))
 
 
-df_tool_dap_info <- df_tool_questions |> 
+df_tool_dap_info <- df_tool_groups |> 
     left_join(df_dap_questions)
 
 
@@ -41,7 +59,10 @@ df_tool_dap_info <- df_tool_questions |>
 df_analysis_dap_info <- df_analysis |> 
     left_join(df_tool_dap_info |> 
                   select(name, indicator_group_sector, indicator_variable), by = c("variable" = "name")) |> 
-    select(-c(population, subset_1_name, subset_1_val))
+    mutate(response_lable = recode(analysis_choice_id, !!!setNames(df_choices_support$choice_label, df_choices_support$survey_choice_id)),
+           choices = ifelse(is.na(response_lable), `choices/options`, response_lable),
+           subset_1_val_label = recode(subset_1_val, !!!setNames(df_choices$choice_label, df_choices$choice_name)),
+           subset_1_val_label =  ifelse(is.na(subset_1_val_label), "Zonal", subset_1_val_label))
 
 # split data based on groups or sectors
 output <- split(df_analysis_dap_info, df_analysis_dap_info$indicator_group_sector)
@@ -61,6 +82,7 @@ for (i in 1:length(output)) {
     addStyle(wb, sheet = names(output[i]), hs1, rows = 1, cols = 1:5, gridExpand = TRUE)
     # get current data for the group or sector
     current_sheet_data <- output[[i]] |> 
+        
         mutate(row_id = row_number())
     
     # split variables to be written in different tables with in a sheet
@@ -84,7 +106,7 @@ for (i in 1:length(output)) {
         addStyle(wb, sheet = names(output[i]), hs2, rows = previous_max_row + 2, cols = 1:5, gridExpand = TRUE)
         writeDataTable(wb = wb, 
                        sheet = names(output[i]), 
-                       x = current_variable_data |> select(-c(Question, indicator_group_sector, indicator_variable, row_id)), 
+                       x = current_variable_data |> select(variable, choices, `Results(mean/percentage)`), 
                        startRow = variable_data_length, 
                        startCol = 1, 
                        tableStyle = "TableStyleLight9", 
