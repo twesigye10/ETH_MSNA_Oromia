@@ -3,9 +3,13 @@ library(srvyr)
 library(supporteR)  
 
 source("R/composite_indicators.R")
+source("R/make_weights.R")
+
 # packages to install incase
 # devtools::install_github("zackarno/butteR")
 # devtools::install_github("twesigye10/supporteR")
+
+df_pop_data <- read_csv("inputs/msna_population_oromia.csv")
 
 # clean data
 data_path <- "inputs/clean_data_eth_msha_oromia.xlsx"
@@ -14,9 +18,17 @@ data_nms <- names(readxl::read_excel(path = data_path, n_max = 2000, sheet = "cl
 c_types <- ifelse(str_detect(string = data_nms, pattern = "_other$"), "text", "guess")
 
 df_main_clean_data <- readxl::read_excel(path = data_path, sheet = "cleaned_main_data", col_types = c_types, na = "NA") |> 
-    create_composite_indicators()
+    create_composite_indicators() |> 
+    mutate(strata = hh_woreda)
 
-loop_support_data <- df_main_clean_data |> select(uuid, hh_woreda, i.hoh_gender)
+# weights table
+weight_table <- make_weight_table(input_df = df_main_clean_data, 
+                                  input_pop = df_pop_data)
+# add weights to data
+df_main_clean_data_with_weights <- df_main_clean_data |>  
+    left_join(weight_table, by = "strata")
+
+loop_support_data <- df_main_clean_data_with_weights |> select(uuid, hh_woreda, i.hoh_gender, weights)
 
 education_loop <- readxl::read_excel(path = data_path, sheet = "cleaned_education_loop", na = "NA")
 df_education_data <- loop_support_data |> 
