@@ -56,7 +56,7 @@ dap <- read_csv("inputs/r_dap_msha_eth.csv")
 # main dataset ------------------------------------------------------------
 
 # set up design object
-ref_svy <- as_survey(.data = df_main_clean_data)
+ref_svy <- as_survey(.data = df_main_clean_data_with_weights, strata = strata, weights = weights)
 
 # analysis
 
@@ -73,7 +73,7 @@ df_main_analysis <- analysis_after_survey_creation(input_svy_obj = ref_svy,
 # education loop ----------------------------------------------------------
 
 # set up design object
-ref_svy_education_loop <- as_survey(.data = df_education_data)
+ref_svy_education_loop <- as_survey(.data = df_education_data, strata = strata, weights = weights)
 # analysis 
 df_analysis_education_loop <- analysis_after_survey_creation(input_svy_obj = ref_svy_education_loop,
                                                    input_dap = dap |> 
@@ -86,7 +86,7 @@ df_analysis_education_loop <- analysis_after_survey_creation(input_svy_obj = ref
 # health loop -------------------------------------------------------------
 
 # set up design object
-ref_svy_health_loop <- as_survey(.data = df_health_clean_data)
+ref_svy_health_loop <- as_survey(.data = df_health_clean_data, strata = strata, weights = weights)
 # analysis
 df_analysis_health_loop <- analysis_after_survey_creation(input_svy_obj = ref_svy_health_loop,
                                                    input_dap = dap |> 
