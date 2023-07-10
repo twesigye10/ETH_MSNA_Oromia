@@ -9,9 +9,9 @@ options("openxlsx.withFilter" = FALSE)
 # analysis
 df_analysis <- read_csv("outputs/full_analysis_lf_eth_msna_oromia.csv") |> 
     mutate(analysis_choice_id = case_when(select_type %in% c("select_multiple", "select multiple") ~ str_replace(string = `choices/options`, 
-                                                                                                              pattern = "\\/", replacement = "_"),
-                                        select_type %in% c("select_one", "select one") ~ paste0(variable, "_", `choices/options`)
-                                        ))
+                                                                                                                 pattern = "\\/", replacement = "_"),
+                                          select_type %in% c("select_one", "select one") ~ paste0(variable, "_", `choices/options`)
+    ))
 
 # tool
 loc_tool <- "inputs/ETH2301_MSHA_Oromia_tool.xlsx"
@@ -43,39 +43,39 @@ df_tool_groups <- df_survey |>
     select(type, name, `label::English`, i.group, in_number)
 
 df_support_composite_grps <- tibble::tribble(
-                                             ~composite_code,         ~grp_label, ~composite_type,
-                                                     "i.fcs",    "Food security",       "integer",
-                                                 "i.fcs_cat",    "Food security",    "select_one",
-                                                    "i.rcsi",    "Food security",       "integer",
-                                                "i.rcsi_cat",    "Food security",    "select_one",
-                                                     "i.hhs",    "Food security",       "integer",
-                                                 "i.hhs_cat",    "Food security",    "select_one",
-                                     "i.hh_composition_size",   "HH information",       "integer",
-                                              "i.hoh_gender",   "HH information",    "select_one",
-                                                 "i.hoh_age",   "HH information",    "select_one",
-                                    "i.adults_permanent_job", "Cash and Markets",       "integer",
-                                    "i.adults_temporary_job", "Cash and Markets",       "integer",
-                                    "i.adults_casual_lobour", "Cash and Markets",       "integer",
-                                     "i.adults_own_bisuness", "Cash and Markets",       "integer",
-                                  "i.children_permanent_job", "Cash and Markets",       "integer",
-                                  "i.children_temporary_job", "Cash and Markets",       "integer",
-                                  "i.children_casual_lobour", "Cash and Markets",       "integer",
-                                   "i.children_own_bisuness", "Cash and Markets",       "integer",
-                                                "i.lost_job", "Cash and Markets",    "select_one",
-                                     "i.boys_early_marriege",       "Protection",    "select_one",
-                                    "i.girls_early_marriege",       "Protection",    "select_one",
-                                  "i.boys_work_outside_home",       "Protection",    "select_one",
-                                 "i.girls_work_outside_home",       "Protection",    "select_one",
-                                            "i.boys_anxiety",       "Protection",    "select_one",
-                                           "i.girls_anxiety",       "Protection",    "select_one",
-                                          "i.adults_anxiety",       "Protection",    "select_one",
-                                           "i.snfi_no_rooms",      "Shelter_NFI",       "integer",
-                                   "i.chronic_illiness_male",           "Health",    "select_one",
-                                 "i.chronic_illiness_female",           "Health",    "select_one",
-                                       "i.mental_heath_male",           "Health",    "select_one",
-                                     "i.mental_heath_female",           "Health",    "select_one",
-                                              "i.disability",           "Health",    "select_one"
-                                 )
+    ~composite_code,         ~grp_label, ~composite_type,
+    "i.fcs",    "Food security",       "integer",
+    "i.fcs_cat",    "Food security",    "select_one",
+    "i.rcsi",    "Food security",       "integer",
+    "i.rcsi_cat",    "Food security",    "select_one",
+    "i.hhs",    "Food security",       "integer",
+    "i.hhs_cat",    "Food security",    "select_one",
+    "i.hh_composition_size",   "HH information",       "integer",
+    "i.hoh_gender",   "HH information",    "select_one",
+    "i.hoh_age",   "HH information",    "select_one",
+    "i.adults_permanent_job", "Cash and Markets",       "integer",
+    "i.adults_temporary_job", "Cash and Markets",       "integer",
+    "i.adults_casual_lobour", "Cash and Markets",       "integer",
+    "i.adults_own_bisuness", "Cash and Markets",       "integer",
+    "i.children_permanent_job", "Cash and Markets",       "integer",
+    "i.children_temporary_job", "Cash and Markets",       "integer",
+    "i.children_casual_lobour", "Cash and Markets",       "integer",
+    "i.children_own_bisuness", "Cash and Markets",       "integer",
+    "i.lost_job", "Cash and Markets",    "select_one",
+    "i.boys_early_marriege",       "Protection",    "select_one",
+    "i.girls_early_marriege",       "Protection",    "select_one",
+    "i.boys_work_outside_home",       "Protection",    "select_one",
+    "i.girls_work_outside_home",       "Protection",    "select_one",
+    "i.boys_anxiety",       "Protection",    "select_one",
+    "i.girls_anxiety",       "Protection",    "select_one",
+    "i.adults_anxiety",       "Protection",    "select_one",
+    "i.snfi_no_rooms",      "Shelter_NFI",       "integer",
+    "i.chronic_illiness_male",           "Health",    "select_one",
+    "i.chronic_illiness_female",           "Health",    "select_one",
+    "i.mental_heath_male",           "Health",    "select_one",
+    "i.mental_heath_female",           "Health",    "select_one",
+    "i.disability",           "Health",    "select_one"
+)
 
 
 
@@ -90,25 +90,27 @@ df_dap_questions <- readxl::read_excel("support_files/ETH2301_DAP_Validated.xlsx
                                               indicator_group_sector %in% c("Protection", "Child Protection") ~ "Protection",
                                               indicator_group_sector %in% c("PSNP", "Shock or vulnerability") ~ "Shock or vulnerability",
                                               TRUE ~ indicator_group_sector)
-           )
+    )
 
 
 df_tool_dap_info <- df_tool_groups |> 
-    left_join(df_dap_questions)
+    left_join(df_dap_questions) |> 
+    mutate(qn_number = row_number())
 
 
 # format the data ---------------------------------------------------------
 
 df_analysis_dap_info <- df_analysis |> 
     left_join(df_tool_dap_info |> 
-                  select(name, indicator_group_sector, indicator_variable), by = c("variable" = "name")) |> 
+                  select(name, indicator_group_sector, indicator_variable, qn_number), by = c("variable" = "name")) |> 
     mutate(response_lable = recode(analysis_choice_id, !!!setNames(df_choices_support$choice_label, df_choices_support$survey_choice_id)),
            choices = ifelse(is.na(response_lable), `choices/options`, response_lable),
            subset_1_val_label = recode(subset_1_val, !!!setNames(df_choices$choice_label, df_choices$choice_name)),
            subset_1_val_label =  ifelse(is.na(subset_1_val_label), "Zonal", subset_1_val_label),
            indicator_group_sector = ifelse(is.na(indicator_group_sector) & variable %in% df_support_composite_grps$composite_code, recode(variable, !!!setNames(df_support_composite_grps$grp_label, df_support_composite_grps$composite_code)), indicator_group_sector), 
            select_type = ifelse(is.na(select_type) & variable %in% df_support_composite_grps$composite_code, recode(variable, !!!setNames(df_support_composite_grps$composite_type, df_support_composite_grps$composite_code)), select_type)) |> 
-    select(-c(n_unweighted, subset_1_name, subset_1_val))
+    select(-c(n_unweighted, subset_1_name, subset_1_val)) |> 
+    filter(!is.na(indicator_group_sector))
 
 # split data based on groups or sectors
 output <- split(df_analysis_dap_info, df_analysis_dap_info$indicator_group_sector)
@@ -134,13 +136,14 @@ for (i in 1:length(output)) {
     # get current data for the group or sector
     current_sheet_data <- output[[i]] |> 
         pivot_wider(names_from = subset_1_val_label, values_from = `Results(mean/percentage)`) |> 
+        arrange(qn_number) |> 
         mutate(row_id = row_number())
     
     # split variables to be written in different tables with in a sheet
-    sheet_variables_data <- split(current_sheet_data, current_sheet_data$variable)
+    sheet_variables_data <- split(current_sheet_data, factor(current_sheet_data$variable, levels = unique(current_sheet_data$variable)))
     
     previous_max_row <- 2
-        
+    
     for (j in 1:length(sheet_variables_data)) {
         
         current_variable_data <- sheet_variables_data[[j]]
@@ -169,7 +172,7 @@ for (i in 1:length(output)) {
         }
         
         variable_data_length <- previous_max_row + 3
-    
+        
         print(variable_data_length)
         
         # add header for variable
@@ -182,8 +185,8 @@ for (i in 1:length(output)) {
                            select(-c(Question, `choices/options`, 
                                      population, analysis_choice_id, 
                                      indicator_group_sector,response_lable,
-                                     row_id, variable, select_type, indicator_variable)
-                                                           ), 
+                                     row_id, variable, select_type, indicator_variable, qn_number)
+                           ), 
                        startRow = variable_data_length, 
                        startCol = 1, 
                        tableStyle = "TableStyleLight9", 
