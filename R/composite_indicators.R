@@ -75,7 +75,7 @@ create_composite_indicators <- function(input_df) {
                i.children_casual_lobour = (int.children_casual_lobour/int.hh_number_children) * 100,
                i.children_own_bisuness = (int.children_own_bisuness/int.hh_number_children) * 100,
                i.lost_job = case_when(int.lost_job == 0 ~ "no",
-                                        int.lost_job > 0 ~ "yes"),
+                                      int.lost_job > 0 ~ "yes"),
                i.boys_early_marriege = (boys_early_marriege/int.hh_number_children_male) * 100,
                i.girls_early_marriege = (girls_early_marriege/int.hh_number_children_female) * 100,
                i.boys_work_outside_home = (int.boys_work_outside_home/int.hh_number_children_male) * 100,
@@ -95,7 +95,61 @@ create_composite_indicators <- function(input_df) {
                                                mental_heath_male > 0 ~ "yes"), 
                i.mental_heath_female = case_when(mental_heath_female == 0 ~ "no",
                                                  mental_heath_female > 0 ~ "yes"),
-               
+               i.fc_matrix = case_when( 
+                   # 1 - 5
+                   i.hhs == 0 & i.rcsi < 4 & i.fcs > 35 ~ 1,
+                   i.hhs == 1 & i.rcsi < 4 & i.fcs > 35 ~ 2,
+                   (i.hhs >= 2 & i.hhs <= 3) & i.rcsi < 4 & i.fcs > 35 ~ 3,
+                   i.hhs == 4 & i.rcsi < 4 & i.fcs > 35 ~ 4,
+                   (i.hhs >= 5 & i.hhs <= 6) & i.rcsi < 4 & i.fcs > 35 ~ 5,
+                   # 6 - 10
+                   i.hhs == 0 & i.rcsi < 4 & (i.fcs >= 21.5 i.fcs <= 35) ~ 6,
+                   i.hhs == 1 & i.rcsi < 4 & (i.fcs >= 21.5 i.fcs <= 35) ~ 7,
+                   (i.hhs >= 2 & i.hhs <= 3) & i.rcsi < 4 & (i.fcs >= 21.5 i.fcs <= 35) ~ 8,
+                   i.hhs == 4 & i.rcsi < 4 & (i.fcs >= 21.5 i.fcs <= 35) ~ 9,
+                   (i.hhs >= 5 & i.hhs <= 6) & i.rcsi < 4 & (i.fcs >= 21.5 i.fcs <= 35) ~ 10,
+                   # 11 - 15
+                   i.hhs == 0 & i.rcsi < 4 & i.fcs  < 21.5 ~ 11,
+                   i.hhs == 1 & i.rcsi < 4 & i.fcs  < 21.5 ~ 12,
+                   (i.hhs >= 2 & i.hhs <= 3) & i.rcsi < 4 & i.fcs  < 21.5 ~ 13,
+                   i.hhs == 4 & i.rcsi < 4 & i.fcs  < 21.5 ~ 14,
+                   (i.hhs >= 5 & i.hhs <= 6) & i.rcsi < 4 & i.fcs  < 21.5 ~ 15,
+                   # 16 - 20
+                   i.hhs == 0 & (i.rcsi >= 4 & i.rcsi <= 18) & i.fcs > 35 ~ 16,
+                   i.hhs == 1 & (i.rcsi >= 4 & i.rcsi <= 18) & i.fcs > 35 ~ 17,
+                   (i.hhs >= 2 & i.hhs <= 3) & (i.rcsi >= 4 & i.rcsi <= 18) & i.fcs > 35 ~ 18,
+                   i.hhs == 4 & (i.rcsi >= 4 & i.rcsi <= 18) & i.fcs > 35 ~ 19,
+                   (i.hhs >= 5 & i.hhs <= 6) & (i.rcsi >= 4 & i.rcsi <= 18) & i.fcs > 35 ~ 20,
+                   # 21 - 25
+                   i.hhs == 0 & (i.rcsi >= 4 & i.rcsi <= 18) & (i.fcs >= 21.5 i.fcs <= 35) ~ 21,
+                   i.hhs == 1 & (i.rcsi >= 4 & i.rcsi <= 18) & (i.fcs >= 21.5 i.fcs <= 35) ~ 22,
+                   (i.hhs >= 2 & i.hhs <= 3) & (i.rcsi >= 4 & i.rcsi <= 18) & (i.fcs >= 21.5 i.fcs <= 35) ~ 23,
+                   i.hhs == 4 & (i.rcsi >= 4 & i.rcsi <= 18) & (i.fcs >= 21.5 i.fcs <= 35) ~ 24,
+                   (i.hhs >= 5 & i.hhs <= 6) & (i.rcsi >= 4 & i.rcsi <= 18) & (i.fcs >= 21.5 i.fcs <= 35) ~ 25,
+                   # 26 - 30
+                   i.hhs == 0 & (i.rcsi >= 4 & i.rcsi <= 18) & i.fcs  < 21.5 ~ 26,
+                   i.hhs == 1 & (i.rcsi >= 4 & i.rcsi <= 18) & i.fcs  < 21.5 ~ 27,
+                   (i.hhs >= 2 & i.hhs <= 3) & (i.rcsi >= 4 & i.rcsi <= 18) & i.fcs  < 21.5 ~ 28,
+                   i.hhs == 4 & (i.rcsi >= 4 & i.rcsi <= 18) & i.fcs  < 21.5 ~ 29,
+                   (i.hhs >= 5 & i.hhs <= 6) & (i.rcsi >= 4 & i.rcsi <= 18) & i.fcs  < 21.5 ~ 30,
+                   # 31 - 35
+                   i.hhs == 0 & i.rcsi > 18 & i.fcs > 35 ~ 31,
+                   i.hhs == 1 & i.rcsi > 18 & i.fcs > 35 ~ 32,
+                   (i.hhs >= 2 & i.hhs <= 3) & i.rcsi > 18 & i.fcs > 35 ~ 33,
+                   i.hhs == 4 & i.rcsi > 18 & i.fcs > 35 ~ 34,
+                   (i.hhs >= 5 & i.hhs <= 6) & i.rcsi > 18 & i.fcs > 35 ~ 35,
+                   # 36 - 40
+                   i.hhs == 0 & i.rcsi > 18 & (i.fcs >= 21.5 i.fcs <= 35) ~ 36,
+                   i.hhs == 1 & i.rcsi > 18 & (i.fcs >= 21.5 i.fcs <= 35) ~ 37,
+                   (i.hhs >= 2 & i.hhs <= 3) & i.rcsi > 18 & (i.fcs >= 21.5 i.fcs <= 35) ~ 38,
+                   i.hhs == 4 & i.rcsi > 18 & (i.fcs >= 21.5 i.fcs <= 35) ~ 39,
+                   (i.hhs >= 5 & i.hhs <= 6) & i.rcsi > 18 & (i.fcs >= 21.5 i.fcs <= 35) ~ 40,
+                   # 41 - 45
+                   i.hhs == 0 & i.rcsi > 18 & i.fcs  < 21.5 ~ 41,
+                   i.hhs == 1 & i.rcsi > 18 & i.fcs  < 21.5 ~ 42,
+                   (i.hhs >= 2 & i.hhs <= 3) & i.rcsi > 18 & i.fcs  < 21.5 ~ 43,
+                   i.hhs == 4 & i.rcsi > 18 & i.fcs  < 21.5 ~ 44,
+                   (i.hhs >= 5 & i.hhs <= 6) & i.rcsi > 18 & i.fcs  < 21.5 ~ 45)  
         ) |> 
         select(-c(starts_with("int.")))
 }
@@ -104,7 +158,7 @@ create_composite_indicators <- function(input_df) {
 create_composite_indicators_health <- function(input_df) {
     input_df |> 
         mutate(int.disability = paste(difficulty_seeing, difficulty_hearing, difficulty_walking, 
-                                   difficulty_remembering, difficulty_self_care, difficulty_communicating),
+                                      difficulty_remembering, difficulty_self_care, difficulty_communicating),
                i.disability = ifelse(str_detect(string = int.disability, pattern = "a_lot_of_difficulty|cannot_do_at_all"), "yes", "no"),
                
         ) |>  
