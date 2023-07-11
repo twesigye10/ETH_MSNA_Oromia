@@ -28,7 +28,7 @@ weight_table <- make_weight_table(input_df = df_main_clean_data,
 df_main_clean_data_with_weights <- df_main_clean_data |>  
     left_join(weight_table, by = "strata")
 
-loop_support_data <- df_main_clean_data_with_weights |> select(uuid, hh_woreda, i.hoh_gender, weights)
+loop_support_data <- df_main_clean_data_with_weights |> select(uuid, hh_woreda, i.hoh_gender, strata,weights)
 
 education_loop <- readxl::read_excel(path = data_path, sheet = "cleaned_education_loop", na = "NA")
 df_education_data <- loop_support_data |> 
@@ -135,3 +135,4 @@ full_analysis_long <- combined_analysis |>
 # output analysis
 write_csv(full_analysis_long, paste0("outputs/", butteR::date_file_prefix(), "_full_analysis_lf_eth_msna_oromia.csv"), na="")
 write_csv(full_analysis_long, paste0("outputs/full_analysis_lf_eth_msna_oromia.csv"), na="")
+write_csv(combined_analysis, paste0("outputs/combined_analysis_lf_eth_msna_oromia.csv"), na="")
