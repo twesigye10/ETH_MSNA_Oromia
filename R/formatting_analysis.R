@@ -10,8 +10,10 @@ options("openxlsx.withFilter" = FALSE)
 df_analysis <- read_csv("outputs/full_analysis_lf_eth_msna_oromia.csv") |> 
     mutate(analysis_choice_id = case_when(select_type %in% c("select_multiple", "select multiple") ~ str_replace(string = `choices/options`, 
                                                                                                                  pattern = "\\/", replacement = "_"),
-                                          select_type %in% c("select_one", "select one") ~ paste0(variable, "_", `choices/options`)
-    ))
+                                          select_type %in% c("select_one", "select one") ~ paste0(variable, "_", `choices/options`)),
+           analysis_choice_id = ifelse(variable %in% c("i.hoh_age"), paste0("hoh_age_", `choices/options`), analysis_choice_id),
+           analysis_choice_id = ifelse(variable %in% c("i.hoh_gender"), paste0("hoh_gender_", `choices/options`), analysis_choice_id)
+           )
 
 # tool
 loc_tool <- "inputs/ETH2301_MSHA_Oromia_tool.xlsx"
