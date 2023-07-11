@@ -151,6 +151,14 @@ create_composite_indicators <- function(input_df) {
                    i.hhs == 4 & i.rcsi > 18 & i.fcs  < 21.5 ~ 44,
                    (i.hhs >= 5 & i.hhs <= 6) & i.rcsi > 18 & i.fcs  < 21.5 ~ 45)  
         ) |> 
+        addindicators::add_lcsi(lcsi_stress_vars = c("livh_stress_lcsi_1", "livh_stress_lcsi_2", "livh_stress_lcsi_3", "livh_stress_lcsi_4"),
+                                lcsi_crisis_vars = c("livh_crisis_lcsi_1", "livh_crisis_lcsi_2", "livh_crisis_lcsi_3"),
+                                lcsi_emergency_vars = c("livh_emerg_lcsi_1", "livh_emerg_lcsi_2", "livh_emerg_lcsi_3"),
+                                yes_val = "yes",
+                                no_val = "no_had_no_need",
+                                exhausted_val = "no_exhausted",
+                                not_applicable_val = "not_applicable") |> 
+        rename(i.lcsi_cat = lcsi_cat ) |> 
         select(-c(starts_with("int.")))
 }
 
