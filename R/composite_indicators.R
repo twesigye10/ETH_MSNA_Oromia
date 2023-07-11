@@ -154,7 +154,67 @@ create_composite_indicators <- function(input_df) {
                                            i.fc_matrix %in% c(2, 3, 7, 11, 12, 16, 17, 18, 21, 22, 26, 31, 32, 36) ~ " Phase 2",
                                            i.fc_matrix %in% c(4, 5, 8, 9, 13, 19, 20, 23, 24, 27, 28, 33, 34, 37, 38, 41, 42, 43) ~ " Phase 3",
                                            i.fc_matrix %in% c(10, 14, 15, 25, 29, 35, 39, 40, 44) ~ " Phase 4",
-                                           i.fc_matrix %in% c(30, 45) ~ " Phase 5")
+                                           i.fc_matrix %in% c(30, 45) ~ " Phase 5"),
+               i.fc_matrix_fcs_hhs = case_when( 
+                   # 1 - 5
+                   i.hhs == 0 & i.fcs > 35 ~ 1,
+                   i.hhs == 1 & i.fcs > 35 ~ 2,
+                   (i.hhs >= 2 & i.hhs <= 3) & i.fcs > 35 ~ 3,
+                   i.hhs == 4 & i.fcs > 35 ~ 4,
+                   (i.hhs >= 5 & i.hhs <= 6) & i.fcs > 35 ~ 5,
+                   # 6 - 10
+                   i.hhs == 0 & (i.fcs >= 21.5 & i.fcs <= 35) ~ 6,
+                   i.hhs == 1 & (i.fcs >= 21.5 & i.fcs <= 35) ~ 7,
+                   (i.hhs >= 2 & i.hhs <= 3) & (i.fcs >= 21.5 & i.fcs <= 35) ~ 8,
+                   i.hhs == 4 & (i.fcs >= 21.5 & i.fcs <= 35) ~ 9,
+                   (i.hhs >= 5 & i.hhs <= 6) & (i.fcs >= 21.5 & i.fcs <= 35) ~ 10,
+                   # 11 - 15
+                   i.hhs == 0 & i.fcs  < 21.5 ~ 11,
+                   i.hhs == 1 & i.fcs  < 21.5 ~ 12,
+                   (i.hhs >= 2 & i.hhs <= 3) & i.fcs  < 21.5 ~ 13,
+                   i.hhs == 4 & i.fcs  < 21.5 ~ 14,
+                   (i.hhs >= 5 & i.hhs <= 6) & i.fcs  < 21.5 ~ 15,
+                   # 16 - 20
+                   i.hhs == 0  & i.fcs > 35 ~ 16,
+                   i.hhs == 1  & i.fcs > 35 ~ 17,
+                   (i.hhs >= 2 & i.hhs <= 3)  & i.fcs > 35 ~ 18,
+                   i.hhs == 4  & i.fcs > 35 ~ 19,
+                   (i.hhs >= 5 & i.hhs <= 6)  & i.fcs > 35 ~ 20,
+                   # 21 - 25
+                   i.hhs == 0  & (i.fcs >= 21.5 & i.fcs <= 35) ~ 21,
+                   i.hhs == 1  & (i.fcs >= 21.5 & i.fcs <= 35) ~ 22,
+                   (i.hhs >= 2 & i.hhs <= 3)  & (i.fcs >= 21.5 & i.fcs <= 35) ~ 23,
+                   i.hhs == 4  & (i.fcs >= 21.5 & i.fcs <= 35) ~ 24,
+                   (i.hhs >= 5 & i.hhs <= 6)  & (i.fcs >= 21.5 & i.fcs <= 35) ~ 25,
+                   # 26 - 30
+                   i.hhs == 0  & i.fcs  < 21.5 ~ 26,
+                   i.hhs == 1  & i.fcs  < 21.5 ~ 27,
+                   (i.hhs >= 2 & i.hhs <= 3)  & i.fcs  < 21.5 ~ 28,
+                   i.hhs == 4  & i.fcs  < 21.5 ~ 29,
+                   (i.hhs >= 5 & i.hhs <= 6)  & i.fcs  < 21.5 ~ 30,
+                   # 31 - 35
+                   i.hhs == 0 & i.fcs > 35 ~ 31,
+                   i.hhs == 1 & i.fcs > 35 ~ 32,
+                   (i.hhs >= 2 & i.hhs <= 3) & i.fcs > 35 ~ 33,
+                   i.hhs == 4 & i.fcs > 35 ~ 34,
+                   (i.hhs >= 5 & i.hhs <= 6) & i.fcs > 35 ~ 35,
+                   # 36 - 40
+                   i.hhs == 0 & (i.fcs >= 21.5 & i.fcs <= 35) ~ 36,
+                   i.hhs == 1 & (i.fcs >= 21.5 & i.fcs <= 35) ~ 37,
+                   (i.hhs >= 2 & i.hhs <= 3) & (i.fcs >= 21.5 & i.fcs <= 35) ~ 38,
+                   i.hhs == 4 & (i.fcs >= 21.5 & i.fcs <= 35) ~ 39,
+                   (i.hhs >= 5 & i.hhs <= 6) & (i.fcs >= 21.5 & i.fcs <= 35) ~ 40,
+                   # 41 - 45
+                   i.hhs == 0 & i.fcs  < 21.5 ~ 41,
+                   i.hhs == 1 & i.fcs  < 21.5 ~ 42,
+                   (i.hhs >= 2 & i.hhs <= 3) & i.fcs  < 21.5 ~ 43,
+                   i.hhs == 4 & i.fcs  < 21.5 ~ 44,
+                   (i.hhs >= 5 & i.hhs <= 6) & i.fcs  < 21.5 ~ 45),
+               i.fc_matrix_fcs_hhs = case_when(i.fc_matrix_fcs_hhs %in% c(1, 6) ~ " Phase 1",
+                                               i.fc_matrix_fcs_hhs %in% c(2, 3, 7, 11, 12, 16, 17, 18, 21, 22, 26, 31, 32, 36) ~ " Phase 2",
+                                               i.fc_matrix_fcs_hhs %in% c(4, 5, 8, 9, 13, 19, 20, 23, 24, 27, 28, 33, 34, 37, 38, 41, 42, 43) ~ " Phase 3",
+                                               i.fc_matrix_fcs_hhs %in% c(10, 14, 15, 25, 29, 35, 39, 40, 44) ~ " Phase 4",
+                                               i.fc_matrix_fcs_hhs %in% c(30, 45) ~ " Phase 5"),
         ) |> 
         addindicators::add_lcsi(lcsi_stress_vars = c("livh_stress_lcsi_1", "livh_stress_lcsi_2", "livh_stress_lcsi_3", "livh_stress_lcsi_4"),
                                 lcsi_crisis_vars = c("livh_crisis_lcsi_1", "livh_crisis_lcsi_2", "livh_crisis_lcsi_3"),
