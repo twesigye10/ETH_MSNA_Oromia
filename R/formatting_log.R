@@ -54,7 +54,8 @@ df_formatted_log <- df_cleaning_log |>
   mutate(int.adjust_log = ifelse(adjust_log %in% c("delete_log"), "no", "yes"),
          `enumerator ID` = enumerator_id, question.name = name, Issue = str_replace_all(string = issue, pattern = "\\[+.+\\]", replacement = ""), 
          `Type of Issue` = type, feedback = comment, 
-         changed = int.adjust_log, old.value = current_value, new.value = value) |> 
+         changed = int.adjust_log, old.value = current_value, new.value = value,
+         new.value = ifelse(changed %in% c("no"), old.value, new.value)) |> 
   select(uuid, `enumerator ID`, question.name, Issue, `Type of Issue`, 
          feedback, changed, old.value, new.value)
   
@@ -264,3 +265,4 @@ writeDataTable(wb = wb_log, sheet = "Enumerator - performance",
 
 saveWorkbook(wb_log, paste0("outputs/", butteR::date_file_prefix(),"_eth_msna_data_cleaning_logbook_oromia.xlsx"), overwrite = TRUE)
 openXL(file = paste0("outputs/", butteR::date_file_prefix(),"_eth_msna_data_cleaning_logbook_oromia.xlsx"))
+
