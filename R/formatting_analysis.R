@@ -96,6 +96,10 @@ wb <- createWorkbook()
 hs1 <- createStyle(fgFill = "#EE5859", halign = "CENTER", textDecoration = "Bold", fontColour = "white", fontSize = 14, wrapText = T)
 hs2 <- createStyle(fgFill = "#808080", halign = "CENTER", textDecoration = "Bold", fontColour = "white", wrapText = T)
 hs3 <- createStyle(fgFill = "#EE5859", halign = "CENTER", textDecoration = "Bold", border = "Bottom", fontColour = "white")
+# numbers
+number_2digit_style <- openxlsx::createStyle(numFmt = "0.00")
+number_1digit_style <- openxlsx::createStyle(numFmt = "0.0")
+number_style <- openxlsx::createStyle(numFmt = "0")
 
 cols_for_special_formatting <- c("Zonal", "Gasera", "Sinana", "Goba", "Harena Buluk", "Delo Mena", "Berbere", "Goro")
 
@@ -118,7 +122,7 @@ for (i in 1:length(output)) {
     # split variables to be written in different tables with in a sheet
     sheet_variables_data <- split(current_sheet_data, factor(current_sheet_data$variable, levels = unique(current_sheet_data$variable)))
     
-    previous_max_row <- 2
+    previous_row_end <- 2
     
     for (j in 1:length(sheet_variables_data)) {
         
@@ -147,14 +151,20 @@ for (i in 1:length(output)) {
             class(current_variable_data$Goro) <- "numeric"
         }
         
-        variable_data_length <- previous_max_row + 3
+        current_row_start <- previous_row_end + 3
         
-        print(variable_data_length)
+        print(current_row_start)
         
         # add header for variable
-        mergeCells(wb, sheet = names(output[i]), rows = previous_max_row + 2, cols = 1:10)
-        writeData(wb, sheet = names(output[i]), get_question, startCol = 1, startRow = previous_max_row + 2)
-        addStyle(wb, sheet = names(output[i]), hs2, rows = previous_max_row + 2, cols = 1:10, gridExpand = TRUE)
+        mergeCells(wb, sheet = names(output[i]), rows = previous_row_end + 2, cols = 1:10)
+        writeData(wb, sheet = names(output[i]), get_question, startCol = 1, startRow = previous_row_end + 2)
+        addStyle(wb, sheet = names(output[i]), hs2, rows = previous_row_end + 2, cols = 1:10, gridExpand = TRUE)
+        
+        current_data_length <- max(current_variable_data$row_id) - min(current_variable_data$row_id)
+        
+        addStyle(wb, sheet = names(output[i]), number_1digit_style, rows = current_row_start : current_row_start + 1 + current_data_length, cols = 1:10, gridExpand = TRUE)
+        addStyle(wb, sheet = names(output[i]), number_1digit_style, rows = current_row_start : current_row_start + 1 + current_data_length, cols = 1:10, gridExpand = TRUE)
+        
         writeDataTable(wb = wb, 
                        sheet = names(output[i]), 
                        x = current_variable_data |> 
@@ -163,12 +173,12 @@ for (i in 1:length(output)) {
                                      indicator_group_sector,response_lable,
                                      row_id, variable, select_type, indicator_variable, qn_number)
                            ), 
-                       startRow = variable_data_length, 
+                       startRow = current_row_start, 
                        startCol = 1, 
                        tableStyle = "TableStyleLight9", 
                        headerStyle = hs3)
         
-        previous_max_row <- variable_data_length + 1 + max(current_variable_data$row_id) - min(current_variable_data$row_id)
+        previous_row_end <- current_row_start + 1 + current_data_length
     }
     
 }
