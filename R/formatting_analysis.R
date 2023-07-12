@@ -45,6 +45,10 @@ df_analysis <- read_csv("outputs/full_analysis_lf_eth_msna_oromia.csv") |>
                                           select_type %in% c("select_one", "select one") ~ paste0(variable, "_", `choices/options`)),
            analysis_choice_id = ifelse(variable %in% c("i.hoh_age"), paste0("hoh_age_", `choices/options`), analysis_choice_id),
            analysis_choice_id = ifelse(variable %in% c("i.hoh_gender"), paste0("hoh_gender_", `choices/options`), analysis_choice_id),
+           analysis_choice_id = ifelse(variable %in% c("i.lost_job", "i.boys_anxiety", "i.girls_anxiety", 
+                                                       "i.adults_anxiety", "i.chronic_illiness_male", 
+                                                       "i.chronic_illiness_female", "i.mental_heath_male", 
+                                                       "i.mental_heath_female"), paste0("consent_", `choices/options`), analysis_choice_id),
            Question = ifelse(variable %in% df_support_composite_grps$composite_code, recode(variable, !!!setNames(df_support_composite_grps$composite_qn_label, df_support_composite_grps$composite_code)), Question)
            )
 
@@ -77,7 +81,10 @@ df_analysis_dap_info <- df_analysis |>
            subset_1_val_label = recode(subset_1_val, !!!setNames(df_choices$choice_label, df_choices$choice_name)),
            subset_1_val_label =  ifelse(is.na(subset_1_val_label), "Zonal", subset_1_val_label),
            indicator_group_sector = ifelse(is.na(indicator_group_sector) & variable %in% df_support_composite_grps$composite_code, recode(variable, !!!setNames(df_support_composite_grps$grp_label, df_support_composite_grps$composite_code)), indicator_group_sector), 
-           select_type = ifelse(is.na(select_type) & variable %in% df_support_composite_grps$composite_code, recode(variable, !!!setNames(df_support_composite_grps$composite_type, df_support_composite_grps$composite_code)), select_type)) |> 
+           select_type = ifelse((is.na(select_type) | variable %in% c("i.chronic_illiness_male", 
+                                                                      "i.chronic_illiness_female", 
+                                                                      "i.mental_heath_male", 
+                                                                      "i.mental_heath_female")) & variable %in% df_support_composite_grps$composite_code, recode(variable, !!!setNames(df_support_composite_grps$composite_type, df_support_composite_grps$composite_code)), select_type)) |> 
     select(-c(n_unweighted, subset_1_name, subset_1_val)) |> 
     filter(!is.na(indicator_group_sector))
 
