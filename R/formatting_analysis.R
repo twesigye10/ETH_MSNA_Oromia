@@ -6,15 +6,6 @@ options("openxlsx.borderStyle" = "thin")
 # options("openxlsx.borderColour" = "#4F81BD")
 options("openxlsx.withFilter" = FALSE)
 
-# analysis
-df_analysis <- read_csv("outputs/full_analysis_lf_eth_msna_oromia.csv") |> 
-    mutate(analysis_choice_id = case_when(select_type %in% c("select_multiple", "select multiple") ~ str_replace(string = `choices/options`, 
-                                                                                                                 pattern = "\\/", replacement = "_"),
-                                          select_type %in% c("select_one", "select one") ~ paste0(variable, "_", `choices/options`)),
-           analysis_choice_id = ifelse(variable %in% c("i.hoh_age"), paste0("hoh_age_", `choices/options`), analysis_choice_id),
-           analysis_choice_id = ifelse(variable %in% c("i.hoh_gender"), paste0("hoh_gender_", `choices/options`), analysis_choice_id)
-           )
-
 # tool
 loc_tool <- "inputs/ETH2301_MSHA_Oromia_tool.xlsx"
 df_survey <- readxl::read_excel(loc_tool, sheet = "survey")
@@ -44,42 +35,18 @@ df_tool_groups <- df_survey |>
     ) |> 
     select(type, name, `label::English`, i.group, in_number)
 
-df_support_composite_grps <- tibble::tribble(
-    ~composite_code,         ~grp_label, ~composite_type,
-    "i.fcs",    "Food security",       "integer",
-    "i.fcs_cat",    "Food security",    "select_one",
-    "i.rcsi",    "Food security",       "integer",
-    "i.rcsi_cat",    "Food security",    "select_one",
-    "i.hhs",    "Food security",       "integer",
-    "i.hhs_cat",    "Food security",    "select_one",
-    "i.hh_composition_size",   "HH information",       "integer",
-    "i.hoh_gender",   "HH information",    "select_one",
-    "i.hoh_age",   "HH information",    "select_one",
-    "i.adults_permanent_job", "Cash and Markets",       "integer",
-    "i.adults_temporary_job", "Cash and Markets",       "integer",
-    "i.adults_casual_lobour", "Cash and Markets",       "integer",
-    "i.adults_own_bisuness", "Cash and Markets",       "integer",
-    "i.children_permanent_job", "Cash and Markets",       "integer",
-    "i.children_temporary_job", "Cash and Markets",       "integer",
-    "i.children_casual_lobour", "Cash and Markets",       "integer",
-    "i.children_own_bisuness", "Cash and Markets",       "integer",
-    "i.lost_job", "Cash and Markets",    "select_one",
-    "i.boys_early_marriege",       "Protection",    "select_one",
-    "i.girls_early_marriege",       "Protection",    "select_one",
-    "i.boys_work_outside_home",       "Protection",    "select_one",
-    "i.girls_work_outside_home",       "Protection",    "select_one",
-    "i.boys_anxiety",       "Protection",    "select_one",
-    "i.girls_anxiety",       "Protection",    "select_one",
-    "i.adults_anxiety",       "Protection",    "select_one",
-    "i.snfi_no_rooms",      "Shelter_NFI",       "integer",
-    "i.chronic_illiness_male",           "Health",    "select_one",
-    "i.chronic_illiness_female",           "Health",    "select_one",
-    "i.mental_heath_male",           "Health",    "select_one",
-    "i.mental_heath_female",           "Health",    "select_one",
-    "i.disability",           "Health",    "select_one"
-)
+# support composite grps and labels
+df_support_composite_grps <- readxl::read_excel("support_files/support composite grps and labels.xlsx")
 
-
+# analysis
+df_analysis <- read_csv("outputs/full_analysis_lf_eth_msna_oromia.csv") |> 
+    mutate(analysis_choice_id = case_when(select_type %in% c("select_multiple", "select multiple") ~ str_replace(string = `choices/options`, 
+                                                                                                                 pattern = "\\/", replacement = "_"),
+                                          select_type %in% c("select_one", "select one") ~ paste0(variable, "_", `choices/options`)),
+           analysis_choice_id = ifelse(variable %in% c("i.hoh_age"), paste0("hoh_age_", `choices/options`), analysis_choice_id),
+           analysis_choice_id = ifelse(variable %in% c("i.hoh_gender"), paste0("hoh_gender_", `choices/options`), analysis_choice_id),
+           Question = ifelse(variable %in% df_support_composite_grps$composite_code, recode(variable, !!!setNames(df_support_composite_grps$composite_qn_label, df_support_composite_grps$composite_code)), Question)
+           )
 
 # identify indicators
 df_dap_questions <- readxl::read_excel("support_files/ETH2301_DAP_Validated.xlsx", sheet = "ETH2301_DAP") |> 
