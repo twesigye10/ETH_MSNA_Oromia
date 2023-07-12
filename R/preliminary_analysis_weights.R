@@ -18,8 +18,10 @@ data_nms <- names(readxl::read_excel(path = data_path, n_max = 2000, sheet = "cl
 c_types <- ifelse(str_detect(string = data_nms, pattern = "_other$"), "text", "guess")
 
 df_main_clean_data <- readxl::read_excel(path = data_path, sheet = "cleaned_main_data", col_types = c_types, na = "NA") |> 
+    select(-starts_with("i.")) |> 
     create_composite_indicators() |> 
-    mutate(strata = hh_woreda)
+    mutate(strata = hh_woreda) |> 
+    mutate(across(.cols = starts_with("i."), .fns = ~ ifelse((is.infinite(.x)|is.nan(.x)), NA, .)))
 
 # weights table
 weight_table <- make_weight_table(input_df = df_main_clean_data, 
