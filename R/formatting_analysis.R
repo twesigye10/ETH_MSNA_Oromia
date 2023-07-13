@@ -166,9 +166,8 @@ for (i in 1:length(output)) {
         
         current_data_length <- max(current_variable_data$row_id) - min(current_variable_data$row_id)
         
-        addStyle(wb, sheet = names(output[i]), number_1digit_style, rows = current_row_start : current_row_start + 1 + current_data_length, cols = 1:10, gridExpand = TRUE)
-        # addStyle(wb, sheet = names(output[i]), number_1digit_style, rows = current_row_start : current_row_start + 1 + current_data_length, cols = 1:10, gridExpand = TRUE)
-        
+        addStyle(wb, sheet = names(output[i]), number_1digit_style, rows = current_row_start + 1 : current_row_start + 1 + current_data_length, cols = 1:10, gridExpand = TRUE)
+
         writeDataTable(wb = wb, 
                        sheet = names(output[i]), 
                        x = current_variable_data |> 
