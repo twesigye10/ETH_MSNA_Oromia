@@ -86,7 +86,10 @@ df_analysis_dap_info <- df_analysis |>
            select_type = ifelse((is.na(select_type) | variable %in% c("i.chronic_illiness_male", 
                                                                       "i.chronic_illiness_female", 
                                                                       "i.mental_heath_male", 
-                                                                      "i.mental_heath_female")) & variable %in% df_support_composite_grps$composite_code, recode(variable, !!!setNames(df_support_composite_grps$composite_type, df_support_composite_grps$composite_code)), select_type),
+                                                                      "i.mental_heath_female",
+                                                                      "i.boys_anxiety",
+                                                                      "i.girls_anxiety",
+                                                                      "i.adults_anxiety")) & variable %in% df_support_composite_grps$composite_code, recode(variable, !!!setNames(df_support_composite_grps$composite_type, df_support_composite_grps$composite_code)), select_type),
            choices = ifelse(variable %in% df_support_integer_col_labs$variable, recode(variable, !!!setNames(df_support_integer_col_labs$integer_column_label, df_support_integer_col_labs$variable)), choices)
            ) |> 
     select(-c(n_unweighted, subset_1_name, subset_1_val)) |> 
