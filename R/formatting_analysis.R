@@ -37,6 +37,8 @@ df_tool_groups <- df_survey |>
 
 # support composite grps and labels
 df_support_composite_grps <- readxl::read_excel("support_files/support composite grps and labels.xlsx")
+df_support_integer_col_labs <- readxl::read_excel("support_files/support integer column names.xlsx") |> 
+    filter(!is.na(integer_column_label))
 
 # analysis
 df_analysis <- read_csv("outputs/full_analysis_lf_eth_msna_oromia.csv") |> 
@@ -84,7 +86,9 @@ df_analysis_dap_info <- df_analysis |>
            select_type = ifelse((is.na(select_type) | variable %in% c("i.chronic_illiness_male", 
                                                                       "i.chronic_illiness_female", 
                                                                       "i.mental_heath_male", 
-                                                                      "i.mental_heath_female")) & variable %in% df_support_composite_grps$composite_code, recode(variable, !!!setNames(df_support_composite_grps$composite_type, df_support_composite_grps$composite_code)), select_type)) |> 
+                                                                      "i.mental_heath_female")) & variable %in% df_support_composite_grps$composite_code, recode(variable, !!!setNames(df_support_composite_grps$composite_type, df_support_composite_grps$composite_code)), select_type),
+           choices = ifelse(variable %in% df_support_integer_col_labs$variable, recode(variable, !!!setNames(df_support_integer_col_labs$integer_column_label, df_support_integer_col_labs$variable)), choices)
+           ) |> 
     select(-c(n_unweighted, subset_1_name, subset_1_val)) |> 
     filter(!is.na(indicator_group_sector))
 
@@ -163,7 +167,7 @@ for (i in 1:length(output)) {
         current_data_length <- max(current_variable_data$row_id) - min(current_variable_data$row_id)
         
         addStyle(wb, sheet = names(output[i]), number_1digit_style, rows = current_row_start : current_row_start + 1 + current_data_length, cols = 1:10, gridExpand = TRUE)
-        addStyle(wb, sheet = names(output[i]), number_1digit_style, rows = current_row_start : current_row_start + 1 + current_data_length, cols = 1:10, gridExpand = TRUE)
+        # addStyle(wb, sheet = names(output[i]), number_1digit_style, rows = current_row_start : current_row_start + 1 + current_data_length, cols = 1:10, gridExpand = TRUE)
         
         writeDataTable(wb = wb, 
                        sheet = names(output[i]), 
@@ -180,7 +184,8 @@ for (i in 1:length(output)) {
         
         previous_row_end <- current_row_start + 1 + current_data_length
     }
-    
+    # hide grid lines
+    showGridLines(wb,  names(output[i]), showGridLines = FALSE)  
 }
 
 # worksheets order
