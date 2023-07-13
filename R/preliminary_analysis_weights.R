@@ -120,7 +120,7 @@ full_analysis_long <- combined_analysis |>
          select_type = ifelse(variable %in% integer_cols_int, "integer", select_type),
          label = ifelse(is.na(label), variable, label),
          # `mean/pct` = ifelse(select_type %in% c("integer") & !variable %in% integer_cols_i & !str_detect(string = variable, pattern = "^i\\."), `mean/pct`, `mean/pct`*100),
-         `mean/pct` = round(`mean/pct`, digits = 2)) |> 
+         `mean/pct` = round(`mean/pct`, digits = 3)) |> 
   mutate(variable = ifelse(variable %in% integer_cols_int, str_replace(string = variable, pattern = "int.", replacement = "i."), variable),
          label = ifelse(label %in% integer_cols_int, str_replace(string = label, pattern = "int.", replacement = "i."), label)) |> 
   select(`Question`= label, 
