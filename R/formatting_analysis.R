@@ -51,7 +51,8 @@ df_analysis <- read_csv("outputs/full_analysis_lf_eth_msna_oromia.csv") |>
                                                        "i.adults_anxiety", "i.chronic_illiness_male", 
                                                        "i.chronic_illiness_female", "i.mental_heath_male", 
                                                        "i.mental_heath_female"), paste0("consent_", `choices/options`), analysis_choice_id),
-           Question = ifelse(variable %in% df_support_composite_grps$composite_code, recode(variable, !!!setNames(df_support_composite_grps$composite_qn_label, df_support_composite_grps$composite_code)), Question)
+           Question = ifelse(variable %in% df_support_composite_grps$composite_code, recode(variable, !!!setNames(df_support_composite_grps$composite_qn_label, df_support_composite_grps$composite_code)), Question),
+           Question = str_replace_all(string = Question, pattern = "\\*", replacement = "")
            )
 
 # identify indicators
