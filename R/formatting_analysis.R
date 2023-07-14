@@ -52,7 +52,13 @@ df_analysis <- read_csv("outputs/full_analysis_lf_eth_msna_oromia.csv") |>
                                                        "i.chronic_illiness_female", "i.mental_heath_male", 
                                                        "i.mental_heath_female"), paste0("consent_", `choices/options`), analysis_choice_id),
            Question = ifelse(variable %in% df_support_composite_grps$composite_code, recode(variable, !!!setNames(df_support_composite_grps$composite_qn_label, df_support_composite_grps$composite_code)), Question),
-           Question = str_replace_all(string = Question, pattern = "\\*", replacement = "")
+           Question = str_replace_all(string = Question, pattern = "\\*", replacement = ""),
+           Question = str_replace_all(string = Question, pattern = "was \\[name\\] enrolled", replacement = "was atleast a school aged child enrolled"),
+           Question = str_replace_all(string = Question, pattern = "Has \\[woman_name\\]", replacement = "Has atleast a member of the household"),
+           Question = str_replace_all(string = Question, pattern = "did \\[woman_name\\] give birth", replacement = "wdid she give birth"),
+           Question = str_replace_all(string = Question, pattern = "assisted \\[woman_name\\]", replacement = "assisted her"),
+           Question = str_replace_all(string = Question, pattern = "Has \\[Child Name\\]", replacement = "Has any child"),
+           Question = str_replace_all(string = Question, pattern = "If \\[woman_name\\]", replacement = "If she")
            )
 
 # identify indicators
