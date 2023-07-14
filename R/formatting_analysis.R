@@ -67,8 +67,8 @@ df_dap_questions <- readxl::read_excel("support_files/ETH2301_DAP_Validated.xlsx
     janitor::clean_names() |> 
     select(in_number, indicator_group_sector, indicator_variable, questionnaire_question) |> 
     mutate(indicator_group_sector = str_replace_all(string = indicator_group_sector, pattern = "\\/|\\?", replacement = "_"),
-           indicator_group_sector = case_when(indicator_group_sector %in% c("Presentation and consent", "Respondent information","HH information") ~ "HH information",
-                                              indicator_group_sector %in% c("Cash & Markets, Livelihoods", "Cash and Markets") ~ "Cash and Markets",
+           indicator_group_sector = case_when(indicator_group_sector %in% c("Presentation and consent", "Respondent information","HH information") ~ "Household data",
+                                              indicator_group_sector %in% c("Cash & Markets, Livelihoods", "Cash and Markets", "Livelihoods") ~ "Livelihoods, Cash and Markets",
                                               indicator_group_sector %in% c("Protection", "Child Protection") ~ "Protection",
                                               indicator_group_sector %in% c("PSNP", "Shock or vulnerability") ~ "Shock or vulnerability",
                                               TRUE ~ indicator_group_sector)
@@ -97,7 +97,11 @@ df_analysis_dap_info <- df_analysis |>
                                                                       "i.boys_anxiety",
                                                                       "i.girls_anxiety",
                                                                       "i.adults_anxiety")) & variable %in% df_support_composite_grps$composite_code, recode(variable, !!!setNames(df_support_composite_grps$composite_type, df_support_composite_grps$composite_code)), select_type),
-           choices = ifelse(variable %in% df_support_integer_col_labs$variable, recode(variable, !!!setNames(df_support_integer_col_labs$integer_column_label, df_support_integer_col_labs$variable)), choices)
+           choices = ifelse(variable %in% df_support_integer_col_labs$variable, recode(variable, !!!setNames(df_support_integer_col_labs$integer_column_label, df_support_integer_col_labs$variable)), choices),
+           indicator_group_sector = case_when(indicator_group_sector %in% c("Cash & Markets, Livelihoods", "Cash and Markets", "Livelihoods") ~ "Livelihoods, Cash and Markets",
+                                              indicator_group_sector %in% c("HH information") ~ "Household data",
+                                              indicator_group_sector %in% c("Shelter_NFI") ~ "Shelter and NFI",
+                                              TRUE ~ indicator_group_sector)
            ) |> 
     select(-c(n_unweighted, subset_1_name, subset_1_val)) |> 
     filter(!is.na(indicator_group_sector))
@@ -198,9 +202,9 @@ for (i in 1:length(output)) {
 }
 
 # worksheets order
-worksheetOrder(wb) <- c(7, 2, 8, 4, 3, 10, 13, 11, 6, 5, 1, 9, 12)
+worksheetOrder(wb) <- c(6, 4, 7, 8, 12, 5, 3, 9, 10, 11, 2, 1)
 
-activeSheet(wb) <- 7
+activeSheet(wb) <- 6
 
 saveWorkbook(wb, paste0("outputs/", butteR::date_file_prefix(),"_formatted_analysis_eth_msna_oromia.xlsx"), overwrite = TRUE)
 openXL(file = paste0("outputs/", butteR::date_file_prefix(),"_formatted_analysis_eth_msna_oromia.xlsx"))
