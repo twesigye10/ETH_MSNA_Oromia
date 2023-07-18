@@ -102,7 +102,12 @@ df_analysis_health_loop <- analysis_after_survey_creation(input_svy_obj = ref_sv
 df_dap_roster <- bind_rows(tibble::tribble(~variable,
                                            "i.individual_age_cat")) |> 
     mutate(split = "all",
-           subset_1 = "i.individual_gender")
+           subset_1 = "hh_woreda",
+           subset_2 = "i.individual_gender"
+           ) |> 
+    pivot_longer(cols = starts_with("subset"), names_to = "subset_no", values_to = "subset_1") |> 
+    filter(!is.na(subset_1), !subset_1 %in% c("NA")) |> 
+    select(-subset_no)
     
 df_main_pivot <- df_main_clean_data_with_weights |> 
     pivot_longer(cols = num_males_0to6:num_females_66plusyrs, names_to = "i.num_gender_age", values_to = "i.hh_size_based_on_gender_age")
