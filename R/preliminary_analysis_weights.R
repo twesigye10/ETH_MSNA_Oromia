@@ -96,9 +96,36 @@ df_analysis_health_loop <- analysis_after_survey_creation(input_svy_obj = ref_sv
                                                    ) |> 
     mutate(level = "Individual")
 
+
+# roster ------------------------------------------------------------------
+
+df_dap_roster <- bind_rows(tibble::tribble(~variable,
+                                           "i.individual_age_cat")) |> 
+    mutate(split = "all",
+           subset_1 = "i.individual_gender")
+    
+df_main_pivot <- df_main_clean_data_with_weights |> 
+    pivot_longer(cols = num_males_0to6:num_females_66plusyrs, names_to = "i.num_gender_age", values_to = "i.hh_size_based_on_gender_age")
+
+df_roster_extract <- df_main_pivot |> 
+    filter(i.hh_size_based_on_gender_age > 0) |> 
+    uncount(i.hh_size_based_on_gender_age) |> 
+    mutate(i.individual_gender = ifelse(str_detect(string = i.num_gender_age, pattern = "females"), "Female", "Male"),
+           i.individual_age_cat = case_when(str_detect(string = i.num_gender_age, pattern = "0to6|7to3yrs|4to6") ~ "cat_0_6",
+                                  str_detect(string = i.num_gender_age, pattern = "7to13|14to17") ~ "cat_7_17",
+                                  str_detect(string = i.num_gender_age, pattern = "18to49|50to65") ~ "cat_18_65",
+                                  str_detect(string = i.num_gender_age, pattern = "66plusyrs") ~ "cat_66+" ))
+
+# set up design object
+ref_svy_roster <- as_survey(.data = df_roster_extract, strata = strata, weights = weights)
+# analysis
+df_analysis_roster <- analysis_after_survey_creation(input_svy_obj = ref_svy_roster,
+                                                          input_dap = df_dap_roster ) |> 
+    mutate(level = "Individual")
+
 # merge and format analysis ----------------------------------------------------------
 
-combined_analysis <- bind_rows(df_main_analysis, df_analysis_education_loop, df_analysis_health_loop)
+combined_analysis <- bind_rows(df_main_analysis, df_analysis_education_loop, df_analysis_health_loop, df_analysis_roster)
 
 
 integer_cols_i <- c("i.fcs", "i.rcsi", "i.hhs", "i.hh_composition_size",  "i.adults_permanent_job", "i.adults_temporary_job", "i.adults_casual_lobour",
