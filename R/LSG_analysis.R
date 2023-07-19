@@ -1,6 +1,7 @@
 library(tidyverse)
 library(openxlsx)
 
+source("R/composite_indicators.R")
 # clean data
 data_path <- "inputs/clean_data_eth_msha_oromia.xlsx"
 
@@ -40,18 +41,69 @@ df_lsg_cash <- df_main_clean_data |>
                                            i.lost_job %in% c("no") &
                                            if_any(.cols = c(income_salaried_work, income_business), .fns = ~ . > 0) &
                                            hh_basic_needs %in% c("all") ~ "1",
+                                       
                                        str_detect(string = int.lcsi_stress, pattern = "yes|no_exhausted") &
                                            str_detect(string = int.lcsi_crisis, pattern = "yes|no_exhausted", negate = TRUE) &
                                            str_detect(string = int.lcsi_emergency, pattern = "yes|no_exhausted", negate = TRUE) &
                                            int.income_props_seasonal > 1 &
                                            hh_basic_needs %in% c("almost_all") ~ "2",
+                                       
                                        str_detect(string = int.lcsi_crisis, pattern = "yes|no_exhausted") &
                                            str_detect(string = int.lcsi_emergency, pattern = "yes|no_exhausted", negate = TRUE) &
                                            i.lost_job %in% c("yes") &
                                            int.income_props_seasonal == 1 &
                                            hh_basic_needs %in% c("some", "many") ~ "3",
+                                       
                                        str_detect(string = int.lcsi_emergency, pattern = "yes|no_exhausted") &
                                            int.income_props_receiving >= 1 &
                                            hh_basic_needs %in% c("none", "few") ~ "4",
                                        ))
 
+
+# WASH --------------------------------------------------------------------
+
+# wash_drinkingwatersource
+# wash_watertime
+
+# wash_waterfreq
+
+# wash_sanitationfacility #combined with
+# wash_sanitationsharing_yn #and
+# wash_sanitationsharing_number
+
+# wash_handwashingfacility #combined with 
+# wash_handwashing_water_available #and
+# wash_handwashing_soap_available
+
+df_lsg_wash <- df_main_clean_data |> 
+    mutate(crit_score_wash = case_when(wash_drinkingwatersource %in% c("piped_into_dwelling", "piped_into_compound") &
+                                           wash_waterfreq %in% c("never") &
+                                       (wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "flush_to_dnt_where", "pit_latrine_with_slab", "composting_toilet") & 
+                                            wash_sanitationsharing_yn %in% c("no")) &
+                                          (wash_handwashingfacility %in% c("fixed_or_mobile_handwashing") &
+                                               wash_handwashing_water_available %in% c("water_available") & wash_handwashing_soap_available %in% c("soap_available")) ~ "1",
+                                       
+                                       (wash_drinkingwatersource %in% c("piped_to_neighbour", "public_tap", "borehole", "protected_well", "protected_spring", "rain_water_collection", "tanker_trucks", "cart_with_tank_drum", "water_kiosk", "bottled_water", "sachet_water") &
+                                           wash_watertime <= 30) &
+                                           wash_waterfreq %in% c("rarely") &
+                                           (wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "flush_to_dnt_where", "pit_latrine_with_slab", "composting_toilet") & 
+                                                wash_sanitationsharing_number <= 20) &
+                                           (wash_handwashingfacility %in% c("no_handwashing") |
+                                                wash_handwashing_water_available %in% c("water_not_available") | wash_handwashing_soap_available %in% c("soap_not_available")) ~ "2",
+                                       
+                                       (wash_drinkingwatersource %in% c("piped_to_neighbour", "public_tap", "borehole", "protected_well", "protected_spring", "rain_water_collection", "tanker_trucks", "cart_with_tank_drum", "water_kiosk", "bottled_water", "sachet_water") &
+                                            wash_watertime > 30) &
+                                           wash_waterfreq %in% c("sometimes") &
+                                           (wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "flush_to_dnt_where", "pit_latrine_with_slab", "composting_toilet") & 
+                                                wash_sanitationsharing_number > 20) ~ "3",
+                                       
+                                       wash_drinkingwatersource %in% c("piped_to_neighbour", "public_tap", "borehole", "protected_well", "protected_spring", "rain_water_collection", "tanker_trucks", "cart_with_tank_drum", "water_kiosk", "bottled_water", "sachet_water") &
+                                           wash_waterfreq %in% c("often") &
+                                           (wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "flush_to_open", "flush_to_elsewhere", "flush_to_dnt_where", "pit_latrine_with_slab", "pit_latrine_without_slab", "composting_toilet", "plastic_bag", "buket", "hanging_toiletlatrine") & 
+                                                wash_sanitationsharing_number > 50) ~ "4",
+                                       
+                                       wash_drinkingwatersource %in% c("surface_water") &
+                                           wash_waterfreq %in% c("always") &
+                                           wash_sanitationfacility %in% c("no_facility") ~ "4+",
+                                       
+))
