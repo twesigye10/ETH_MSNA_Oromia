@@ -13,6 +13,8 @@ df_main_clean_data <- readxl::read_excel(path = data_path, sheet = "cleaned_main
     create_composite_indicators() |> 
     mutate(across(.cols = starts_with("i."), .fns = ~ ifelse((is.infinite(.x)|is.nan(.x)), NA, .)))
 
+education_loop <- readxl::read_excel(path = data_path, sheet = "cleaned_education_loop", na = "NA")
+
 # Food security -----------------------------------------------------------
 
 # calculated using: Fewsnet matrix (combining FCS, rCSI and HHS scores)
@@ -190,6 +192,51 @@ df_lsg_shelter <- df_main_clean_data |>
 
 # Education ---------------------------------------------------------------
 
+## loop
+# edu_attendance #combined with
+# edu_non_access_reason
+# edu_safe_environment #combined with
+# edu_learning_conditions
+
+# main data
+# edu_dropout_due_drought
+# edu_dropout_due_drought_yes
+
+edu_learning_conditions_reasons_cols <- c("overcrowding", "curriculum_not_adapted", "lack_teachers", "lack_qualified_staff", "lack_materials", "poor_wash", "discrimination", "displacement", "drought_related_challanges", "curriculum_not_adapted_remote", "internt_isnt_reliable", "equipment_sahred_with_others")
+edu_safe_environment_reasons_cols <- c("security_concerns_travel", "attacks", "armed_groups", "gbv", "verbal_bullying", "physical_bullying", "physical_punishment", "unsafe_infrastructure", "lack_staff_psychosocial_support", "lack_referral_mechanism", "discrimination")
+child_support_cols <- c("excemption_from_school_fees", "cash_for_school_supplies", "cash_for_school_transportation_to_schhol", "cash_for_children_food", "cash_to_offset_opportunity", "direct_provision_of_school", "direct_provision_of_transportation", "direct_provision_of_water_for_children", "direct_provision_of_food_for_children", "healthcare_at_school", "provision_of_alterntavive_learning", "assistance_for_children_of_minority_groups", "Ȁ")
+
+df_lsg_edu_loop <- education_loop |> 
+    group_by(uuid) |> 
+    mutate(int.hh_loop_size = n(),
+           int.edu_attendance = paste(edu_attendance, collapse = " "),
+           int.edu_attendance_yes_count = str_count(int.edu_attendance, pattern = "yes")) |> 
+    ungroup() |> 
+    mutate(crit_score_edu = case_when(int.hh_loop_size == int.edu_attendance_yes_count &
+                                          edu_safe_environment %in% c("yes") &
+                                          edu_learning_conditions %in% c("yes") ~ "1",
+                                       
+                                      edu_safe_environment %in% c("no") &
+                                          str_detect(string = edu_learning_conditions_reasons, pattern = paste0(edu_learning_conditions_reasons_cols, collapse = "|")) ~ "2",
+                                       
+                                      int.hh_loop_size > int.edu_attendance_yes_count ~ "3",
+                                       
+                                      int.hh_loop_size > int.edu_attendance_yes_count &
+                                          edu_non_access_reason %in% c("protection_risks", "child_marriage") &
+                                          edu_safe_environment %in% c("no")&
+                                          str_detect(string = edu_safe_environment_reasons, pattern = paste0(edu_safe_environment_reasons_cols, collapse = "|")) ~ "4"
+    )
+    )
+
+df_lsg_edu <- df_main_clean_data |> 
+    mutate(non_crit_score_edu = case_when(edu_dropout_due_drought %in% c("no") &
+                                              str_detect(string = edu_dropout_due_drought_yes, pattern = "no_support_needed") ~ "0",
+                                          edu_dropout_due_drought %in% c("yes") &
+                                              str_detect(string = edu_dropout_due_drought_yes, pattern = paste0(child_support_cols, collapse = "|")) ~ "1",
+                                       
+                                      
+    )
+    )
 
 
 
