@@ -140,3 +140,49 @@ df_lsg_health <- df_main_clean_data |>
     )
 
 
+# Shelter & NFI -----------------------------------------------------------
+
+# snfi_sheltertype #combined with
+# snfi_shelter_issues #and
+# snfi_occupancy_arrangement
+
+adequate_shelter_cols <- c("plastic_sheet", "cgi_sheet", "mud_and_stick_wall", "stone_or_birk")
+inadequate_shelter_cols <- c("buul", "tent", "emergency_shelter", "hybrid_or_transitional_shelters", "stick_wall", "collective_shelter")
+
+# snfi_living_space_cooking
+# snfi_living_space_sleeping
+# snfi_living_space_storing_food_water
+# snfi_living_space_electricity
+
+df_lsg_shelter <- df_main_clean_data |> 
+    mutate(crit_score_shelter = case_when(snfi_sheltertype %in% adequate_shelter_cols &
+                                              str_detect(string = snfi_shelter_issues, pattern = "none") &
+                                              snfi_occupancy_arrangement %in% c("ownership", "rented") ~ "1",
+                                          
+                                          ((snfi_sheltertype %in% inadequate_shelter_cols &)|(snfi_sheltertype %in% adequate_shelter_cols &)) &
+                                              (str_detect(string = snfi_shelter_issues, pattern = paste0("(?=.*", paste0(c("minor_damage_roof", "major_damage_roof", "damage_floors", "damage_walls"), collapse = ")(?=.*"), ")")) |
+                                                   str_detect(string = snfi_shelter_issues, pattern = paste0("(?=.*", paste0(c("lack_privacy", "lack_space", "lack_of_insulation", "limited_ventilation", "leaks_during_rain", "unable_to_lock", "lack_light"), collapse = ")(?=.*"), ")")) |
+                                              snfi_occupancy_arrangement %in% c("hosted", "squatting")) ~ "2",
+                                          
+                                          (snfi_sheltertype %in% inadequate_shelter_cols &) &
+                                              (str_detect(string = snfi_shelter_issues, pattern = paste0("(?=.*", paste0(c("minor_damage_roof", "major_damage_roof", "damage_floors", "damage_walls"), collapse = ")(?=.*"), ")")) |
+                                                   str_detect(string = snfi_shelter_issues, pattern = paste0("(?=.*", paste0(c("lack_privacy", "lack_space", "lack_of_insulation", "limited_ventilation", "leaks_during_rain", "unable_to_lock", "lack_light"), collapse = ")(?=.*"), ")")) |
+                                                   snfi_occupancy_arrangement %in% c("hosted", "squatting")) ~ "3",
+                                          
+                                          (snfi_sheltertype %in% c("none_or_sleep_in_the_open") |
+                                              str_detect(string = snfi_shelter_issues, pattern = "collapse_or_unsafe")) ~ "4+",
+    ),
+    non_crit_score_shelter = case_when(snfi_living_space_cooking %in% c("no_issues", "can_do_with_issues") &
+                                           snfi_living_space_sleeping %in% c("no_issues", "can_do_with_issues") &
+                                           snfi_living_space_storing_food_water %in% c("no_issues", "can_do_with_issues") &
+                                           snfi_living_space_electricity %in% c("no_issues", "can_do_with_issues")
+                                            ~ "0",
+                                       snfi_living_space_cooking %in% c("cannot_do") &
+                                           snfi_living_space_sleeping %in% c("cannot_do") &
+                                           snfi_living_space_storing_food_water %in% c("cannot_do") &
+                                           snfi_living_space_electricity %in% c("cannot_do")
+                                           ~ "1"
+                                      
+    )
+    )
+# still need clarification on level 2 and level 3
