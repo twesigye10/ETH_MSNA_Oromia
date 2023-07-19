@@ -186,3 +186,48 @@ df_lsg_shelter <- df_main_clean_data |>
     )
     )
 # still need clarification on level 2 and level 3
+
+
+# Education ---------------------------------------------------------------
+
+
+
+
+# Protection --------------------------------------------------------------
+
+# hh_separated
+# hh_reason_left
+# hh_early_marriege
+# prot_id
+
+
+df_lsg_prot <- df_main_clean_data |> 
+    mutate(crit_score_prot = case_when(hh_separated %in% c("no") &
+                                           hh_early_marriege %in% c("no") &
+                                           prot_id %in% c("yes_all_have_id") ~ "1",
+                                          
+                                       prot_id %in% c("atleast_child_havent_id", "all_children_havent_id") ~ "2",
+                                          
+                                       prot_id %in% c("atleast_adult_havent_id", "atleast_child_and_adult_havent_id", "no_all_havent_id", "no_all_adults_havent_id") ~ "3",
+                                          
+                                       hh_separated %in% c("yes") &
+                                           str_detect(string = hh_reason_left, pattern = "married|seek_employment") &
+                                           hh_early_marriege %in% c("yes")
+                                                ~ "4",
+                                    
+                                       hh_separated %in% c("yes") &
+                                           str_detect(string = hh_reason_left, pattern = "engage_army_group|abducted|missing")
+                                                ~ "4+"
+    ),
+    non_crit_score_prot = case_when(!is.na(child_services_available)  &
+                                        hh_anxiety %in% c("no") &
+                                        work_outside_home %in% c("no") 
+                                       ~ "0",
+                                    is.na(child_services_available) &
+                                        hh_anxiety %in% c("yes") &
+                                        work_outside_home %in% c("yes") 
+                                       ~ "1"
+                                       
+    )
+    )
+
