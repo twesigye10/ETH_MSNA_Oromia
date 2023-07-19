@@ -105,5 +105,38 @@ df_lsg_wash <- df_main_clean_data |>
                                        wash_drinkingwatersource %in% c("surface_water") &
                                            wash_waterfreq %in% c("always") &
                                            wash_sanitationfacility %in% c("no_facility") ~ "4+",
-                                       
 ))
+
+
+# Health ------------------------------------------------------------------
+
+# healthcare_needed
+# healthcare_received
+
+# health_last3months_barriers
+# health_last3months_barriers_healthcare
+health_options_cols <- c("no_functional_health_facility_nearby", "specific_medicine", "long_waiting_time", 
+                         "could_not_afford_cost_treatment", "could_not_afford_consultation_cost", 
+                         "could_not_afford_transportation", "health_facility_is_too_far_away", 
+                         "disability_prevents_access_to_health_facility", "no_means_of_transport", 
+                         "unsafe_security_at_health_facility", "unsafe_security_while_travelling_to_health_facility", 
+                         "didnt_receive_correct_meducations", "not_trained_staff_at_health_facility", "not_enough_staff_at_health_facility", 
+                         "wanted_to_wait_and_see_if_problem_got_better_on_its_own", "fear_distrust_of_health_workers", "couldnt_take_time_off_work", 
+                         "language_barriers_or_issues", "minority_clan_affilation_prevents_access_to_health_facility")
+
+
+
+df_lsg_health <- df_main_clean_data |> 
+    mutate(crit_score_health = case_when(healthcare_needed %in% c("no") ~ "1",
+                                         healthcare_needed %in% c("yes") & healthcare_received %in% c("yes") ~ "2",
+                                         ((healthcare_needed %in% c("yes") & healthcare_received %in% c("no")) | i.disability %in% c("yes")) ~ "3",
+                                         ((healthcare_needed %in% c("yes") & healthcare_received %in% c("no")) & i.disability %in% c("yes")) ~ "4",
+    ),
+    non_crit_score_health = case_when(health_last3months_barriers %in% c("no_barriers_faced") & 
+                                          health_last3months_barriers_healthcare %in% c("no_barriers_faced")~ "0",
+                                  str_detect(string = health_last3months_barriers, pattern = paste0(health_options_cols, collapse = "|")) &
+                                      str_detect(string = health_last3months_barriers_healthcare, pattern = paste0(health_options_cols, collapse = "|"))~ "1"
+    )
+    )
+
+
