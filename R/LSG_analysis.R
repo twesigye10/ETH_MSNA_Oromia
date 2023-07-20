@@ -161,12 +161,12 @@ df_lsg_shelter <- df_main_clean_data |>
                                               str_detect(string = snfi_shelter_issues, pattern = "none") &
                                               snfi_occupancy_arrangement %in% c("ownership", "rented") ~ "1",
                                           
-                                          ((snfi_sheltertype %in% inadequate_shelter_cols &)|(snfi_sheltertype %in% adequate_shelter_cols &)) &
+                                          ((snfi_sheltertype %in% inadequate_shelter_cols)|(snfi_sheltertype %in% adequate_shelter_cols)) &
                                               (str_detect(string = snfi_shelter_issues, pattern = paste0("(?=.*", paste0(c("minor_damage_roof", "major_damage_roof", "damage_floors", "damage_walls"), collapse = ")(?=.*"), ")")) |
                                                    str_detect(string = snfi_shelter_issues, pattern = paste0("(?=.*", paste0(c("lack_privacy", "lack_space", "lack_of_insulation", "limited_ventilation", "leaks_during_rain", "unable_to_lock", "lack_light"), collapse = ")(?=.*"), ")")) |
                                               snfi_occupancy_arrangement %in% c("hosted", "squatting")) ~ "2",
                                           
-                                          (snfi_sheltertype %in% inadequate_shelter_cols &) &
+                                          (snfi_sheltertype %in% inadequate_shelter_cols) &
                                               (str_detect(string = snfi_shelter_issues, pattern = paste0("(?=.*", paste0(c("minor_damage_roof", "major_damage_roof", "damage_floors", "damage_walls"), collapse = ")(?=.*"), ")")) |
                                                    str_detect(string = snfi_shelter_issues, pattern = paste0("(?=.*", paste0(c("lack_privacy", "lack_space", "lack_of_insulation", "limited_ventilation", "leaks_during_rain", "unable_to_lock", "lack_light"), collapse = ")(?=.*"), ")")) |
                                                    snfi_occupancy_arrangement %in% c("hosted", "squatting")) ~ "3",
