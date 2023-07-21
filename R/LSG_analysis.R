@@ -73,36 +73,38 @@ df_lsg_cash <- df_main_clean_data |>
 # wash_handwashing_soap_available
 
 df_lsg_wash <- df_main_clean_data |> 
-    mutate(crit_score_wash = case_when(wash_drinkingwatersource %in% c("piped_into_dwelling", "piped_into_compound") &
-                                           wash_waterfreq %in% c("never") &
-                                       (wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "flush_to_dnt_where", "pit_latrine_with_slab", "composting_toilet") & 
-                                            wash_sanitationsharing_yn %in% c("no")) &
-                                          (wash_handwashingfacility %in% c("fixed_or_mobile_handwashing") &
+    mutate(int.crit_wash_ind1 = case_when(wash_drinkingwatersource %in% c("piped_into_dwelling", "piped_into_compound") ~ "1",
+                                          (wash_drinkingwatersource %in% c("piped_to_neighbour", "public_tap", "borehole", 
+                                                                           "protected_well", "protected_spring", 
+                                                                           "rain_water_collection", "tanker_trucks", 
+                                                                           "cart_with_tank_drum", "water_kiosk", 
+                                                                           "bottled_water", "sachet_water") & wash_watertime <= 30) ~ "2",
+                                          (wash_drinkingwatersource %in% c("piped_to_neighbour", "public_tap", "borehole", 
+                                                                           "protected_well", "protected_spring", 
+                                                                           "rain_water_collection", "tanker_trucks", 
+                                                                           "cart_with_tank_drum", "water_kiosk", 
+                                                                           "bottled_water", "sachet_water") & wash_watertime > 30) ~ "3",
+                                          wash_drinkingwatersource %in% c("unprotected_well", "unprotected_spring") ~ "4",
+                                          wash_drinkingwatersource %in% c("surface_water") ~ "4+"),
+           int.crit_wash_ind2 = case_when(wash_waterfreq %in% c("never") ~ "1",
+                                          wash_waterfreq %in% c("rarely") ~ "2",
+                                          wash_waterfreq %in% c("sometimes") ~ "3",
+                                          wash_waterfreq %in% c("often") ~ "4",
+                                          wash_waterfreq %in% c("always") ~ "4+"),
+           int.crit_wash_ind3 = case_when((wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "flush_to_dnt_where", "pit_latrine_with_slab", "composting_toilet") & 
+                                               wash_sanitationsharing_yn %in% c("no")) ~ "1",
+                                          (wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "flush_to_dnt_where", "pit_latrine_with_slab", "composting_toilet") & 
+                                               wash_sanitationsharing_number <= 20) ~ "2",
+                                          (wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "flush_to_dnt_where", "pit_latrine_with_slab", "composting_toilet") & 
+                                               wash_sanitationsharing_number > 20) ~ "3",
+                                          (wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "flush_to_open", "flush_to_elsewhere", "flush_to_dnt_where", "pit_latrine_with_slab", "pit_latrine_without_slab", "composting_toilet", "plastic_bag", "buket", "hanging_toiletlatrine") & 
+                                               wash_sanitationsharing_number > 50) ~ "4",
+                                          wash_sanitationfacility %in% c("no_facility") ~ "4+"),
+           int.crit_wash_ind4 = case_when((wash_handwashingfacility %in% c("fixed_or_mobile_handwashing") &
                                                wash_handwashing_water_available %in% c("water_available") & wash_handwashing_soap_available %in% c("soap_available")) ~ "1",
-                                       
-                                       (wash_drinkingwatersource %in% c("piped_to_neighbour", "public_tap", "borehole", "protected_well", "protected_spring", "rain_water_collection", "tanker_trucks", "cart_with_tank_drum", "water_kiosk", "bottled_water", "sachet_water") &
-                                           wash_watertime <= 30) &
-                                           wash_waterfreq %in% c("rarely") &
-                                           (wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "flush_to_dnt_where", "pit_latrine_with_slab", "composting_toilet") & 
-                                                wash_sanitationsharing_number <= 20) &
-                                           (wash_handwashingfacility %in% c("no_handwashing") |
-                                                wash_handwashing_water_available %in% c("water_not_available") | wash_handwashing_soap_available %in% c("soap_not_available")) ~ "2",
-                                       
-                                       (wash_drinkingwatersource %in% c("piped_to_neighbour", "public_tap", "borehole", "protected_well", "protected_spring", "rain_water_collection", "tanker_trucks", "cart_with_tank_drum", "water_kiosk", "bottled_water", "sachet_water") &
-                                            wash_watertime > 30) &
-                                           wash_waterfreq %in% c("sometimes") &
-                                           (wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "flush_to_dnt_where", "pit_latrine_with_slab", "composting_toilet") & 
-                                                wash_sanitationsharing_number > 20) ~ "3",
-                                       
-                                       wash_drinkingwatersource %in% c("piped_to_neighbour", "public_tap", "borehole", "protected_well", "protected_spring", "rain_water_collection", "tanker_trucks", "cart_with_tank_drum", "water_kiosk", "bottled_water", "sachet_water") &
-                                           wash_waterfreq %in% c("often") &
-                                           (wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "flush_to_open", "flush_to_elsewhere", "flush_to_dnt_where", "pit_latrine_with_slab", "pit_latrine_without_slab", "composting_toilet", "plastic_bag", "buket", "hanging_toiletlatrine") & 
-                                                wash_sanitationsharing_number > 50) ~ "4",
-                                       
-                                       wash_drinkingwatersource %in% c("surface_water") &
-                                           wash_waterfreq %in% c("always") &
-                                           wash_sanitationfacility %in% c("no_facility") ~ "4+",
-))
+                                          (wash_handwashingfacility %in% c("no_handwashing") |
+                                               wash_handwashing_water_available %in% c("water_not_available") | wash_handwashing_soap_available %in% c("soap_not_available")) ~ "2")
+    )
 
 
 # Health ------------------------------------------------------------------
@@ -131,8 +133,8 @@ df_lsg_health <- df_main_clean_data |>
     ),
     non_crit_score_health = case_when(health_last3months_barriers %in% c("no_barriers_faced") & 
                                           health_last3months_barriers_healthcare %in% c("no_barriers_faced")~ "0",
-                                  str_detect(string = health_last3months_barriers, pattern = paste0(health_options_cols, collapse = "|")) &
-                                      str_detect(string = health_last3months_barriers_healthcare, pattern = paste0(health_options_cols, collapse = "|"))~ "1"
+                                      str_detect(string = health_last3months_barriers, pattern = paste0(health_options_cols, collapse = "|")) &
+                                          str_detect(string = health_last3months_barriers_healthcare, pattern = paste0(health_options_cols, collapse = "|"))~ "1"
     )
     )
 
@@ -159,7 +161,7 @@ df_lsg_shelter <- df_main_clean_data |>
                                           ((snfi_sheltertype %in% inadequate_shelter_cols)|(snfi_sheltertype %in% adequate_shelter_cols)) &
                                               (str_detect(string = snfi_shelter_issues, pattern = paste0("(?=.*", paste0(c("minor_damage_roof", "major_damage_roof", "damage_floors", "damage_walls"), collapse = ")(?=.*"), ")")) |
                                                    str_detect(string = snfi_shelter_issues, pattern = paste0("(?=.*", paste0(c("lack_privacy", "lack_space", "lack_of_insulation", "limited_ventilation", "leaks_during_rain", "unable_to_lock", "lack_light"), collapse = ")(?=.*"), ")")) |
-                                              snfi_occupancy_arrangement %in% c("hosted", "squatting")) ~ "2",
+                                                   snfi_occupancy_arrangement %in% c("hosted", "squatting")) ~ "2",
                                           
                                           (snfi_sheltertype %in% inadequate_shelter_cols) &
                                               (str_detect(string = snfi_shelter_issues, pattern = paste0("(?=.*", paste0(c("minor_damage_roof", "major_damage_roof", "damage_floors", "damage_walls"), collapse = ")(?=.*"), ")")) |
@@ -167,19 +169,19 @@ df_lsg_shelter <- df_main_clean_data |>
                                                    snfi_occupancy_arrangement %in% c("hosted", "squatting")) ~ "3",
                                           
                                           (snfi_sheltertype %in% c("none_or_sleep_in_the_open") |
-                                              str_detect(string = snfi_shelter_issues, pattern = "collapse_or_unsafe")) ~ "4+",
+                                               str_detect(string = snfi_shelter_issues, pattern = "collapse_or_unsafe")) ~ "4+",
     ),
     non_crit_score_shelter = case_when(snfi_living_space_cooking %in% c("no_issues", "can_do_with_issues") &
                                            snfi_living_space_sleeping %in% c("no_issues", "can_do_with_issues") &
                                            snfi_living_space_storing_food_water %in% c("no_issues", "can_do_with_issues") &
                                            snfi_living_space_electricity %in% c("no_issues", "can_do_with_issues")
-                                            ~ "0",
+                                       ~ "0",
                                        snfi_living_space_cooking %in% c("cannot_do") &
                                            snfi_living_space_sleeping %in% c("cannot_do") &
                                            snfi_living_space_storing_food_water %in% c("cannot_do") &
                                            snfi_living_space_electricity %in% c("cannot_do")
-                                           ~ "1"
-                                      
+                                       ~ "1"
+                                       
     )
     )
 # still need clarification on level 2 and level 3
@@ -210,12 +212,12 @@ df_lsg_edu_loop <- education_loop |>
     mutate(crit_score_edu = case_when(int.hh_loop_size == int.edu_attendance_yes_count &
                                           edu_safe_environment %in% c("yes") &
                                           edu_learning_conditions %in% c("yes") ~ "1",
-                                       
+                                      
                                       edu_safe_environment %in% c("no") &
                                           str_detect(string = edu_learning_conditions_reasons, pattern = paste0(edu_learning_conditions_reasons_cols, collapse = "|")) ~ "2",
-                                       
+                                      
                                       int.hh_loop_size > int.edu_attendance_yes_count ~ "3",
-                                       
+                                      
                                       int.hh_loop_size > int.edu_attendance_yes_count &
                                           edu_non_access_reason %in% c("protection_risks", "child_marriage") &
                                           edu_safe_environment %in% c("no")&
@@ -228,8 +230,8 @@ df_lsg_edu <- df_main_clean_data |>
                                               str_detect(string = edu_dropout_due_drought_yes, pattern = "no_support_needed") ~ "0",
                                           edu_dropout_due_drought %in% c("yes") &
                                               str_detect(string = edu_dropout_due_drought_yes, pattern = paste0(child_support_cols, collapse = "|")) ~ "1",
-                                       
-                                      
+                                          
+                                          
     )
     )
 
@@ -247,29 +249,29 @@ df_lsg_prot <- df_main_clean_data |>
     mutate(crit_score_prot = case_when(hh_separated %in% c("no") &
                                            hh_early_marriege %in% c("no") &
                                            prot_id %in% c("yes_all_have_id") ~ "1",
-                                          
+                                       
                                        prot_id %in% c("atleast_child_havent_id", "all_children_havent_id") ~ "2",
-                                          
+                                       
                                        prot_id %in% c("atleast_adult_havent_id", "atleast_child_and_adult_havent_id", "no_all_havent_id", "no_all_adults_havent_id") ~ "3",
-                                          
+                                       
                                        hh_separated %in% c("yes") &
                                            str_detect(string = hh_reason_left, pattern = "married|seek_employment") &
                                            hh_early_marriege %in% c("yes")
-                                                ~ "4",
-                                    
+                                       ~ "4",
+                                       
                                        hh_separated %in% c("yes") &
                                            str_detect(string = hh_reason_left, pattern = "engage_army_group|abducted|missing")
-                                                ~ "4+"
+                                       ~ "4+"
     ),
     non_crit_score_prot = case_when(!is.na(child_services_available)  &
                                         hh_anxiety %in% c("no") &
                                         work_outside_home %in% c("no") 
-                                       ~ "0",
+                                    ~ "0",
                                     is.na(child_services_available) &
                                         hh_anxiety %in% c("yes") &
                                         work_outside_home %in% c("yes") 
-                                       ~ "1"
-                                       
+                                    ~ "1"
+                                    
     )
     )
 
