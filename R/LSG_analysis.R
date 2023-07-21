@@ -126,16 +126,14 @@ health_options_cols <- c("no_functional_health_facility_nearby", "specific_medic
 
 
 df_lsg_health <- df_main_clean_data |> 
-    mutate(crit_score_health = case_when(healthcare_needed %in% c("no") ~ "1",
-                                         healthcare_needed %in% c("yes") & healthcare_received %in% c("yes") ~ "2",
-                                         ((healthcare_needed %in% c("yes") & healthcare_received %in% c("no")) | i.disability %in% c("yes")) ~ "3",
-                                         ((healthcare_needed %in% c("yes") & healthcare_received %in% c("no")) & i.disability %in% c("yes")) ~ "4",
-    ),
-    non_crit_score_health = case_when(health_last3months_barriers %in% c("no_barriers_faced") & 
-                                          health_last3months_barriers_healthcare %in% c("no_barriers_faced")~ "0",
-                                      str_detect(string = health_last3months_barriers, pattern = paste0(health_options_cols, collapse = "|")) &
-                                          str_detect(string = health_last3months_barriers_healthcare, pattern = paste0(health_options_cols, collapse = "|"))~ "1"
-    )
+    mutate(int.crit_health_ind1 = case_when(healthcare_needed %in% c("no") ~ "1",
+                                            healthcare_needed %in% c("yes") & healthcare_received %in% c("yes") ~ "2",
+                                            ((healthcare_needed %in% c("yes") & healthcare_received %in% c("no")) | i.disability %in% c("yes")) ~ "3",
+                                            ((healthcare_needed %in% c("yes") & healthcare_received %in% c("no")) & i.disability %in% c("yes")) ~ "4"),
+           int.none_crit_health_ind1 = case_when(health_last3months_barriers %in% c("no_barriers_faced") ~ "0",
+                                                 str_detect(string = health_last3months_barriers, pattern = paste0(health_options_cols, collapse = "|")) ~ "1"),
+           int.none_crit_health_ind2 = case_when(health_last3months_barriers_healthcare %in% c("no_barriers_faced") ~ "0",
+                                                 str_detect(string = health_last3months_barriers_healthcare, pattern = paste0(health_options_cols, collapse = "|")) ~ "1")
     )
 
 
