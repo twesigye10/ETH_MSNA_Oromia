@@ -40,27 +40,21 @@ df_lsg_cash <- df_main_clean_data |>
     mutate(int.income_props_seasonal = sum(c_across(c(int.income_casual_labour:int.income_remittances)), na.rm = T),
            int.income_props_receiving = sum(c_across(c(int.income_loans_family_friends:int.income_hum_assistance)), na.rm = T)) |> 
     ungroup() |> 
-    mutate(crit_score_cash = case_when(str_detect(string = int.lcsi, pattern = "yes|no_exhausted", negate = TRUE) & 
-                                           i.lost_job %in% c("no") &
-                                           if_any(.cols = c(income_salaried_work, income_business), .fns = ~ . > 0) &
-                                           hh_basic_needs %in% c("all") ~ "1",
-                                       
-                                       str_detect(string = int.lcsi_stress, pattern = "yes|no_exhausted") &
-                                           str_detect(string = int.lcsi_crisis, pattern = "yes|no_exhausted", negate = TRUE) &
-                                           str_detect(string = int.lcsi_emergency, pattern = "yes|no_exhausted", negate = TRUE) &
-                                           int.income_props_seasonal > 1 &
-                                           hh_basic_needs %in% c("almost_all") ~ "2",
-                                       
-                                       str_detect(string = int.lcsi_crisis, pattern = "yes|no_exhausted") &
-                                           str_detect(string = int.lcsi_emergency, pattern = "yes|no_exhausted", negate = TRUE) &
-                                           i.lost_job %in% c("yes") &
-                                           int.income_props_seasonal == 1 &
-                                           hh_basic_needs %in% c("some", "many") ~ "3",
-                                       
-                                       str_detect(string = int.lcsi_emergency, pattern = "yes|no_exhausted") &
-                                           int.income_props_receiving >= 1 &
-                                           hh_basic_needs %in% c("none", "few") ~ "4",
-                                       ))
+    mutate(int.crit_cash_ind1_lcsi = case_when(str_detect(string = int.lcsi, pattern = "yes|no_exhausted", negate = TRUE) ~ "1",
+                                               str_detect(string = int.lcsi_stress, pattern = "yes|no_exhausted") ~ "2",
+                                               str_detect(string = int.lcsi_crisis, pattern = "yes|no_exhausted") ~ "3",
+                                               str_detect(string = int.lcsi_emergency, pattern = "yes|no_exhausted") ~ "4"),
+    int.crit_cash_ind2_hh_lost_job = case_when(i.lost_job %in% c("no") ~ "1",
+                                               i.lost_job %in% c("yes") ~ "3"),
+    int.crit_cash_ind3_hh_tot_income = case_when(if_any(.cols = c(income_salaried_work, income_business), .fns = ~ . > 0) ~ "1",
+                                                 int.income_props_seasonal > 1 ~ "2",
+                                                 int.income_props_seasonal == 1 ~ "3",
+                                                 int.income_props_receiving >= 1 ~ "4"),
+    int.crit_cash_ind4_hh_basic_needs = case_when(hh_basic_needs %in% c("all") ~ "1",
+                                                  hh_basic_needs %in% c("almost_all") ~ "2",
+                                                  hh_basic_needs %in% c("some", "many") ~ "3",
+                                                  hh_basic_needs %in% c("none", "few") ~ "4")
+    )
 
 
 # WASH --------------------------------------------------------------------
