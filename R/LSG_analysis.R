@@ -1,4 +1,5 @@
 library(tidyverse)
+library(msni2022)
 library(openxlsx)
 
 source("R/composite_indicators.R")
