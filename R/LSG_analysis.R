@@ -250,34 +250,22 @@ df_lsg_edu <- df_main_clean_data |>
 # hh_early_marriege
 # prot_id
 
-
 df_lsg_prot <- df_main_clean_data |> 
-    mutate(crit_score_prot = case_when(hh_separated %in% c("no") &
-                                           hh_early_marriege %in% c("no") &
-                                           prot_id %in% c("yes_all_have_id") ~ "1",
-                                       
+    mutate(int.crit_prot_ind1 = case_when(hh_separated %in% c("no") ~ "1",
+                                       hh_separated %in% c("yes") &
+                                           str_detect(string = hh_reason_left, pattern = "married|seek_employment") ~ "4",
+                                       hh_separated %in% c("yes") &
+                                           str_detect(string = hh_reason_left, pattern = "engage_army_group|abducted|missing") ~ "4+" ),
+    int.crit_prot_ind2 = case_when(hh_early_marriege %in% c("no") ~ "1",
+                                       hh_early_marriege %in% c("yes") ~ "4"),
+    int.crit_prot_ind3 = case_when(prot_id %in% c("yes_all_have_id") ~ "1",
                                        prot_id %in% c("atleast_child_havent_id", "all_children_havent_id") ~ "2",
-                                       
-                                       prot_id %in% c("atleast_adult_havent_id", "atleast_child_and_adult_havent_id", "no_all_havent_id", "no_all_adults_havent_id") ~ "3",
-                                       
-                                       hh_separated %in% c("yes") &
-                                           str_detect(string = hh_reason_left, pattern = "married|seek_employment") &
-                                           hh_early_marriege %in% c("yes")
-                                       ~ "4",
-                                       
-                                       hh_separated %in% c("yes") &
-                                           str_detect(string = hh_reason_left, pattern = "engage_army_group|abducted|missing")
-                                       ~ "4+"
-    ),
-    non_crit_score_prot = case_when(!is.na(child_services_available)  &
-                                        hh_anxiety %in% c("no") &
-                                        work_outside_home %in% c("no") 
-                                    ~ "0",
-                                    is.na(child_services_available) &
-                                        hh_anxiety %in% c("yes") &
-                                        work_outside_home %in% c("yes") 
-                                    ~ "1"
-                                    
-    )
+                                       prot_id %in% c("atleast_adult_havent_id", "atleast_child_and_adult_havent_id", "no_all_havent_id", "no_all_adults_havent_id") ~ "3"),
+    int.none_crit_prot_ind1 = case_when(!is.na(child_services_available) ~ "0",
+                                    is.na(child_services_available) ~ "1"),
+    int.none_crit_prot_ind2 = case_when(hh_anxiety %in% c("no") ~ "0",
+                                    hh_anxiety %in% c("yes") ~ "1"),
+    int.none_crit_prot_ind3 = case_when(work_outside_home %in% c("no") ~ "0",
+                                    work_outside_home %in% c("yes") ~ "1")
     )
 
