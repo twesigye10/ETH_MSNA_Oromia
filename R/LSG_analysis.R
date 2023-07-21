@@ -16,6 +16,16 @@ df_main_clean_data <- readxl::read_excel(path = data_path, sheet = "cleaned_main
 
 education_loop <- readxl::read_excel(path = data_path, sheet = "cleaned_education_loop", na = "NA")
 
+health_loop <- readxl::read_excel(path = data_path, sheet = "cleaned_health_loop", na = "NA")
+
+df_hh_disability <- health_loop |> 
+    create_composite_indicators_health() |> 
+    group_by(`_submission__uuid`) |> 
+    mutate(int.hh_disability = paste(i.disability, collapse = " "),
+           i.hh_disability = ifelse(str_detect(string = int.hh_disability, pattern = "yes"), "yes", "no")) |> 
+    filter(row_number() == 1) |> 
+    select(uuid = `_submission__uuid`, i.hh_disability)
+
 # Food security -----------------------------------------------------------
 
 # calculated using: Fewsnet matrix (combining FCS, rCSI and HHS scores)
@@ -123,13 +133,12 @@ health_options_cols <- c("no_functional_health_facility_nearby", "specific_medic
                          "wanted_to_wait_and_see_if_problem_got_better_on_its_own", "fear_distrust_of_health_workers", "couldnt_take_time_off_work", 
                          "language_barriers_or_issues", "minority_clan_affilation_prevents_access_to_health_facility")
 
-
-
 df_lsg_health <- df_main_clean_data |> 
+    left_join(df_hh_disability) |> 
     mutate(int.crit_health_ind1 = case_when(healthcare_needed %in% c("no") ~ "1",
                                             healthcare_needed %in% c("yes") & healthcare_received %in% c("yes") ~ "2",
-                                            ((healthcare_needed %in% c("yes") & healthcare_received %in% c("no")) | i.disability %in% c("yes")) ~ "3",
-                                            ((healthcare_needed %in% c("yes") & healthcare_received %in% c("no")) & i.disability %in% c("yes")) ~ "4"),
+                                            ((healthcare_needed %in% c("yes") & healthcare_received %in% c("no")) | i.hh_disability %in% c("yes")) ~ "3"),
+           int.crit_health_ind1 = ifelse(((healthcare_needed %in% c("yes") & healthcare_received %in% c("no")) & i.hh_disability %in% c("yes")), "4", int.crit_health_ind1), # did not work inside case when because of the | operation
            int.none_crit_health_ind1 = case_when(health_last3months_barriers %in% c("no_barriers_faced") ~ "0",
                                                  str_detect(string = health_last3months_barriers, pattern = paste0(health_options_cols, collapse = "|")) ~ "1"),
            int.none_crit_health_ind2 = case_when(health_last3months_barriers_healthcare %in% c("no_barriers_faced") ~ "0",
