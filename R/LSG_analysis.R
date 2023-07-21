@@ -207,35 +207,38 @@ edu_safe_environment_reasons_cols <- c("security_concerns_travel", "attacks", "a
 child_support_cols <- c("excemption_from_school_fees", "cash_for_school_supplies", "cash_for_school_transportation_to_schhol", "cash_for_children_food", "cash_to_offset_opportunity", "direct_provision_of_school", "direct_provision_of_transportation", "direct_provision_of_water_for_children", "direct_provision_of_food_for_children", "healthcare_at_school", "provision_of_alterntavive_learning", "assistance_for_children_of_minority_groups", "Ȁ")
 
 df_lsg_edu_loop <- education_loop |> 
-    group_by(uuid) |> 
+    group_by(`_submission__uuid`) |> 
     mutate(int.hh_loop_size = n(),
            int.edu_attendance = paste(edu_attendance, collapse = " "),
-           int.edu_attendance_yes_count = str_count(int.edu_attendance, pattern = "yes")) |> 
+           int.edu_attendance_yes_count = str_count(int.edu_attendance, pattern = "yes"),
+           int.edu_non_access_reason = mode_with_out_nc(paste(edu_non_access_reason)),
+           int.edu_safe_environment = case_when(!is.na(edu_safe_environment) & str_detect(string = paste(edu_safe_environment, collapse = " "), pattern = "no") ~ "no",
+                                                !is.na(edu_safe_environment) & !str_detect(string = paste(edu_safe_environment, collapse = " "), pattern = "no") ~ "yes"),
+           int.edu_learning_conditions = case_when(!is.na(edu_learning_conditions) & str_detect(string = paste(edu_learning_conditions, collapse = " "), pattern = "no") ~ "no",
+                                                   !is.na(edu_learning_conditions) & !str_detect(string = paste(edu_learning_conditions, collapse = " "), pattern = "no") ~ "yes"),
+           int.edu_learning_conditions_reasons = paste(edu_learning_conditions_reasons, collapse = " "),
+           int.edu_safe_environment_reasons = paste(edu_safe_environment_reasons, collapse = " ")
+    ) |> 
+    filter(row_number() == 1) |> 
     ungroup() |> 
-    mutate(crit_score_edu = case_when(int.hh_loop_size == int.edu_attendance_yes_count &
-                                          edu_safe_environment %in% c("yes") &
-                                          edu_learning_conditions %in% c("yes") ~ "1",
-                                      
-                                      edu_safe_environment %in% c("no") &
-                                          str_detect(string = edu_learning_conditions_reasons, pattern = paste0(edu_learning_conditions_reasons_cols, collapse = "|")) ~ "2",
-                                      
-                                      int.hh_loop_size > int.edu_attendance_yes_count ~ "3",
-                                      
-                                      int.hh_loop_size > int.edu_attendance_yes_count &
-                                          edu_non_access_reason %in% c("protection_risks", "child_marriage") &
-                                          edu_safe_environment %in% c("no")&
-                                          str_detect(string = edu_safe_environment_reasons, pattern = paste0(edu_safe_environment_reasons_cols, collapse = "|")) ~ "4"
-    )
+    mutate(int.crit_edu_ind1 = case_when(int.hh_loop_size == int.edu_attendance_yes_count ~ "1",
+                                         int.hh_loop_size > int.edu_attendance_yes_count ~ "3"),
+           int.crit_edu_ind1 = case_when(int.hh_loop_size > int.edu_attendance_yes_count &
+                                             int.edu_non_access_reason %in% c("protection_risks", "child_marriage") ~ "4",
+                                         TRUE ~ int.crit_edu_ind1),
+           int.crit_edu_ind2 = case_when(int.edu_safe_environment %in% c("yes") &
+                                             int.edu_learning_conditions %in% c("yes") ~ "1",
+                                         int.edu_learning_conditions %in% c("no") &
+                                             str_detect(string = int.edu_learning_conditions_reasons, pattern = paste0(edu_learning_conditions_reasons_cols, collapse = "|")) ~ "2",
+                                         int.edu_safe_environment %in% c("no")&
+                                             str_detect(string = int.edu_safe_environment_reasons, pattern = paste0(edu_safe_environment_reasons_cols, collapse = "|")) ~ "4")
     )
 
 df_lsg_edu <- df_main_clean_data |> 
-    mutate(non_crit_score_edu = case_when(edu_dropout_due_drought %in% c("no") &
-                                              str_detect(string = edu_dropout_due_drought_yes, pattern = "no_support_needed") ~ "0",
-                                          edu_dropout_due_drought %in% c("yes") &
-                                              str_detect(string = edu_dropout_due_drought_yes, pattern = paste0(child_support_cols, collapse = "|")) ~ "1",
-                                          
-                                          
-    )
+    mutate(int.none_crit_edu_ind1 = case_when(edu_dropout_due_drought %in% c("no") ~ "0",
+                                          edu_dropout_due_drought %in% c("yes") ~ "1"),
+           int.none_crit_edu_ind2 = case_when(str_detect(string = edu_dropout_due_drought_yes, pattern = "no_support_needed") ~ "0",
+                                          str_detect(string = edu_dropout_due_drought_yes, pattern = paste0(child_support_cols, collapse = "|")) ~ "1")
     )
 
 
