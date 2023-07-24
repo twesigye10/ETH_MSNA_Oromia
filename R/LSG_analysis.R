@@ -8,7 +8,6 @@ source("R/composite_indicators.R")
 check_lsg_driver <- function(df, lsg_to_remove, crit_ind_pattern = "crit_", none_crit_ind_pattern = "none_crit_"){
     set.seed(2022)
     df %>% 
-        select(-uuid, -lsg_to_remove) %>% 
         select(contains(crit_ind_pattern), contains(none_crit_ind_pattern)) %>% 
         replace(is.na(.), 0) %>% 
         mutate(indicator = names(.)[max.col(.)]) %>% 
