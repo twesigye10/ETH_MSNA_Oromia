@@ -114,7 +114,9 @@ df_lsg_wash <- df_main_clean_data |>
                                                wash_handwashing_water_available %in% c("water_available") & wash_handwashing_soap_available %in% c("soap_available")) ~ "1",
                                           (wash_handwashingfacility %in% c("no_handwashing") |
                                                wash_handwashing_water_available %in% c("water_not_available") | wash_handwashing_soap_available %in% c("soap_not_available")) ~ "2")
-    )
+    ) |> 
+    mutate(wash_lsg = make_lsg(., crit_to_4plus = c("int.crit_wash_ind1", "int.crit_wash_ind2", "int.crit_wash_ind3"), 
+                               crit_to_3 = c("int.crit_wash_ind4")))
 
 
 # Health ------------------------------------------------------------------
