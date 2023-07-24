@@ -123,10 +123,5 @@ for (i in 1:length(output)) {
     showGridLines(wb,  names(output[i]), showGridLines = FALSE)  
 }
 
-# worksheets order
-worksheetOrder(wb) <- c(6, 4, 7, 8, 12, 5, 3, 9, 10, 11, 2, 1)
-
-activeSheet(wb) <- 6
-
 saveWorkbook(wb, paste0("outputs/", butteR::date_file_prefix(),"_formatted_lsg_analysis_eth_msna_oromia.xlsx"), overwrite = TRUE)
 openXL(file = paste0("outputs/", butteR::date_file_prefix(),"_formatted_lsg_analysis_eth_msna_oromia.xlsx"))
