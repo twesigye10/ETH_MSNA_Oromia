@@ -163,10 +163,10 @@ df_lsg_health <- df_main_clean_data |>
     mutate(int.crit_health_ind1 = case_when(healthcare_needed %in% c("no") ~ 1,
                                             healthcare_needed %in% c("yes") & healthcare_received %in% c("yes") ~ 2,
                                             ((healthcare_needed %in% c("yes") & healthcare_received %in% c("no")) | i.hh_disability %in% c("yes")) ~ 3),
-           int.crit_health_ind1 = ifelse(((healthcare_needed %in% c("yes") & healthcare_received %in% c("no")) & i.hh_disability %in% c("yes")), "4", int.crit_health_ind1), # did not work inside case when because of the | operation
-           int.none_crit_health_ind1 = case_when(health_last3months_barriers %in% c("no_barriers_faced") ~ "0",
+           int.crit_health_ind1 = ifelse(((healthcare_needed %in% c("yes") & healthcare_received %in% c("no")) & i.hh_disability %in% c("yes")), 4, int.crit_health_ind1), # did not work inside case when because of the | operation
+           int.none_crit_health_ind1 = case_when(health_last3months_barriers %in% c("no_barriers_faced") ~ 0,
                                                  str_detect(string = health_last3months_barriers, pattern = paste0(health_options_cols, collapse = "|")) ~ 1),
-           int.none_crit_health_ind2 = case_when(health_last3months_barriers_healthcare %in% c("no_barriers_faced") ~ "0",
+           int.none_crit_health_ind2 = case_when(health_last3months_barriers_healthcare %in% c("no_barriers_faced") ~ 0,
                                                  str_detect(string = health_last3months_barriers_healthcare, pattern = paste0(health_options_cols, collapse = "|")) ~ 1)
     ) |> 
     mutate(int.means_none_crit_health = round(rowMeans(select(., starts_with("int.none_crit_health")), na.rm = FALSE), digits = 2),
@@ -212,13 +212,13 @@ df_lsg_shelter <- df_main_clean_data |>
                                            str_detect(string = snfi_shelter_issues, pattern = "collapse_or_unsafe")) ~ 5,
                                       TRUE ~ int.crit_shelter_ind1
     ),
-    int.none_crit_shelter_ind1 = case_when(snfi_living_space_cooking %in% c("no_issues", "can_do_with_issues") ~ "0",
+    int.none_crit_shelter_ind1 = case_when(snfi_living_space_cooking %in% c("no_issues", "can_do_with_issues") ~ 0,
                                            snfi_living_space_cooking %in% c("cannot_do") ~ 1),
-    int.none_crit_shelter_ind2 = case_when(snfi_living_space_sleeping %in% c("no_issues", "can_do_with_issues") ~ "0",
+    int.none_crit_shelter_ind2 = case_when(snfi_living_space_sleeping %in% c("no_issues", "can_do_with_issues") ~ 0,
                                            snfi_living_space_sleeping %in% c("cannot_do") ~ 1),
-    int.none_crit_shelter_ind3 = case_when(snfi_living_space_storing_food_water %in% c("no_issues", "can_do_with_issues") ~ "0",
+    int.none_crit_shelter_ind3 = case_when(snfi_living_space_storing_food_water %in% c("no_issues", "can_do_with_issues") ~ 0,
                                            snfi_living_space_storing_food_water %in% c("cannot_do") ~ 1),
-    int.none_crit_shelter_ind4 = case_when(snfi_living_space_electricity %in% c("no_issues", "can_do_with_issues") ~ "0",
+    int.none_crit_shelter_ind4 = case_when(snfi_living_space_electricity %in% c("no_issues", "can_do_with_issues") ~ 0,
                                            snfi_living_space_electricity %in% c("cannot_do") ~ 1)
     ) |> 
     mutate(int.means_none_crit_shelter = round(rowMeans(select(., starts_with("int.none_crit_shelter")), na.rm = FALSE), digits = 2),
@@ -277,9 +277,9 @@ df_lsg_edu_loop <- education_loop |>
     select(uuid = `_submission__uuid`, starts_with("int."))
 
 df_lsg_edu <- df_main_clean_data |> 
-    mutate(int.none_crit_edu_ind1 = case_when(edu_dropout_due_drought %in% c("no") ~ "0",
+    mutate(int.none_crit_edu_ind1 = case_when(edu_dropout_due_drought %in% c("no") ~ 0,
                                           edu_dropout_due_drought %in% c("yes") ~ 1),
-           int.none_crit_edu_ind2 = case_when(str_detect(string = edu_dropout_due_drought_yes, pattern = "no_support_needed") ~ "0",
+           int.none_crit_edu_ind2 = case_when(str_detect(string = edu_dropout_due_drought_yes, pattern = "no_support_needed") ~ 0,
                                           str_detect(string = edu_dropout_due_drought_yes, pattern = paste0(child_support_cols, collapse = "|")) ~ 1)
     ) |> 
     left_join(df_lsg_edu_loop, by = "uuid") |> 
@@ -311,11 +311,11 @@ df_lsg_prot <- df_main_clean_data |>
     int.crit_prot_ind3 = case_when(prot_id %in% c("yes_all_have_id") ~ 1,
                                        prot_id %in% c("atleast_child_havent_id", "all_children_havent_id") ~ 2,
                                        prot_id %in% c("atleast_adult_havent_id", "atleast_child_and_adult_havent_id", "no_all_havent_id", "no_all_adults_havent_id") ~ 3),
-    int.none_crit_prot_ind1 = case_when(!is.na(child_services_available) ~ "0",
+    int.none_crit_prot_ind1 = case_when(!is.na(child_services_available) ~ 0,
                                     is.na(child_services_available) ~ 1),
-    int.none_crit_prot_ind2 = case_when(hh_anxiety %in% c("no") ~ "0",
+    int.none_crit_prot_ind2 = case_when(hh_anxiety %in% c("no") ~ 0,
                                     hh_anxiety %in% c("yes") ~ 1),
-    int.none_crit_prot_ind3 = case_when(work_outside_home %in% c("no") ~ "0",
+    int.none_crit_prot_ind3 = case_when(work_outside_home %in% c("no") ~ 0,
                                     work_outside_home %in% c("yes") ~ 1)
     ) |> 
     mutate(int.means_none_crit_prot = round(rowMeans(select(., starts_with("int.none_crit_prot")), na.rm = FALSE), digits = 2),
@@ -327,3 +327,12 @@ df_lsg_prot <- df_main_clean_data |>
 df_lsg_prot_extract <- df_lsg_prot |> select(uuid, contains("int.crit_"), contains("none_crit_"))
 df_lsg_prot_extract$prot_lsg <- make_lsg(dataset = df_lsg_prot_extract, crit_to_4plus = c("int.crit_prot_ind1"), crit_to_4 = c("int.crit_prot_ind2"),
                                          crit_to_3 = c("int.crit_prot_ind3"), non_crit = c("none_crit_prot"))
+
+
+# join all data -----------------------------------------------------------
+
+df_all_lsg_datasets_list <- list(df_lsg_fs_extract, df_lsg_cash_extract, 
+                            df_lsg_wash_extract, df_lsg_health_extract, df_lsg_shelter_extract,
+                            df_lsg_edu_extract, df_lsg_prot_extract)
+
+df_all_lsg_datasets <- purrr::reduce(.f = left_join, .x = df_all_lsg_datasets_list)
