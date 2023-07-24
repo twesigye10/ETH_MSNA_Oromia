@@ -143,7 +143,14 @@ df_lsg_health <- df_main_clean_data |>
                                                  str_detect(string = health_last3months_barriers, pattern = paste0(health_options_cols, collapse = "|")) ~ "1"),
            int.none_crit_health_ind2 = case_when(health_last3months_barriers_healthcare %in% c("no_barriers_faced") ~ "0",
                                                  str_detect(string = health_last3months_barriers_healthcare, pattern = paste0(health_options_cols, collapse = "|")) ~ "1")
-    )
+    ) |> 
+    mutate(int.means_none_crit_health = round(rowMeans(select(., starts_with("int.none_crit_health")), na.rm = FALSE), digits = 2),
+           none_crit_health = case_when(between(int.means_none_crit_health, 0, 0.33) ~ 1,
+                                        between(int.means_none_crit_health, 0.34, 0.66) ~ 2,
+                                        between(int.means_none_crit_health, 0.67, 1) ~ 3)
+           ) |> 
+    mutate(health_lsg = make_lsg(., crit_to_4 = c("int.crit_health_ind1"),
+                               non_crit = c("none_crit_health")))
 
 
 # Shelter & NFI -----------------------------------------------------------
