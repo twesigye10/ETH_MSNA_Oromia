@@ -350,5 +350,10 @@ df_all_lsg_datasets_list <- list(df_lsg_fs_extract, df_lsg_cash_extract,
 df_all_lsg_datasets <- purrr::reduce(.f = left_join, .x = df_all_lsg_datasets_list)
 
 
+# calculate msni ----------------------------------------------------------
 
-
+df_msni <- df_all_lsg_datasets |> 
+    rowwise() |> 
+    mutate(msni = max(c_across(ends_with("_lsg")), na.rm = TRUE)
+    ) |> 
+    ungroup()
