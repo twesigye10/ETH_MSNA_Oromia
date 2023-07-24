@@ -41,8 +41,14 @@ df_hh_disability <- health_loop |>
 # Food security -----------------------------------------------------------
 
 # calculated using: Fewsnet matrix (combining FCS, rCSI and HHS scores)
-
-
+df_lsg_fs <- df_main_clean_data |> 
+    mutate(int.crit_fs_ind1 = case_when(i.fc_matrix_cat %in% c("Phase 1") ~ "1",
+                                        i.fc_matrix_cat %in% c("Phase 2") ~ "2",
+                                        i.fc_matrix_cat %in% c("Phase 3") ~ "3",
+                                        i.fc_matrix_cat %in% c("Phase 4") ~ "4",
+                                        i.fc_matrix_cat %in% c("Phase 5") ~ "4+")
+    ) |> 
+    mutate(fs_lsg = make_lsg(., crit_to_4plus = c("int.crit_fs_ind1")))
 
 # Cash markets and livelihoods --------------------------------------------
 
