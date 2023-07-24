@@ -169,8 +169,11 @@ df_lsg_health <- df_main_clean_data |>
            int.none_crit_health_ind2 = case_when(health_last3months_barriers_healthcare %in% c("no_barriers_faced") ~ 0,
                                                  str_detect(string = health_last3months_barriers_healthcare, pattern = paste0(health_options_cols, collapse = "|")) ~ 1)
     ) |> 
-    mutate(int.means_none_crit_health = round(rowMeans(select(., starts_with("int.none_crit_health")), na.rm = FALSE), digits = 2),
-           none_crit_health = case_when(between(int.means_none_crit_health, 0, 0.33) ~ 1,
+    rowwise() |> 
+    mutate(int.means_none_crit_health = round(mean(c_across(starts_with("int.none_crit_health")), na.rm = FALSE), digits = 2)
+    ) |> 
+    ungroup() |>
+    mutate(none_crit_health = case_when(between(int.means_none_crit_health, 0, 0.33) ~ 1,
                                         between(int.means_none_crit_health, 0.34, 0.66) ~ 2,
                                         between(int.means_none_crit_health, 0.67, 1) ~ 3)
            )
@@ -221,8 +224,11 @@ df_lsg_shelter <- df_main_clean_data |>
     int.none_crit_shelter_ind4 = case_when(snfi_living_space_electricity %in% c("no_issues", "can_do_with_issues") ~ 0,
                                            snfi_living_space_electricity %in% c("cannot_do") ~ 1)
     ) |> 
-    mutate(int.means_none_crit_shelter = round(rowMeans(select(., starts_with("int.none_crit_shelter")), na.rm = FALSE), digits = 2),
-           none_crit_shelter = case_when(between(int.means_none_crit_shelter, 0, 0.33) ~ 1,
+    rowwise() |> 
+    mutate(int.means_none_crit_shelter = round(mean(c_across(starts_with("int.none_crit_shelter")), na.rm = FALSE), digits = 2)
+    ) |> 
+    ungroup() |>
+    mutate(none_crit_shelter = case_when(between(int.means_none_crit_shelter, 0, 0.33) ~ 1,
                                         between(int.means_none_crit_shelter, 0.34, 0.66) ~ 2,
                                         between(int.means_none_crit_shelter, 0.67, 1) ~ 3)
     )
@@ -283,8 +289,11 @@ df_lsg_edu <- df_main_clean_data |>
                                           str_detect(string = edu_dropout_due_drought_yes, pattern = paste0(child_support_cols, collapse = "|")) ~ 1)
     ) |> 
     left_join(df_lsg_edu_loop, by = "uuid") |> 
-    mutate(int.means_none_crit_edu = round(rowMeans(select(., starts_with("int.none_crit_edu")), na.rm = FALSE), digits = 2),
-           none_crit_edu = case_when(between(int.means_none_crit_edu, 0, 0.33) ~ 1,
+    rowwise() |> 
+    mutate(int.means_none_crit_edu = round(mean(c_across(starts_with("int.none_crit_edu")), na.rm = FALSE), digits = 2)
+    ) |> 
+    ungroup() |>
+    mutate(none_crit_edu = case_when(between(int.means_none_crit_edu, 0, 0.33) ~ 1,
                                          between(int.means_none_crit_edu, 0.34, 0.66) ~ 2,
                                          between(int.means_none_crit_edu, 0.67, 1) ~ 3)
     )
@@ -318,8 +327,11 @@ df_lsg_prot <- df_main_clean_data |>
     int.none_crit_prot_ind3 = case_when(work_outside_home %in% c("no") ~ 0,
                                     work_outside_home %in% c("yes") ~ 1)
     ) |> 
-    mutate(int.means_none_crit_prot = round(rowMeans(select(., starts_with("int.none_crit_prot")), na.rm = FALSE), digits = 2),
-           none_crit_prot = case_when(between(int.means_none_crit_prot, 0, 0.33) ~ 1,
+    rowwise() |> 
+    mutate(int.means_none_crit_prot = round(mean(c_across(starts_with("int.none_crit_prot")), na.rm = FALSE), digits = 2)
+    ) |> 
+    ungroup() |>
+    mutate(none_crit_prot = case_when(between(int.means_none_crit_prot, 0, 0.33) ~ 1,
                                      between(int.means_none_crit_prot, 0.34, 0.66) ~ 2,
                                      between(int.means_none_crit_prot, 0.67, 1) ~ 3)
     )
@@ -336,3 +348,7 @@ df_all_lsg_datasets_list <- list(df_lsg_fs_extract, df_lsg_cash_extract,
                             df_lsg_edu_extract, df_lsg_prot_extract)
 
 df_all_lsg_datasets <- purrr::reduce(.f = left_join, .x = df_all_lsg_datasets_list)
+
+
+
+
