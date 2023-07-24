@@ -45,9 +45,11 @@ df_lsg_fs <- df_main_clean_data |>
                                         i.fc_matrix_cat %in% c("Phase 2") ~ 2,
                                         i.fc_matrix_cat %in% c("Phase 3") ~ 3,
                                         i.fc_matrix_cat %in% c("Phase 4") ~ 4,
-                                        i.fc_matrix_cat %in% c("Phase 5") ~ "5")
-    ) |> 
-    mutate(fs_lsg = make_lsg(".", crit_to_4plus = c("int.crit_fs_ind1")))
+                                        i.fc_matrix_cat %in% c("Phase 5") ~ 5)
+    )
+
+df_lsg_fs_extract <- df_lsg_fs |> select(uuid, contains("int.crit_"), contains("none_crit_"))
+df_lsg_fs_extract$fs_lsg <- make_lsg(dataset = df_lsg_fs_extract, crit_to_4plus = c("int.crit_fs_ind1"))
 
 # Cash markets and livelihoods --------------------------------------------
 
@@ -81,10 +83,11 @@ df_lsg_cash <- df_main_clean_data |>
                                                   hh_basic_needs %in% c("almost_all") ~ 2,
                                                   hh_basic_needs %in% c("some", "many") ~ 3,
                                                   hh_basic_needs %in% c("none", "few") ~ 4)
-    ) |> 
-    mutate(cash_lsg = make_lsg(., crit_to_4 = c("int.crit_cash_ind1_lcsi", "int.crit_cash_ind3_hh_tot_income", "int.crit_cash_ind4_hh_basic_needs"), 
-                               crit_to_3 = c("int.crit_cash_ind2_hh_lost_job")))
+    )
 
+df_lsg_cash_extract <- df_lsg_cash |> select(uuid, contains("int.crit_"), contains("none_crit_"))
+df_lsg_cash_extract$cash_lsg <- make_lsg(dataset = df_lsg_cash_extract, crit_to_4 = c("int.crit_cash_ind1_lcsi", "int.crit_cash_ind3_hh_tot_income", "int.crit_cash_ind4_hh_basic_needs"), 
+                                        crit_to_3 = c("int.crit_cash_ind2_hh_lost_job"))
 
 # WASH --------------------------------------------------------------------
 
@@ -133,10 +136,11 @@ df_lsg_wash <- df_main_clean_data |>
                                                wash_handwashing_water_available %in% c("water_available") & wash_handwashing_soap_available %in% c("soap_available")) ~ 1,
                                           (wash_handwashingfacility %in% c("no_handwashing") |
                                                wash_handwashing_water_available %in% c("water_not_available") | wash_handwashing_soap_available %in% c("soap_not_available")) ~ 2)
-    ) |> 
-    mutate(wash_lsg = make_lsg(., crit_to_4plus = c("int.crit_wash_ind1", "int.crit_wash_ind2", "int.crit_wash_ind3"), 
-                               crit_to_3 = c("int.crit_wash_ind4")))
+    )
 
+df_lsg_wash_extract <- df_lsg_wash |> select(uuid, contains("int.crit_"), contains("none_crit_"))
+df_lsg_wash_extract$wash_lsg <- make_lsg(dataset = df_lsg_wash_extract, crit_to_4plus = c("int.crit_wash_ind1", "int.crit_wash_ind2", "int.crit_wash_ind3"), 
+                                        crit_to_3 = c("int.crit_wash_ind4"))
 
 # Health ------------------------------------------------------------------
 
@@ -169,10 +173,11 @@ df_lsg_health <- df_main_clean_data |>
            none_crit_health = case_when(between(int.means_none_crit_health, 0, 0.33) ~ 1,
                                         between(int.means_none_crit_health, 0.34, 0.66) ~ 2,
                                         between(int.means_none_crit_health, 0.67, 1) ~ 3)
-           ) |> 
-    mutate(health_lsg = make_lsg(., crit_to_4 = c("int.crit_health_ind1"),
-                               non_crit = c("none_crit_health")))
+           )
 
+df_lsg_health_extract <- df_lsg_health |> select(uuid, contains("int.crit_"), contains("none_crit_"))
+df_lsg_health_extract$health_lsg <- make_lsg(dataset = df_lsg_health_extract, crit_to_4 = c("int.crit_health_ind1"),
+                                            non_crit = c("none_crit_health"))
 
 # Shelter & NFI -----------------------------------------------------------
 
@@ -220,10 +225,11 @@ df_lsg_shelter <- df_main_clean_data |>
            none_crit_shelter = case_when(between(int.means_none_crit_shelter, 0, 0.33) ~ 1,
                                         between(int.means_none_crit_shelter, 0.34, 0.66) ~ 2,
                                         between(int.means_none_crit_shelter, 0.67, 1) ~ 3)
-    ) |> 
-    mutate(shelter_lsg = make_lsg(., crit_to_4plus = c("int.crit_shelter_ind1"),
-                                 non_crit = c("none_crit_shelter")))
+    )
 
+df_lsg_shelter_extract <- df_lsg_shelter |> select(uuid, contains("int.crit_"), contains("none_crit_"))
+df_lsg_shelter_extract$shelter_lsg <- make_lsg(dataset = df_lsg_shelter_extract, crit_to_4plus = c("int.crit_shelter_ind1"),
+                                              non_crit = c("none_crit_shelter"))
 
 # Education ---------------------------------------------------------------
 
@@ -281,10 +287,11 @@ df_lsg_edu <- df_main_clean_data |>
            none_crit_edu = case_when(between(int.means_none_crit_edu, 0, 0.33) ~ 1,
                                          between(int.means_none_crit_edu, 0.34, 0.66) ~ 2,
                                          between(int.means_none_crit_edu, 0.67, 1) ~ 3)
-    ) |> 
-    mutate(edu_lsg = make_lsg(., crit_to_4 = c("int.crit_edu_ind1", "int.crit_edu_ind2"),
-                                  non_crit = c("none_crit_edu")))
+    )
 
+df_lsg_edu_extract <- df_lsg_edu |> select(uuid, contains("int.crit_"), contains("none_crit_"))
+df_lsg_edu_extract$edu_lsg <- make_lsg(dataset = df_lsg_edu_extract, crit_to_4 = c("int.crit_edu_ind1", "int.crit_edu_ind2"),
+                                       non_crit = c("none_crit_edu"))
 
 # Protection --------------------------------------------------------------
 
@@ -315,7 +322,8 @@ df_lsg_prot <- df_main_clean_data |>
            none_crit_prot = case_when(between(int.means_none_crit_prot, 0, 0.33) ~ 1,
                                      between(int.means_none_crit_prot, 0.34, 0.66) ~ 2,
                                      between(int.means_none_crit_prot, 0.67, 1) ~ 3)
-    ) |> 
-    mutate(prot_lsg = make_lsg(., crit_to_4plus = c("int.crit_prot_ind1"), crit_to_4 = c("int.crit_prot_ind2"),
-                               crit_to_3 = c("int.crit_prot_ind3"), non_crit = c("none_crit_prot")))
+    )
 
+df_lsg_prot_extract <- df_lsg_prot |> select(uuid, contains("int.crit_"), contains("none_crit_"))
+df_lsg_prot_extract$prot_lsg <- make_lsg(dataset = df_lsg_prot_extract, crit_to_4plus = c("int.crit_prot_ind1"), crit_to_4 = c("int.crit_prot_ind2"),
+                                         crit_to_3 = c("int.crit_prot_ind3"), non_crit = c("none_crit_prot"))
