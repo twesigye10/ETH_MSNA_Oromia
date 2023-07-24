@@ -380,14 +380,21 @@ df_msni <- df_all_lsg_datasets |>
     mutate(msni = max(c_across(ends_with("_lsg")), na.rm = TRUE)
     ) |> 
     ungroup() |> 
-    mutate(i.fs_sl3_above = case_when(fs_lsg < 3 ~ "no", fs_lsg >= 3 ~ "yes"),
-           i.cash_sl3_above = case_when(cash_lsg < 3 ~ "no", cash_lsg >= 3 ~ "yes"),
-           i.wash_sl3_above = case_when(wash_lsg < 3 ~ "no", wash_lsg >= 3 ~ "yes"),
-           i.health_sl3_above = case_when(health_lsg < 3 ~ "no", health_lsg >= 3 ~ "yes"),
-           i.shelter_sl3_above = case_when(shelter_lsg < 3 ~ "no", shelter_lsg >= 3 ~ "yes"),
-           i.edu_sl3_above = case_when(edu_lsg < 3 ~ "no", edu_lsg >= 3 ~ "yes"),
-           i.prot_sl3_above = case_when(prot_lsg < 3 ~ "no", prot_lsg >= 3 ~ "yes"),
-           i.msni_sl3_above = case_when(msni < 3 ~ "no", msni >= 3 ~ "yes")
+    mutate(i.fs_sl3_above = case_when(fs_lsg < 3 ~ "No LSG identified", fs_lsg >= 3 ~ "LSG identified"),
+           i.cash_sl3_above = case_when(cash_lsg < 3 ~ "No LSG identified", cash_lsg >= 3 ~ "LSG identified"),
+           i.wash_sl3_above = case_when(wash_lsg < 3 ~ "No LSG identified", wash_lsg >= 3 ~ "LSG identified"),
+           i.health_sl3_above = case_when(health_lsg < 3 ~ "No LSG identified", health_lsg >= 3 ~ "LSG identified"),
+           i.shelter_sl3_above = case_when(shelter_lsg < 3 ~ "No LSG identified", shelter_lsg >= 3 ~ "LSG identified"),
+           i.edu_sl3_above = case_when(edu_lsg < 3 ~ "No LSG identified", edu_lsg >= 3 ~ "LSG identified"),
+           i.prot_sl3_above = case_when(prot_lsg < 3 ~ "No LSG identified", prot_lsg >= 3 ~ "LSG identified"),
+           i.msni_sl3_above = case_when(msni < 3 ~ "No LSG identified", msni >= 3 ~ "LSG identified")
            )
 
 df_drivers_msni <- check_msni_driver(df = df_msni, lsg_ind_pattern = "_lsg")
+
+
+# export msni dataset -----------------------------------------------------
+
+write_csv(df_msni, paste0("outputs/", butteR::date_file_prefix(), "_lsg_and_msni_oromia.csv"), na="")
+write_csv(df_msni, "outputs/lsg_and_msni_oromia.csv", na="")
+
