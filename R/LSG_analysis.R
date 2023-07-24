@@ -3,6 +3,18 @@ library(msni2022)
 library(openxlsx)
 
 source("R/composite_indicators.R")
+
+# check drivers of LSG
+check_lsg_driver <- function(df, lsg_to_remove, crit_ind_pattern = "crit_", none_crit_ind_pattern = "none_crit_"){
+    set.seed(2022)
+    df %>% 
+        select(-uuid, -lsg_to_remove) %>% 
+        select(contains(crit_ind_pattern), contains(none_crit_ind_pattern)) %>% 
+        replace(is.na(.), 0) %>% 
+        mutate(indicator = names(.)[max.col(.)]) %>% 
+        count(indicator) %>% 
+        mutate(rel_freq = round(n/sum(n), digits = 2))}
+
 # clean data
 data_path <- "inputs/clean_data_eth_msha_oromia.xlsx"
 
