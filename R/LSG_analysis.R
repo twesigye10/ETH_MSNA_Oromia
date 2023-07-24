@@ -379,6 +379,15 @@ df_msni <- df_all_lsg_datasets |>
     rowwise() |> 
     mutate(msni = max(c_across(ends_with("_lsg")), na.rm = TRUE)
     ) |> 
-    ungroup()
+    ungroup() |> 
+    mutate(i.fs_sl3_above = case_when(fs_lsg < 3 ~ "no", fs_lsg >= 3 ~ "yes"),
+           i.cash_sl3_above = case_when(cash_lsg < 3 ~ "no", cash_lsg >= 3 ~ "yes"),
+           i.wash_sl3_above = case_when(wash_lsg < 3 ~ "no", wash_lsg >= 3 ~ "yes"),
+           i.health_sl3_above = case_when(health_lsg < 3 ~ "no", health_lsg >= 3 ~ "yes"),
+           i.shelter_sl3_above = case_when(shelter_lsg < 3 ~ "no", shelter_lsg >= 3 ~ "yes"),
+           i.edu_sl3_above = case_when(edu_lsg < 3 ~ "no", edu_lsg >= 3 ~ "yes"),
+           i.prot_sl3_above = case_when(prot_lsg < 3 ~ "no", prot_lsg >= 3 ~ "yes"),
+           i.msni_sl3_above = case_when(msni < 3 ~ "no", msni >= 3 ~ "yes")
+           )
 
 df_drivers_msni <- check_msni_driver(df = df_msni, lsg_ind_pattern = "_lsg")
