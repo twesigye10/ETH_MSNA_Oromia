@@ -64,7 +64,9 @@ df_lsg_cash <- df_main_clean_data |>
                                                   hh_basic_needs %in% c("almost_all") ~ "2",
                                                   hh_basic_needs %in% c("some", "many") ~ "3",
                                                   hh_basic_needs %in% c("none", "few") ~ "4")
-    )
+    ) |> 
+    mutate(cash_lsg = make_lsg(., crit_to_4 = c("int.crit_cash_ind1_lcsi", "int.crit_cash_ind3_hh_tot_income", "int.crit_cash_ind4_hh_basic_needs"), 
+                               crit_to_3 = c("int.crit_cash_ind2_hh_lost_job")))
 
 
 # WASH --------------------------------------------------------------------
