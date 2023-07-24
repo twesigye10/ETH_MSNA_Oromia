@@ -198,7 +198,14 @@ df_lsg_shelter <- df_main_clean_data |>
                                            snfi_living_space_storing_food_water %in% c("cannot_do") ~ "1"),
     int.none_crit_shelter_ind4 = case_when(snfi_living_space_electricity %in% c("no_issues", "can_do_with_issues") ~ "0",
                                            snfi_living_space_electricity %in% c("cannot_do") ~ "1")
-    )
+    ) |> 
+    mutate(int.means_none_crit_shelter = round(rowMeans(select(., starts_with("int.none_crit_shelter")), na.rm = FALSE), digits = 2),
+           none_crit_shelter = case_when(between(int.means_none_crit_shelter, 0, 0.33) ~ 1,
+                                        between(int.means_none_crit_shelter, 0.34, 0.66) ~ 2,
+                                        between(int.means_none_crit_shelter, 0.67, 1) ~ 3)
+    ) |> 
+    mutate(shelter_lsg = make_lsg(., crit_to_4plus = c("int.crit_shelter_ind1"),
+                                 non_crit = c("none_crit_shelter")))
 
 
 # Education ---------------------------------------------------------------
