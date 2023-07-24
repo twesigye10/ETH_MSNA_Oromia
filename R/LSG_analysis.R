@@ -5,8 +5,8 @@ library(openxlsx)
 source("R/composite_indicators.R")
 
 # check drivers of LSG
-check_lsg_driver <- function(df, lsg_to_remove, crit_ind_pattern = "crit_", none_crit_ind_pattern = "none_crit_"){
-    set.seed(2022)
+check_lsg_driver <- function(df, crit_ind_pattern = "crit_", none_crit_ind_pattern = "none_crit_"){
+    set.seed(2023)
     df %>% 
         select(contains(crit_ind_pattern), contains(none_crit_ind_pattern)) %>% 
         replace(is.na(.), 0) %>% 
