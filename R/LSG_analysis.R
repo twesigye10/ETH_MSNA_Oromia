@@ -250,15 +250,23 @@ df_lsg_edu_loop <- education_loop |>
                                              str_detect(string = int.edu_learning_conditions_reasons, pattern = paste0(edu_learning_conditions_reasons_cols, collapse = "|")) ~ "2",
                                          int.edu_safe_environment %in% c("no")&
                                              str_detect(string = int.edu_safe_environment_reasons, pattern = paste0(edu_safe_environment_reasons_cols, collapse = "|")) ~ "4")
-    )
+    ) |> 
+    select(uuid = `_submission__uuid`, starts_with("int."))
 
 df_lsg_edu <- df_main_clean_data |> 
     mutate(int.none_crit_edu_ind1 = case_when(edu_dropout_due_drought %in% c("no") ~ "0",
                                           edu_dropout_due_drought %in% c("yes") ~ "1"),
            int.none_crit_edu_ind2 = case_when(str_detect(string = edu_dropout_due_drought_yes, pattern = "no_support_needed") ~ "0",
                                           str_detect(string = edu_dropout_due_drought_yes, pattern = paste0(child_support_cols, collapse = "|")) ~ "1")
-    )
-
+    ) |> 
+    left_join(df_lsg_edu_loop, by = "uuid") |> 
+    mutate(int.means_none_crit_edu = round(rowMeans(select(., starts_with("int.none_crit_edu")), na.rm = FALSE), digits = 2),
+           none_crit_edu = case_when(between(int.means_none_crit_edu, 0, 0.33) ~ 1,
+                                         between(int.means_none_crit_edu, 0.34, 0.66) ~ 2,
+                                         between(int.means_none_crit_edu, 0.67, 1) ~ 3)
+    ) |> 
+    mutate(edu_lsg = make_lsg(., crit_to_4 = c("int.crit_edu_ind1", "int.crit_edu_ind2"),
+                                  non_crit = c("none_crit_edu")))
 
 
 # Protection --------------------------------------------------------------
