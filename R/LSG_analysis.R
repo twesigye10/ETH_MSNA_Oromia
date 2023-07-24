@@ -293,5 +293,12 @@ df_lsg_prot <- df_main_clean_data |>
                                     hh_anxiety %in% c("yes") ~ "1"),
     int.none_crit_prot_ind3 = case_when(work_outside_home %in% c("no") ~ "0",
                                     work_outside_home %in% c("yes") ~ "1")
-    )
+    ) |> 
+    mutate(int.means_none_crit_prot = round(rowMeans(select(., starts_with("int.none_crit_prot")), na.rm = FALSE), digits = 2),
+           none_crit_prot = case_when(between(int.means_none_crit_prot, 0, 0.33) ~ 1,
+                                     between(int.means_none_crit_prot, 0.34, 0.66) ~ 2,
+                                     between(int.means_none_crit_prot, 0.67, 1) ~ 3)
+    ) |> 
+    mutate(prot_lsg = make_lsg(., crit_to_4plus = c("int.crit_prot_ind1"), crit_to_4 = c("int.crit_prot_ind2"),
+                               crit_to_3 = c("int.crit_prot_ind3"), non_crit = c("none_crit_prot")))
 
