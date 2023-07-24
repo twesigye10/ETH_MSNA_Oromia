@@ -8,7 +8,16 @@ source("R/composite_indicators.R")
 check_lsg_driver <- function(df, crit_ind_pattern = "crit_", none_crit_ind_pattern = "none_crit_"){
     set.seed(2023)
     df %>% 
-        select(contains(crit_ind_pattern), contains(none_crit_ind_pattern)) %>% 
+        select(starts_with(crit_ind_pattern), starts_with(none_crit_ind_pattern)) %>% 
+        replace(is.na(.), 0) %>% 
+        mutate(indicator = names(.)[max.col(.)]) %>% 
+        count(indicator) %>% 
+        mutate(rel_freq = round(n/sum(n), digits = 2))}
+
+check_msni_driver <- function(df, lsg_ind_pattern = "_lsg"){
+    set.seed(2023)
+    df %>% 
+        select(ends_with(lsg_ind_pattern)) %>% 
         replace(is.na(.), 0) %>% 
         mutate(indicator = names(.)[max.col(.)]) %>% 
         count(indicator) %>% 
@@ -51,6 +60,8 @@ df_lsg_fs <- df_main_clean_data |>
 df_lsg_fs_extract <- df_lsg_fs |> select(uuid, contains("int.crit_"), contains("none_crit_"))
 df_lsg_fs_extract$fs_lsg <- make_lsg(dataset = df_lsg_fs_extract, crit_to_4plus = c("int.crit_fs_ind1"))
 
+df_drivers_fs <- ccheck_lsg_driver(df = df_lsg_fs_extract, crit_ind_pattern = "int.crit_", none_crit_ind_pattern = "none_crit_")
+
 # Cash markets and livelihoods --------------------------------------------
 
 # LCSI : yes, no_had_no_need, no_exhausted, not_applicable
@@ -88,6 +99,8 @@ df_lsg_cash <- df_main_clean_data |>
 df_lsg_cash_extract <- df_lsg_cash |> select(uuid, contains("int.crit_"), contains("none_crit_"))
 df_lsg_cash_extract$cash_lsg <- make_lsg(dataset = df_lsg_cash_extract, crit_to_4 = c("int.crit_cash_ind1_lcsi", "int.crit_cash_ind3_hh_tot_income", "int.crit_cash_ind4_hh_basic_needs"), 
                                         crit_to_3 = c("int.crit_cash_ind2_hh_lost_job"))
+
+df_drivers_cash <- check_lsg_driver(df = df_lsg_cash_extract, crit_ind_pattern = "int.crit_", none_crit_ind_pattern = "none_crit_")
 
 # WASH --------------------------------------------------------------------
 
@@ -142,6 +155,8 @@ df_lsg_wash_extract <- df_lsg_wash |> select(uuid, contains("int.crit_"), contai
 df_lsg_wash_extract$wash_lsg <- make_lsg(dataset = df_lsg_wash_extract, crit_to_4plus = c("int.crit_wash_ind1", "int.crit_wash_ind2", "int.crit_wash_ind3"), 
                                         crit_to_3 = c("int.crit_wash_ind4"))
 
+df_drivers_wash <- check_lsg_driver(df = df_lsg_wash_extract, crit_ind_pattern = "int.crit_", none_crit_ind_pattern = "none_crit_")
+
 # Health ------------------------------------------------------------------
 
 # healthcare_needed
@@ -181,6 +196,8 @@ df_lsg_health <- df_main_clean_data |>
 df_lsg_health_extract <- df_lsg_health |> select(uuid, contains("int.crit_"), contains("none_crit_"))
 df_lsg_health_extract$health_lsg <- make_lsg(dataset = df_lsg_health_extract, crit_to_4 = c("int.crit_health_ind1"),
                                             non_crit = c("none_crit_health"))
+
+df_drivers_health <- check_lsg_driver(df = df_lsg_health_extract, crit_ind_pattern = "int.crit_", none_crit_ind_pattern = "none_crit_")
 
 # Shelter & NFI -----------------------------------------------------------
 
@@ -236,6 +253,8 @@ df_lsg_shelter <- df_main_clean_data |>
 df_lsg_shelter_extract <- df_lsg_shelter |> select(uuid, contains("int.crit_"), contains("none_crit_"))
 df_lsg_shelter_extract$shelter_lsg <- make_lsg(dataset = df_lsg_shelter_extract, crit_to_4plus = c("int.crit_shelter_ind1"),
                                               non_crit = c("none_crit_shelter"))
+
+df_drivers_shelter <- check_lsg_driver(df = df_lsg_shelter_extract, crit_ind_pattern = "int.crit_", none_crit_ind_pattern = "none_crit_")
 
 # Education ---------------------------------------------------------------
 
@@ -302,6 +321,9 @@ df_lsg_edu_extract <- df_lsg_edu |> select(uuid, contains("int.crit_"), contains
 df_lsg_edu_extract$edu_lsg <- make_lsg(dataset = df_lsg_edu_extract, crit_to_4 = c("int.crit_edu_ind1", "int.crit_edu_ind2"),
                                        non_crit = c("none_crit_edu"))
 
+df_drivers_edu <- check_lsg_driver(df = df_lsg_edu_extract, crit_ind_pattern = "int.crit_", none_crit_ind_pattern = "none_crit_")
+
+
 # Protection --------------------------------------------------------------
 
 # hh_separated
@@ -340,6 +362,7 @@ df_lsg_prot_extract <- df_lsg_prot |> select(uuid, contains("int.crit_"), contai
 df_lsg_prot_extract$prot_lsg <- make_lsg(dataset = df_lsg_prot_extract, crit_to_4plus = c("int.crit_prot_ind1"), crit_to_4 = c("int.crit_prot_ind2"),
                                          crit_to_3 = c("int.crit_prot_ind3"), non_crit = c("none_crit_prot"))
 
+df_drivers_prot <- check_lsg_driver(df = df_lsg_prot_extract, crit_ind_pattern = "int.crit_", none_crit_ind_pattern = "none_crit_")
 
 # join all data -----------------------------------------------------------
 
@@ -357,3 +380,5 @@ df_msni <- df_all_lsg_datasets |>
     mutate(msni = max(c_across(ends_with("_lsg")), na.rm = TRUE)
     ) |> 
     ungroup()
+
+df_drivers_msni <- check_msni_driver(df = df_msni, lsg_ind_pattern = "_lsg")
