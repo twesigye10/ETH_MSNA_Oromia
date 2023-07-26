@@ -8,6 +8,8 @@ options("openxlsx.withFilter" = FALSE)
 
 # analysis
 df_lsg_msni_analysis <- read_csv("outputs/lsg_msni_analysis_eth_msna_oromia.csv") |> 
+    rename(Severity = variable_val) |> 
+    relocate(level, .before = Severity) |> 
     select(-c(`mean/pct_low`, `mean/pct_upp`, n_unweighted, subset_1_name))
 
 # tool
@@ -53,7 +55,7 @@ for (i in 1:length(output)) {
     writeData(wb, sheet = names(output[i]), names(output[i]), startCol = 1, startRow = 1, headerStyle = hs1)
     addStyle(wb, sheet = names(output[i]), hs1, rows = 1, cols = 1:10, gridExpand = TRUE)
     
-    setColWidths(wb = wb, sheet = names(output[i]), cols = 2, widths = 60)
+    setColWidths(wb = wb, sheet = names(output[i]), cols = 2, widths = 30)
     
     # get current data for the group or sector
     current_sheet_data <- output[[i]] |> 
