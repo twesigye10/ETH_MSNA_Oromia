@@ -30,7 +30,7 @@ df_analysis_extra_info <- df_lsg_msni_analysis |>
                                                       "ET041109"), 
                                   recode(subset_1_val, !!!setNames(df_choices$choice_label, df_choices$choice_name)), subset_1_val),
            group_sector = case_when(str_detect(string = variable, pattern = "_lsg$|^msni$") ~ "All Severity Levels",
-                                    str_detect(string = variable, pattern = "_sl3_above") ~ "Higher Severity Levels",)
+                                    str_detect(string = variable, pattern = "_sl3_above$|_sl4_above$") ~ "Higher Severity Levels",)
            )
 
 # split data based on groups

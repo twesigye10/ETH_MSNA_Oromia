@@ -29,7 +29,7 @@ df_main_clean_data_with_weights <- df_main_clean_data |>
 support_data <- df_main_clean_data_with_weights |> select(uuid, hh_woreda, i.hoh_gender, strata,weights)
 
 # lsg/msni data
-df_lsg_msni <- read_csv("outputs/lsg_and_msni_oromia.csv") |> 
+df_lsg_msni <- read_csv("outputs/lsg_and_msni_data_oromia.csv") |> 
     mutate(across(matches("_lsg$|^msni$"), .fns = ~ case_when(.x %in% c("1") ~ "severity level 1",
                                                       .x %in% c("2") ~ "severity level 2",
                                                       .x %in% c("3") ~ "severity level 3",
@@ -56,6 +56,14 @@ df_dap_lsg <- bind_rows(tibble::tribble(~variable,
                                         "i.edu_sl3_above",
                                         "i.prot_sl3_above",
                                         "i.msni_sl3_above",
+                                        "i.fs_sl4_above",
+                                        "i.cash_sl4_above",
+                                        "i.wash_sl4_above",
+                                        "i.health_sl4_above",
+                                        "i.shelter_sl4_above",
+                                        "i.edu_sl4_above",
+                                        "i.prot_sl4_above",
+                                        "i.msni_sl4_above",
 )) |> 
     mutate(split = "all",
            subset_1 = "hh_woreda"

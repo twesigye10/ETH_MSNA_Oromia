@@ -60,7 +60,7 @@ df_lsg_fs <- df_main_clean_data |>
 df_lsg_fs_extract <- df_lsg_fs |> select(uuid, contains("int.crit_"), contains("none_crit_"))
 df_lsg_fs_extract$fs_lsg <- make_lsg(dataset = df_lsg_fs_extract, crit_to_4plus = c("int.crit_fs_ind1"))
 
-df_drivers_fs <- ccheck_lsg_driver(df = df_lsg_fs_extract, crit_ind_pattern = "int.crit_", none_crit_ind_pattern = "none_crit_")
+df_drivers_fs <- check_lsg_driver(df = df_lsg_fs_extract, crit_ind_pattern = "int.crit_", none_crit_ind_pattern = "none_crit_")
 
 # Cash markets and livelihoods --------------------------------------------
 
@@ -387,7 +387,15 @@ df_msni <- df_all_lsg_datasets |>
            i.shelter_sl3_above = case_when(shelter_lsg < 3 ~ "No LSG identified", shelter_lsg >= 3 ~ "LSG identified"),
            i.edu_sl3_above = case_when(edu_lsg < 3 ~ "No LSG identified", edu_lsg >= 3 ~ "LSG identified"),
            i.prot_sl3_above = case_when(prot_lsg < 3 ~ "No LSG identified", prot_lsg >= 3 ~ "LSG identified"),
-           i.msni_sl3_above = case_when(msni < 3 ~ "No LSG identified", msni >= 3 ~ "LSG identified")
+           i.msni_sl3_above = case_when(msni < 3 ~ "No LSG identified", msni >= 3 ~ "LSG identified"),
+           i.fs_sl4_above = case_when(fs_lsg < 4 ~ "No LSG identified", fs_lsg >= 4 ~ "LSG identified"),
+           i.cash_sl4_above = case_when(cash_lsg < 4 ~ "No LSG identified", cash_lsg >= 4 ~ "LSG identified"),
+           i.wash_sl4_above = case_when(wash_lsg < 4 ~ "No LSG identified", wash_lsg >= 4 ~ "LSG identified"),
+           i.health_sl4_above = case_when(health_lsg < 4 ~ "No LSG identified", health_lsg >= 4 ~ "LSG identified"),
+           i.shelter_sl4_above = case_when(shelter_lsg < 4 ~ "No LSG identified", shelter_lsg >= 4 ~ "LSG identified"),
+           i.edu_sl4_above = case_when(edu_lsg < 4 ~ "No LSG identified", edu_lsg >= 4 ~ "LSG identified"),
+           i.prot_sl4_above = case_when(prot_lsg < 4 ~ "No LSG identified", prot_lsg >= 4 ~ "LSG identified"),
+           i.msni_sl4_above = case_when(msni < 4 ~ "No LSG identified", msni >= 4 ~ "LSG identified")
            )
 
 df_drivers_msni <- check_msni_driver(df = df_msni, lsg_ind_pattern = "_lsg")
@@ -395,6 +403,6 @@ df_drivers_msni <- check_msni_driver(df = df_msni, lsg_ind_pattern = "_lsg")
 
 # export msni dataset -----------------------------------------------------
 
-write_csv(df_msni, paste0("outputs/", butteR::date_file_prefix(), "_lsg_and_msni_oromia.csv"), na="")
-write_csv(df_msni, "outputs/lsg_and_msni_oromia.csv", na="")
+write_csv(df_msni, paste0("outputs/", butteR::date_file_prefix(), "_lsg_and_msni_data_oromia.csv"), na="")
+write_csv(df_msni, "outputs/lsg_and_msni_data_oromia.csv", na="")
 
