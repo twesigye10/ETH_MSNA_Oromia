@@ -79,8 +79,12 @@ df_cleaned_data <- df_cleaning_step|>
                                                                                     pattern = str_extract(string = cur_column(), pattern = "[\\w]+.$")) ~ FALSE,
                                     TRUE ~ .)))
 
+intermediate_cols <- c("lcsi_stress1", "lcsi_stress2", "lcsi_stress3", "lcsi_stress4", "lcsi_crisis1", "lcsi_crisis2", "lcsi_crisis3", "lcsi_emergency1", "lcsi_emergency2", "lcsi_emergency3", "lcsi_stress_yes", "lcsi_stress_exhaust", "lcsi_stress", "lcsi_crisis_yes", "lcsi_crisis_exhaust", "lcsi_crisis", "lcsi_emergency_yes", "lcsi_emergency_exhaust", "lcsi_emergency", "lcsi_cat_yes", "lcsi_cat_exhaust")
+
 df_main_with_composites <- df_cleaned_data |> 
-    create_composite_indicators()
+    create_composite_indicators() |> 
+    select(-any_of(intermediate_cols)) |> 
+    mutate(across(.cols = starts_with("i."), .fns = ~ ifelse((is.infinite(.x)|is.nan(.x)), NA, .)))
 
 # clean repeats -----------------------------------------------------------
 
