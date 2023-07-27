@@ -277,7 +277,7 @@ df_lsg_edu_loop <- education_loop |>
     mutate(int.hh_loop_size = n(),
            int.edu_attendance = paste(edu_attendance, collapse = " "),
            int.edu_attendance_yes_count = str_count(int.edu_attendance, pattern = "yes"),
-           int.edu_non_access_reason = mode_with_out_nc(paste(edu_non_access_reason)),
+           int.edu_non_access_reason = supporteR::mode_with_out_nc(paste(edu_non_access_reason)),
            int.edu_safe_environment = case_when(!is.na(edu_safe_environment) & str_detect(string = paste(edu_safe_environment, collapse = " "), pattern = "no") ~ "no",
                                                 !is.na(edu_safe_environment) & !str_detect(string = paste(edu_safe_environment, collapse = " "), pattern = "no") ~ "yes"),
            int.edu_learning_conditions = case_when(!is.na(edu_learning_conditions) & str_detect(string = paste(edu_learning_conditions, collapse = " "), pattern = "no") ~ "no",
