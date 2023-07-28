@@ -8,6 +8,7 @@ options("openxlsx.withFilter" = FALSE)
 
 # analysis
 df_lsg_msni_analysis <- read_csv("outputs/lsg_msni_analysis_eth_msna_oromia.csv") |> 
+    mutate(variable = ifelse(is.na(variable), variable_val, variable)) |> 
     rename(Severity = variable_val) |> 
     relocate(level, .before = Severity) |> 
     select(-c(`mean/pct_low`, `mean/pct_upp`, n_unweighted, subset_1_name))
@@ -60,7 +61,9 @@ for (i in 1:length(output)) {
     # get current data for the group or sector
     current_sheet_data <- output[[i]] |> 
         pivot_wider(names_from = subset_1_val, values_from = `mean/pct`) |> 
-        mutate(row_id = row_number())
+        mutate(row_id = row_number()) |> 
+        mutate(across(any_of(c("Zonal", "Gasera", "Sinana", "Goba", "Harena Buluk",
+                        "Delo Mena", "Berbere", "Goro")), .fns = ~ifelse(is.na(.x), 0, .x)))
     
     # split variables to be written in different tables with in a sheet
     sheet_variables_data <- split(current_sheet_data, factor(current_sheet_data$variable, levels = unique(current_sheet_data$variable)))
