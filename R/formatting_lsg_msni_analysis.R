@@ -22,7 +22,7 @@ df_choices <- readxl::read_excel(loc_tool, sheet = "choices") |>
 # format the data ---------------------------------------------------------
 
 df_analysis_extra_info <- df_lsg_msni_analysis |> 
-    mutate(select_type = "select_one",
+    mutate(select_type = ifelse(variable %in% c("lsg_count", "lsg_profiles"), "integer", "select_one"),
            subset_1_val =  ifelse(is.na(subset_1_val), "Zonal", subset_1_val),
            subset_1_val =  ifelse(subset_1_val %in% c("ET041114", "ET041112",
                                                       "ET041106", "ET041110",
@@ -30,7 +30,7 @@ df_analysis_extra_info <- df_lsg_msni_analysis |>
                                                       "ET041109"), 
                                   recode(subset_1_val, !!!setNames(df_choices$choice_label, df_choices$choice_name)), subset_1_val),
            group_sector = case_when(str_detect(string = variable, pattern = "_lsg$|^msni$") ~ "All Severity Levels",
-                                    str_detect(string = variable, pattern = "_sl3_above$|_sl4_above$") ~ "Higher Severity Levels",)
+                                    str_detect(string = variable, pattern = "_sl3_above$|_sl4_above$|lsg_count|lsg_profiles") ~ "Higher Severity Levels",)
            )
 
 # split data based on groups
