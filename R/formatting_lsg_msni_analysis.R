@@ -22,7 +22,7 @@ df_choices <- readxl::read_excel(loc_tool, sheet = "choices") |>
 # format the data ---------------------------------------------------------
 
 df_analysis_extra_info <- df_lsg_msni_analysis |> 
-    mutate(select_type = ifelse(variable %in% c("lsg_count", "lsg_profiles"), "integer", "select_one"),
+    mutate(select_type = ifelse(variable %in% c("lsg_count"), "integer", "select_one"),
            subset_1_val =  ifelse(is.na(subset_1_val), "Zonal", subset_1_val),
            subset_1_val =  ifelse(subset_1_val %in% c("ET041114", "ET041112",
                                                       "ET041106", "ET041110",
