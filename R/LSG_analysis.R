@@ -403,7 +403,7 @@ df_msni <- df_all_lsg_datasets |>
     unite("lsg_profiles", matches("^profile."), sep = " ", remove = T , na.rm = TRUE) |> 
     mutate(lsg_count = case_when(msni < 3 ~ 0,
                                     msni >= 3 ~ str_count(string = lsg_profiles, pattern = boundary("word")),
-                                    TRUE ~ NA_character_),
+                                    TRUE ~ NA),
            lsg_profiles = case_when(msni < 3 ~ "No needs profile",
                                     msni >= 3 ~ lsg_profiles,
                                     TRUE ~ NA_character_))
