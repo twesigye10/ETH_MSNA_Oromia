@@ -77,7 +77,7 @@ df_dap_lsg <- bind_rows(tibble::tribble(~variable,
 
 # main dataset ------------------------------------------------------------
 
-df_combined_data <- df_main_clean_data_with_weights |> 
+df_combined_data <- support_data |> 
     left_join(df_lsg_msni)
 
 # set up design object
