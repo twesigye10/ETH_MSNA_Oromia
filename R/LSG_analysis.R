@@ -396,7 +396,17 @@ df_msni <- df_all_lsg_datasets |>
            i.edu_sl4_above = case_when(edu_lsg < 4 ~ "No LSG identified", edu_lsg >= 4 ~ "LSG identified"),
            i.prot_sl4_above = case_when(prot_lsg < 4 ~ "No LSG identified", prot_lsg >= 4 ~ "LSG identified"),
            i.msni_sl4_above = case_when(msni < 4 ~ "No LSG identified", msni >= 4 ~ "LSG identified")
-           )
+           ) |> 
+    mutate(across(.cols = matches("_lsg$"), 
+                  .fns = ~ifelse(.x >= 3, cur_column(), NA_character_),
+                  .names = "profile.{.col}")) |>
+    unite("lsg_profiles", matches("^profile."), sep = " ", remove = T , na.rm = TRUE) |> 
+    mutate(lsg_count = case_when(msni < 3 ~ 0,
+                                    msni >= 3 ~ str_count(string = lsg_profiles, pattern = boundary("word")),
+                                    TRUE ~ NA_character_),
+           lsg_profiles = case_when(msni < 3 ~ "No needs profile",
+                                    msni >= 3 ~ lsg_profiles,
+                                    TRUE ~ NA_character_))
 
 df_drivers_msni <- check_msni_driver(df = df_msni, lsg_ind_pattern = "_lsg")
 
