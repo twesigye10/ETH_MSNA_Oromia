@@ -64,6 +64,8 @@ df_dap_lsg <- bind_rows(tibble::tribble(~variable,
                                         "i.edu_sl4_above",
                                         "i.prot_sl4_above",
                                         "i.msni_sl4_above",
+                                        "lsg_profiles",
+                                        "lsg_count"
 )) |> 
     mutate(split = "all",
            subset_1 = "hh_woreda"
