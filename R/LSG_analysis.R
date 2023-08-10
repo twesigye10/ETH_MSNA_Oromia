@@ -177,7 +177,7 @@ health_options_cols <- c("no_functional_health_facility_nearby", "specific_medic
 df_lsg_health <- df_main_clean_data |> 
     left_join(df_hh_disability) |> 
     mutate(int.crit_health_ind1 = case_when(healthcare_needed %in% c("no") ~ 1,
-                                            healthcare_needed %in% c("yes") & healthcare_received %in% c("yes") & !i.hh_disability %in% c("yes") ~ 2,
+                                            healthcare_needed %in% c("yes") & healthcare_received %in% c("yes") ~ 2,
                                             ((healthcare_needed %in% c("yes") & healthcare_received %in% c("no")) | i.hh_disability %in% c("yes")) ~ 3),
            int.crit_health_ind1 = ifelse(((healthcare_needed %in% c("yes") & healthcare_received %in% c("no")) & i.hh_disability %in% c("yes")), 4, int.crit_health_ind1), # did not work inside case when because of the | operation
            int.none_crit_health_ind1 = case_when(health_last3months_barriers %in% c("no_barriers_faced") ~ 0,
@@ -220,12 +220,12 @@ df_lsg_shelter <- df_main_clean_data |>
                                                  snfi_occupancy_arrangement %in% c("ownership", "rented") ~ 1,
                                              
                                              ((snfi_sheltertype %in% inadequate_shelter_cols)|(snfi_sheltertype %in% adequate_shelter_cols)) &
-                                                 (str_detect(string = snfi_shelter_issues, pattern = paste0(c("minor_damage_roof", "major_damage_roof", "damage_floors", "damage_walls"), collapse = "|")) |
+                                                 (str_detect(string = snfi_shelter_issues, pattern = paste0(c("minor_damage_roof", "major_damage_roof", "damage_floors", "damage_walls", "damage_windows"), collapse = "|")) |
                                                       str_detect(string = snfi_shelter_issues, pattern = paste0(c("lack_privacy", "lack_space", "lack_of_insulation", "limited_ventilation", "leaks_during_rain", "unable_to_lock", "lack_light"), collapse = "|")) |
                                                       snfi_occupancy_arrangement %in% c("hosted", "squatting")) ~ 2
     ),
     int.crit_shelter_ind1 = case_when((snfi_sheltertype %in% inadequate_shelter_cols) &
-                                          (str_detect(string = snfi_shelter_issues, pattern = paste0(c("minor_damage_roof", "major_damage_roof", "damage_floors", "damage_walls"), collapse = "|")) |
+                                          (str_detect(string = snfi_shelter_issues, pattern = paste0(c("minor_damage_roof", "major_damage_roof", "damage_floors", "damage_walls", "damage_windows"), collapse = "|")) |
                                                str_detect(string = snfi_shelter_issues, pattern = paste0(c("lack_privacy", "lack_space", "lack_of_insulation", "limited_ventilation", "leaks_during_rain", "unable_to_lock", "lack_light"), collapse = "|")) |
                                                snfi_occupancy_arrangement %in% c("hosted", "squatting")) ~ 3,
                                       
