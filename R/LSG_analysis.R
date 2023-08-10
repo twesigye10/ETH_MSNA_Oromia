@@ -142,8 +142,9 @@ df_lsg_wash <- df_main_clean_data |>
                                                wash_sanitationsharing_number <= 20) ~ 2,
                                           (wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "flush_to_dnt_where", "pit_latrine_with_slab", "composting_toilet") & 
                                                wash_sanitationsharing_number > 20) ~ 3,
-                                          (wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "flush_to_open", "flush_to_elsewhere", "flush_to_dnt_where", "pit_latrine_with_slab", "pit_latrine_without_slab", "composting_toilet", "plastic_bag", "buket", "hanging_toiletlatrine") & 
-                                               wash_sanitationsharing_number > 50) ~ 4,
+                                          (wash_sanitationfacility %in% c("flush_to_open", "flush_to_elsewhere", "flush_to_dnt_where", "pit_latrine_without_slab", "plastic_bag", "buket", "hanging_toiletlatrine") |
+                                               (wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "pit_latrine_with_slab", "composting_toilet") & 
+                                               wash_sanitationsharing_number > 50)) ~ 4,
                                           wash_sanitationfacility %in% c("no_facility") ~ 5),
            int.crit_wash_ind4 = case_when((wash_handwashingfacility %in% c("fixed_or_mobile_handwashing") &
                                                wash_handwashing_water_available %in% c("water_available") & wash_handwashing_soap_available %in% c("soap_available")) ~ 1,
