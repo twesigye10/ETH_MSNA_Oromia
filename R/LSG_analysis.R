@@ -136,11 +136,11 @@ df_lsg_wash <- df_main_clean_data |>
                                           wash_waterfreq %in% c("sometimes") ~ 3,
                                           wash_waterfreq %in% c("often") ~ 4,
                                           wash_waterfreq %in% c("always") ~ 5),
-           int.crit_wash_ind3 = case_when((wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "flush_to_dnt_where", "pit_latrine_with_slab", "composting_toilet") & 
+           int.crit_wash_ind3 = case_when((wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "pit_latrine_with_slab", "composting_toilet") & 
                                                wash_sanitationsharing_yn %in% c("no")) ~ 1,
-                                          (wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "flush_to_dnt_where", "pit_latrine_with_slab", "composting_toilet") & 
+                                          (wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "pit_latrine_with_slab", "composting_toilet") & 
                                                wash_sanitationsharing_number <= 20) ~ 2,
-                                          (wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "flush_to_dnt_where", "pit_latrine_with_slab", "composting_toilet") & 
+                                          (wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "pit_latrine_with_slab", "composting_toilet") & 
                                                wash_sanitationsharing_number > 20) ~ 3,
                                           (wash_sanitationfacility %in% c("flush_to_open", "flush_to_elsewhere", "flush_to_dnt_where", "pit_latrine_without_slab", "plastic_bag", "buket", "hanging_toiletlatrine") |
                                                (wash_sanitationfacility %in% c("flush_to_piped", "flush_to_septic", "flush_to_pit", "pit_latrine_with_slab", "composting_toilet") & 
