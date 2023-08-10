@@ -177,7 +177,7 @@ health_options_cols <- c("no_functional_health_facility_nearby", "specific_medic
 df_lsg_health <- df_main_clean_data |> 
     left_join(df_hh_disability) |> 
     mutate(int.crit_health_ind1 = case_when(healthcare_needed %in% c("no") ~ 1,
-                                            healthcare_needed %in% c("yes") & healthcare_received %in% c("yes") ~ 2,
+                                            healthcare_needed %in% c("yes") & healthcare_received %in% c("yes") & !i.hh_disability %in% c("yes") ~ 2,
                                             ((healthcare_needed %in% c("yes") & healthcare_received %in% c("no")) | i.hh_disability %in% c("yes")) ~ 3),
            int.crit_health_ind1 = ifelse(((healthcare_needed %in% c("yes") & healthcare_received %in% c("no")) & i.hh_disability %in% c("yes")), 4, int.crit_health_ind1), # did not work inside case when because of the | operation
            int.none_crit_health_ind1 = case_when(health_last3months_barriers %in% c("no_barriers_faced") ~ 0,
