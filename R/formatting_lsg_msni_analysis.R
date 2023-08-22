@@ -56,7 +56,7 @@ for (i in 1:length(output)) {
     writeData(wb, sheet = names(output[i]), names(output[i]), startCol = 1, startRow = 1, headerStyle = hs1)
     addStyle(wb, sheet = names(output[i]), hs1, rows = 1, cols = 1:10, gridExpand = TRUE)
     
-    setColWidths(wb = wb, sheet = names(output[i]), cols = 2, widths = 30)
+    setColWidths(wb = wb, sheet = names(output[i]), cols = 2, widths = 56)
     
     # get current data for the group or sector
     current_sheet_data <- output[[i]] |> 
