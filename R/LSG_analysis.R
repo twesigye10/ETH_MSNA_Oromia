@@ -335,7 +335,7 @@ df_drivers_edu <- check_lsg_driver(df = df_lsg_edu_extract, crit_ind_pattern = "
 df_lsg_prot <- df_main_clean_data |> 
     mutate(int.crit_prot_ind1 = case_when(hh_separated %in% c("no") ~ 1,
                                           hh_separated %in% c("yes") &
-                                              str_detect(string = hh_reason_left, pattern = "living_with_relatives|study_leave") ~ 3,
+                                              str_detect(string = hh_reason_left, pattern = "living_with_relatives|study_leave") ~ 1,
                                        hh_separated %in% c("yes") &
                                            str_detect(string = hh_reason_left, pattern = "married|seek_employment") ~ 4,
                                        hh_separated %in% c("yes") &
