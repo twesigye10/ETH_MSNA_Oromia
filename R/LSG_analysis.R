@@ -102,6 +102,25 @@ df_lsg_cash_extract$cash_lsg <- make_lsg(dataset = df_lsg_cash_extract, crit_to_
 
 df_drivers_cash <- check_lsg_driver(df = df_lsg_cash_extract, crit_ind_pattern = "int.crit_", none_crit_ind_pattern = "none_crit_")
 
+# handle nas in lsg calculation
+df_lsg_cash_nas_handled <- df_lsg_cash_extract |> 
+    mutate(across(.cols = matches("^int.crit_cash_|^none_crit_cash"), 
+                  .fns = ~ifelse(is.na(.x), cur_column(), NA_character_),
+                  .names = "check.{.col}")) |> 
+    mutate(across(.cols = matches("^check.int.crit_cash_|^check.none_crit_cash"), 
+                  .fns = ~case_when(.x %in% c("int.crit_cash_ind1_lcsi") ~ 4,
+                                    .x %in% c("int.crit_cash_ind2_hh_lost_job") ~ 3,
+                                    .x %in% c("int.crit_cash_ind3_hh_tot_income") ~ 4,
+                                    .x %in% c("int.crit_cash_ind4_hh_basic_needs") ~ 4,
+                                    TRUE ~ 0),
+                  .names = "fill.{.col}")) |> 
+    rowwise() |> 
+    mutate(highest_na_cash_score = max(c_across(starts_with("fill.check.")), na.rm = TRUE)
+    ) |> 
+    ungroup() |> 
+    mutate(cash_lsg = ifelse(highest_na_cash_score > cash_lsg, NA, cash_lsg)) |> 
+    select(-contains("check."))
+
 # WASH --------------------------------------------------------------------
 
 # wash_drinkingwatersource
@@ -158,6 +177,25 @@ df_lsg_wash_extract$wash_lsg <- make_lsg(dataset = df_lsg_wash_extract, crit_to_
 
 df_drivers_wash <- check_lsg_driver(df = df_lsg_wash_extract, crit_ind_pattern = "int.crit_", none_crit_ind_pattern = "none_crit_")
 
+# handle nas in lsg calculation
+df_lsg_wash_nas_handled <- df_lsg_wash_extract |> 
+    mutate(across(.cols = matches("^int.crit_wash_|^none_crit_wash"), 
+                  .fns = ~ifelse(is.na(.x), cur_column(), NA_character_),
+                  .names = "check.{.col}")) |> 
+    mutate(across(.cols = matches("^check.int.crit_wash_|^check.none_crit_wash"), 
+                  .fns = ~case_when(.x %in% c("int.crit_wash_ind1") ~ 5,
+                                    .x %in% c("int.crit_wash_ind2") ~ 5,
+                                    .x %in% c("int.crit_wash_ind3") ~ 5,
+                                    .x %in% c("int.crit_wash_ind4") ~ 2,
+                                    TRUE ~ 0),
+                  .names = "fill.{.col}")) |> 
+    rowwise() |> 
+    mutate(highest_na_wash_score = max(c_across(starts_with("fill.check.")), na.rm = TRUE)
+    ) |> 
+    ungroup() |> 
+    mutate(wash_lsg = ifelse(highest_na_wash_score > wash_lsg, NA, wash_lsg)) |> 
+    select(-contains("check."))
+
 # Health ------------------------------------------------------------------
 
 # healthcare_needed
@@ -199,6 +237,23 @@ df_lsg_health_extract$health_lsg <- make_lsg(dataset = df_lsg_health_extract, cr
                                             non_crit = c("none_crit_health"))
 
 df_drivers_health <- check_lsg_driver(df = df_lsg_health_extract, crit_ind_pattern = "int.crit_", none_crit_ind_pattern = "none_crit_")
+
+# handle nas in lsg calculation
+df_lsg_health_nas_handled <- df_lsg_health_extract |> 
+    mutate(across(.cols = matches("^int.crit_health_|^none_crit_health"), 
+                  .fns = ~ifelse(is.na(.x), cur_column(), NA_character_),
+                  .names = "check.{.col}")) |> 
+    mutate(across(.cols = matches("^check.int.crit_health_|^check.none_crit_health"), 
+                  .fns = ~case_when(.x %in% c("int.crit_health_ind1") ~ 4,
+                                    .x %in% c("none_crit_health") ~ 3,
+                                    TRUE ~ 0),
+                  .names = "fill.{.col}")) |> 
+    rowwise() |> 
+    mutate(highest_na_health_score = max(c_across(starts_with("fill.check.")), na.rm = TRUE)
+    ) |> 
+    ungroup() |> 
+    mutate(health_lsg = ifelse(highest_na_health_score > health_lsg, NA, health_lsg)) |> 
+    select(-contains("check."))
 
 # Shelter & NFI -----------------------------------------------------------
 
@@ -256,6 +311,23 @@ df_lsg_shelter_extract$shelter_lsg <- make_lsg(dataset = df_lsg_shelter_extract,
                                               non_crit = c("none_crit_shelter"))
 
 df_drivers_shelter <- check_lsg_driver(df = df_lsg_shelter_extract, crit_ind_pattern = "int.crit_", none_crit_ind_pattern = "none_crit_")
+
+# handle nas in lsg calculation
+df_lsg_shelter_nas_handled <- df_lsg_shelter_extract |> 
+    mutate(across(.cols = matches("^int.crit_shelter_|^none_crit_shelter"), 
+                  .fns = ~ifelse(is.na(.x), cur_column(), NA_character_),
+                  .names = "check.{.col}")) |> 
+    mutate(across(.cols = matches("^check.int.crit_shelter_|^check.none_crit_shelter"), 
+                  .fns = ~case_when(.x %in% c("int.crit_shelter_ind1") ~ 5,
+                                    .x %in% c("none_crit_shelter") ~ 3,
+                                    TRUE ~ 0),
+                  .names = "fill.{.col}")) |> 
+    rowwise() |> 
+    mutate(highest_na_shelter_score = max(c_across(starts_with("fill.check.")), na.rm = TRUE)
+    ) |> 
+    ungroup() |> 
+    mutate(shelter_lsg = ifelse(highest_na_shelter_score > shelter_lsg, NA, shelter_lsg)) |> 
+    select(-contains("check."))
 
 # Education ---------------------------------------------------------------
 
@@ -324,6 +396,23 @@ df_lsg_edu_extract$edu_lsg <- make_lsg(dataset = df_lsg_edu_extract, crit_to_4 =
 
 df_drivers_edu <- check_lsg_driver(df = df_lsg_edu_extract, crit_ind_pattern = "int.crit_", none_crit_ind_pattern = "none_crit_")
 
+# handle nas in lsg calculation
+df_lsg_edu_nas_handled <- df_lsg_edu_extract |> 
+    mutate(across(.cols = matches("^int.crit_edu_|^none_crit_edu"), 
+                  .fns = ~ifelse(is.na(.x), cur_column(), NA_character_),
+                  .names = "check.{.col}")) |> 
+    mutate(across(.cols = matches("^check.int.crit_edu_|^check.none_crit_edu"), 
+                  .fns = ~case_when(.x %in% c("int.crit_edu_ind1") ~ 4,
+                                    .x %in% c("int.crit_edu_ind2") ~ 4,
+                                    .x %in% c("none_crit_edu") ~ 3,
+                                    TRUE ~ 0),
+                  .names = "fill.{.col}")) |> 
+    rowwise() |> 
+    mutate(highest_na_edu_score = max(c_across(starts_with("fill.check.")), na.rm = TRUE)
+    ) |> 
+    ungroup() |> 
+    mutate(edu_lsg = ifelse(highest_na_edu_score > edu_lsg, NA, edu_lsg)) |> 
+    select(-contains("check."))
 
 # Protection --------------------------------------------------------------
 
@@ -367,11 +456,30 @@ df_lsg_prot_extract$prot_lsg <- make_lsg(dataset = df_lsg_prot_extract, crit_to_
 
 df_drivers_prot <- check_lsg_driver(df = df_lsg_prot_extract, crit_ind_pattern = "int.crit_", none_crit_ind_pattern = "none_crit_")
 
+# handle nas in lsg calculation
+df_lsg_prot_nas_handled <- df_lsg_prot_extract |> 
+    mutate(across(.cols = matches("^int.crit_prot_|^none_crit_prot"), 
+                  .fns = ~ifelse(is.na(.x), cur_column(), NA_character_),
+                  .names = "check.{.col}")) |> 
+    mutate(across(.cols = matches("^check.int.crit_prot_|^check.none_crit_prot"), 
+                  .fns = ~case_when(.x %in% c("int.crit_prot_ind1") ~ 5,
+                                    .x %in% c("int.crit_prot_ind2") ~ 4,
+                                    .x %in% c("int.crit_prot_ind3") ~ 3,
+                                    .x %in% c("none_crit_prot") ~ 3,
+                                    TRUE ~ 0),
+                  .names = "fill.{.col}")) |> 
+    rowwise() |> 
+    mutate(highest_na_prot_score = max(c_across(starts_with("fill.check.")), na.rm = TRUE)
+    ) |> 
+    ungroup() |> 
+    mutate(prot_lsg = ifelse(highest_na_prot_score > prot_lsg, NA, prot_lsg)) |> 
+    select(-contains("check."))
+
 # join all data -----------------------------------------------------------
 
-df_all_lsg_datasets_list <- list(df_lsg_fs_extract, df_lsg_cash_extract, 
-                            df_lsg_wash_extract, df_lsg_health_extract, df_lsg_shelter_extract,
-                            df_lsg_edu_extract, df_lsg_prot_extract)
+df_all_lsg_datasets_list <- list(df_lsg_fs_extract, df_lsg_cash_nas_handled, 
+                                 df_lsg_wash_nas_handled, df_lsg_health_nas_handled, df_lsg_shelter_nas_handled,
+                                 df_lsg_edu_nas_handled, df_lsg_prot_nas_handled)
 
 df_all_lsg_datasets <- purrr::reduce(.f = left_join, .x = df_all_lsg_datasets_list)
 
@@ -383,6 +491,24 @@ df_msni <- df_all_lsg_datasets |>
     mutate(msni = max(c_across(ends_with("_lsg")), na.rm = TRUE)
     ) |> 
     ungroup() |> 
+    mutate(across(.cols = matches("_lsg$"), 
+                  .fns = ~ifelse(is.na(.x), cur_column(), NA_character_),
+                  .names = "check.{.col}")) |> 
+    mutate(across(.cols = matches("^check\\.+.+_lsg$"), 
+                  .fns = ~case_when(.x %in% c("fs_lsg") ~ 5,
+                                    .x %in% c("cash_lsg") ~ 4,
+                                    .x %in% c("wash_lsg") ~ 5,
+                                    .x %in% c("health_lsg") ~ 4,
+                                    .x %in% c("shelter_lsg") ~ 5,
+                                    .x %in% c("edu_lsg") ~ 4,
+                                    .x %in% c("prot_lsg") ~ 5,
+                                    TRUE ~ 0),
+                  .names = "fill.{.col}")) |> 
+    rowwise() |> 
+    mutate(highest_na_msni_score = max(c_across(starts_with("fill.check.")), na.rm = TRUE)) |> 
+    ungroup() |> 
+    mutate(msni = ifelse(highest_na_msni_score > msni, NA, msni)) |> 
+    select(-contains("check.")) |>
     mutate(i.fs_sl3_above = case_when(fs_lsg < 3 ~ "No LSG identified", fs_lsg >= 3 ~ "LSG identified"),
            i.cash_sl3_above = case_when(cash_lsg < 3 ~ "No LSG identified", cash_lsg >= 3 ~ "LSG identified"),
            i.wash_sl3_above = case_when(wash_lsg < 3 ~ "No LSG identified", wash_lsg >= 3 ~ "LSG identified"),
