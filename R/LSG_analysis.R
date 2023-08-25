@@ -81,9 +81,9 @@ df_lsg_cash <- df_main_clean_data |>
            int.income_props_receiving = sum(c_across(c(int.income_loans_family_friends:int.income_hum_assistance)), na.rm = T)) |> 
     ungroup() |> 
     mutate(int.crit_cash_ind1_lcsi = case_when(str_detect(string = int.lcsi, pattern = "yes|no_exhausted", negate = TRUE) ~ 1,
-                                               str_detect(string = int.lcsi_stress, pattern = "yes|no_exhausted") ~ 2,
-                                               str_detect(string = int.lcsi_crisis, pattern = "yes|no_exhausted") ~ 3,
-                                               str_detect(string = int.lcsi_emergency, pattern = "yes|no_exhausted") ~ 4),
+                                               str_detect(string = int.lcsi_stress, pattern = "yes|no_exhausted") ~ 2),
+           int.crit_cash_ind1_lcsi = ifelse(str_detect(string = int.lcsi_crisis, pattern = "yes|no_exhausted"), 3, int.crit_cash_ind1_lcsi),
+           int.crit_cash_ind1_lcsi = ifelse(str_detect(string = int.lcsi_emergency, pattern = "yes|no_exhausted"), 4, int.crit_cash_ind1_lcsi),
     int.crit_cash_ind2_hh_lost_job = case_when(i.lost_job %in% c("no") ~ 1,
                                                i.lost_job %in% c("yes") ~ 3),
     int.crit_cash_ind3_hh_tot_income = case_when(if_any(.cols = c(income_salaried_work, income_business), .fns = ~ . > 0) ~ 1,
