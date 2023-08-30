@@ -231,7 +231,7 @@ df_lsg_health <- df_main_clean_data |>
            )
 
 df_lsg_health_extract <- df_lsg_health |> select(uuid, contains("int.crit_"), contains("none_crit_"))
-df_lsg_health_extract$health_lsg <- make_lsg(dataset = df_lsg_health_extract, crit_to_4 = c("int.crit_health_ind1"),
+df_lsg_health_extract$health_lsg <- make_lsg(dataset = df_lsg_health_extract, crit_to_3 = c("int.crit_health_ind1"),
                                             non_crit = c("none_crit_health"))
 
 df_drivers_health <- check_lsg_driver(df = df_lsg_health_extract, crit_ind_pattern = "int.crit_", none_crit_ind_pattern = "none_crit_")
@@ -242,7 +242,7 @@ df_lsg_health_nas_handled <- df_lsg_health_extract |>
                   .fns = ~ifelse(is.na(.x), cur_column(), NA_character_),
                   .names = "check.{.col}")) |> 
     mutate(across(.cols = matches("^check.int.crit_health_|^check.none_crit_health"), 
-                  .fns = ~case_when(.x %in% c("int.crit_health_ind1") ~ 4,
+                  .fns = ~case_when(.x %in% c("int.crit_health_ind1") ~ 3,
                                     .x %in% c("none_crit_health") ~ 3,
                                     TRUE ~ 0),
                   .names = "fill.{.col}")) |> 
