@@ -496,7 +496,7 @@ df_msni <- df_all_lsg_datasets |>
                   .fns = ~case_when(.x %in% c("fs_lsg") ~ 5,
                                     .x %in% c("cash_lsg") ~ 4,
                                     .x %in% c("wash_lsg") ~ 5,
-                                    .x %in% c("health_lsg") ~ 4,
+                                    .x %in% c("health_lsg") ~ 3,
                                     .x %in% c("shelter_lsg") ~ 5,
                                     .x %in% c("edu_lsg") ~ 4,
                                     .x %in% c("prot_lsg") ~ 5,
