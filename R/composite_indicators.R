@@ -16,15 +16,15 @@ create_composite_indicators <- function(input_df) {
                int.rCSIMealAdult = 3 * rCSIMealAdult,
                int.rCSIMealNb = rCSIMealNb,
                int.freq_no_food_lack_resources = case_when(fs_hhs_no_food %in% c("0") ~ 0,
-                                                           fs_hhs_no_food %in% c("1") & fs_hhs_no_food_freq %in% c("1") ~ 0,
+                                                           fs_hhs_no_food %in% c("1") & fs_hhs_no_food_freq %in% c("1") ~ 1,
                                                            fs_hhs_no_food %in% c("1") & fs_hhs_no_food_freq %in% c("2") ~ 1,
                                                            fs_hhs_no_food %in% c("1") & fs_hhs_no_food_freq %in% c("3") ~ 2),
                int.freq_sleep_hungry = case_when(fs_hhs_sleephungry %in% c("0") ~ 0,
-                                                 fs_hhs_sleephungry %in% c("1") & fs_hhs_sleephungry_freq %in% c("1") ~ 0,
+                                                 fs_hhs_sleephungry %in% c("1") & fs_hhs_sleephungry_freq %in% c("1") ~ 1,
                                                  fs_hhs_sleephungry %in% c("1") & fs_hhs_sleephungry_freq %in% c("2") ~ 1,
                                                  fs_hhs_sleephungry %in% c("1") & fs_hhs_sleephungry_freq %in% c("3") ~ 2),
                int.freq_day_and_night_no_food = case_when(fs_hhs_daynoteating %in% c("0") ~ 0,
-                                                          fs_hhs_daynoteating %in% c("1") & fs_hhs_daynoteating_freq %in% c("1") ~ 0,
+                                                          fs_hhs_daynoteating %in% c("1") & fs_hhs_daynoteating_freq %in% c("1") ~ 1,
                                                           fs_hhs_daynoteating %in% c("1") & fs_hhs_daynoteating_freq %in% c("2") ~ 1,
                                                           fs_hhs_daynoteating %in% c("1") & fs_hhs_daynoteating_freq %in% c("3") ~ 2) 
         ) |> 
